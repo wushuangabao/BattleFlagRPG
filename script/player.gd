@@ -1,38 +1,79 @@
 extends AnimatedSprite2D
 
+@export var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 @export var move_time: float = 0.5
+@export var map: TileMapLayer = null
 
-var cell: Vector2i
-var map: TileMapLayer
-var is_moving := false
+var _cell: Vector2i # 当前所在格子
+var _hover_cell: Vector2i # 鼠标悬停的格子
+var _is_moving := false
+var _reachable: Dictionary = {} # cell->steps
+var _current_path: Array[Vector2i] = []
 
 func _ready():
-	# 初始格取自当前世界坐标
-	map = get_node("../Ground")
-	cell = GridHelper.to_cell(map, global_position)
-	global_position = GridHelper.to_world_center(map, cell)
+	if map == null:
+		map = get_node("../Ground")
+	_cell = GridHelper.to_cell(map, global_position)
+	global_position = GridHelper.to_world_player(map, _cell)
+	_compute_reachable()
+
+func _compute_reachable():
+	_reachable = GridHelper.movement_range(_cell, MAX_STEPS, _cell_walkable)
+	map.set_reachable(_reachable)
 
 func _process(_delta):
-	if is_moving:
+	if _is_moving:
 		play("run")
 	else:
-		#stop()
+		#stop() # 停止动画会回到第一帧，看起来不自然
 		play("run")
+	# 预览路径
+	var mouse_cell = GridHelper.to_cell(map, get_global_mouse_position())
+	if mouse_cell != _hover_cell:
+		_hover_cell = mouse_cell
+		_update_path_preview()
 
 func _unhandled_input(event):
-	if is_moving:
+	if _is_moving:
 		return
-	if event.is_action_pressed("ui_up"):
-		_try_move(Vector2i(0, -1))
-	elif event.is_action_pressed("ui_down"):
-		_try_move(Vector2i(0, 1))
-	elif event.is_action_pressed("ui_left"):
-		_try_move(Vector2i(-1, 0))
-	elif event.is_action_pressed("ui_right"):
-		_try_move(Vector2i(1, 0))
+	if MAX_STEPS != -1:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			# 只有在可达范围内才移动
+			if _reachable.has(_hover_cell):
+				_move_by_current_path()
+	else:
+		if event.is_action_pressed("ui_up"):
+			_try_move(Vector2i(0, -1))
+		elif event.is_action_pressed("ui_down"):
+			_try_move(Vector2i(0, 1))
+		elif event.is_action_pressed("ui_left"):
+			_try_move(Vector2i(-1, 0))
+		elif event.is_action_pressed("ui_right"):
+			_try_move(Vector2i(1, 0))
+		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			var target_cell = GridHelper.to_cell(map, get_global_mouse_position())
+			_move_by_path(target_cell)
+
+func _update_path_preview():
+	if not _reachable.has(_hover_cell):
+		_current_path.clear()
+		map.clear_path()
+		return
+	var path = GridHelper.a_star(_cell, _hover_cell, _cell_walkable)
+	# A* 可能返回空（理论上不会，因为 _hover_cell 在可达范围内，但以防万一）
+	if path.size() == 0:
+		_current_path.clear()
+		map.clear_path()
+		return
+	# 安全起见，截断超过 MAX_STEPS 的路径
+	if MAX_STEPS != -1:
+		if path.size() - 1 > MAX_STEPS:
+			path = path.slice(0, MAX_STEPS + 1)
+	_current_path = path
+	map.set_path(_current_path)
 
 func _try_move(dir: Vector2i):
-	var target = cell + dir
+	var target = _cell + dir
 	if not _cell_walkable(target):
 		return
 	_move_to_cell(target)
@@ -41,7 +82,6 @@ func _cell_walkable(c: Vector2i) -> bool:
 	var source_id = map.get_cell_source_id(c)
 	if source_id == -1:
 		return false
-		
 	# 在 TileSet 的该Tile里添加了自定义数据 "walkable"
 	var data = map.get_cell_tile_data(c)
 	if data and data.has_custom_data("walkable") and data.get_custom_data("walkable") == true:
@@ -49,9 +89,37 @@ func _cell_walkable(c: Vector2i) -> bool:
 	return false
 
 func _move_to_cell(target: Vector2i):
-	is_moving = true
-	cell = target
+	_is_moving = true
+	_cell = target
 	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "global_position", GridHelper.to_world_center(map, cell), move_time)
+	tween.tween_property(self, "global_position", GridHelper.to_world_player(map, _cell), move_time)
 	tween.finished.connect(func():
-		is_moving = false)
+		_is_moving = false)
+
+func _move_by_path(target: Vector2i):
+	var path: Array[Vector2i] = GridHelper.a_star(_cell, target, _cell_walkable)
+	if path.size() <= 1:
+		return
+	_is_moving = true
+	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	for c in path.slice(1): # 跳过起点
+		tween.tween_property(self, "global_position", GridHelper.to_world_player(map, c), move_time)
+	_cell = target
+	tween.finished.connect(func(): _is_moving = false)
+
+func _move_by_current_path():
+	if _current_path.size() <= 1:
+		return
+	_is_moving = true
+	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	# 跳过起点
+	for i in range(1, _current_path.size()):
+		var c = _current_path[i]
+		tween.tween_property(self, "global_position", GridHelper.to_world_player(map, c), move_time)
+	_cell = _current_path.back()
+	tween.finished.connect(func():
+		_is_moving = false
+		# 移动完刷新可达范围（从新位置出发）
+		_compute_reachable()
+		_current_path.clear()
+		map.clear_path())

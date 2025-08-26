@@ -12,12 +12,22 @@ config_version=5
 
 config/name="战棋RPG"
 run/main_scene="uid://datpgnyw8dvwa"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-grid_helper="*res://script/GridHelper.gd"
+LubanDB="*res://script/Luban/DataService.cs"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+
+[dotnet]
+
+project/assembly_name="战棋RPG"
 
 [rendering]
 
