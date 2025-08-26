@@ -3,3 +3,5 @@
 /android/
 .vs/
 .vscode/
+/data/gen/
+/global.json
