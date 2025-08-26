@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jmxvx1vtb5y3"
-path="res://.godot/imported/run-8.png-272e9b1c44c2cf0900e349cb84da6312.ctex"
+uid="uid://c5pqk87gwxi3h"
+path="res://.godot/imported/run-2.png-2e4d9961638cc396564a978e937d4a31.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://png/character/run_animation/run-8.png"
-dest_files=["res://.godot/imported/run-8.png-272e9b1c44c2cf0900e349cb84da6312.ctex"]
+source_file="res://asset/png/character/run_animation/run-2.png"
+dest_files=["res://.godot/imported/run-2.png-2e4d9961638cc396564a978e937d4a31.ctex"]
 
 [params]
 

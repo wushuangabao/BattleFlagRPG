@@ -14,39 +14,38 @@ namespace cfg.item
 {
 public partial class Tbitem
 {
-    private readonly System.Collections.Generic.Dictionary<int, item.Item> _dataMap;
-    private readonly System.Collections.Generic.List<item.Item> _dataList;
-    
-    public Tbitem(ByteBuf _buf)
-    {
-        int n = _buf.ReadSize();
-        _dataMap = new System.Collections.Generic.Dictionary<int, item.Item>(n);
-        _dataList = new System.Collections.Generic.List<item.Item>(n);
-        for(int i = n ; i > 0 ; --i)
-        {
-            item.Item _v;
-            _v = global::cfg.item.Item.DeserializeItem(_buf);
-            _dataList.Add(_v);
-            _dataMap.Add(_v.Id, _v);
-        }
-    }
+	private readonly System.Collections.Generic.Dictionary<int, item.Item> _dataMap;
+	private readonly System.Collections.Generic.List<item.Item> _dataList;
+	
+	public Tbitem(ByteBuf _buf)
+	{
+		int n = _buf.ReadSize();
+		_dataMap = new System.Collections.Generic.Dictionary<int, item.Item>(n);
+		_dataList = new System.Collections.Generic.List<item.Item>(n);
+		for(int i = n ; i > 0 ; --i)
+		{
+			item.Item _v;
+			_v = global::cfg.item.Item.DeserializeItem(_buf);
+			_dataList.Add(_v);
+			_dataMap.Add(_v.Id, _v);
+		}
+	}
 
-    public System.Collections.Generic.Dictionary<int, item.Item> DataMap => _dataMap;
-    public System.Collections.Generic.List<item.Item> DataList => _dataList;
+	public System.Collections.Generic.Dictionary<int, item.Item> DataMap => _dataMap;
+	public System.Collections.Generic.List<item.Item> DataList => _dataList;
 
-    public item.Item GetOrDefault(int key) => _dataMap.TryGetValue(key, out var v) ? v : default;
-    public item.Item Get(int key) => _dataMap[key];
-    public item.Item this[int key] => _dataMap[key];
+	public item.Item GetOrDefault(int key) => _dataMap.TryGetValue(key, out var v) ? v : default;
+	public item.Item Get(int key) => _dataMap[key];
+	public item.Item this[int key] => _dataMap[key];
 
-    public void ResolveRef(Tables tables)
-    {
-        foreach(var _v in _dataList)
-        {
-            _v.ResolveRef(tables);
-        }
-    }
-
-}
+	public void ResolveRef(Tables tables)
+	{
+		foreach(var _v in _dataList)
+		{
+			_v.ResolveRef(tables);
+		}
+	}
 
 }
 
+}
