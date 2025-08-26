@@ -11,6 +11,9 @@ var _reachable: Dictionary = {} # cell->steps
 var _current_path: Array[Vector2i] = []
 
 func _ready():
+	var i = $"/root/LubanDB".GetItemName(1001)
+	print(i)
+	# 初始化位置到最近的格子中心
 	if map == null:
 		map = get_node("../Ground")
 	_cell = GridHelper.to_cell(map, global_position)
