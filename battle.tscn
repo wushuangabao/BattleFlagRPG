@@ -1,0 +1,61 @@
+[gd_scene load_steps=13 format=4 uid="uid://datpgnyw8dvwa"]
+
+[ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://tres/battle.tres" id="1_b1i6x"]
+[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://png/character/run_animation/run-1.png" id="1_lcjiy"]
+[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://png/character/run_animation/run-2.png" id="2_ol6im"]
+[ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/ground.gd" id="2_sl0w2"]
+[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://png/character/run_animation/run-3.png" id="3_b1i6x"]
+[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://png/character/run_animation/run-4.png" id="4_sl0w2"]
+[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://png/character/run_animation/run-5.png" id="5_elvfr"]
+[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://png/character/run_animation/run-6.png" id="6_4s0ev"]
+[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://png/character/run_animation/run-7.png" id="7_pihy1"]
+[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://png/character/run_animation/run-8.png" id="8_slotg"]
+[ext_resource type="Script" uid="uid://k6fkpi6blm72" path="res://script/player.gd" id="9_ix8ov"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bx4lf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_lcjiy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ol6im")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_b1i6x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_sl0w2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_elvfr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_4s0ev")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_pihy1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_slotg")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}]
+
+[node name="Battle" type="Node2D"]
+
+[node name="Ground" type="TileMapLayer" parent="."]
+position = Vector2(333, 325)
+tile_map_data = PackedByteArray("AAD9/wEAAAAOAAUAAAD9/wIAAAAOAAUAAAD+/wEAAAAOAAUAAAD+/wIAAAAOAAUAAAD//wAAAAAOAAUAAAD//wEAAAAOAAUAAAD//wIAAAAOAAUAAAAAAAAAAAAOAAUAAAAAAAEAAAAOAAUAAAAAAAIAAAAOAAUAAAABAAAAAAAOAAUAAAABAAEAAAAOAAUAAAABAAIAAAAOAAUAAAACAAAAAAAOAAUAAAACAAEAAAAOAAUAAAACAAIAAAAOAAUAAAD8//z/AAAOAAUAAAD8//3/AAAOAAUAAAD8//7/AAAOAAUAAAD8////AAAOAAUAAAD9//3/AAAOAAUAAAD9//7/AAAOAAUAAAD+//z/AAAOAAUAAAD+//3/AAAOAAUAAAD+//7/AAAOAAUAAAD///z/AAAOAAUAAAD///3/AAAOAAUAAAD///7/AAAOAAUAAAD/////AAAOAAUAAAAAAPz/AAAOAAUAAAAAAP3/AAAOAAUAAAAAAP7/AAAOAAUAAAAAAP//AAAOAAUAAAABAPz/AAAOAAUAAAABAP3/AAAOAAUAAAABAP7/AAAOAAUAAAABAP//AAAOAAUAAAACAPz/AAAOAAUAAAACAP3/AAAOAAUAAAACAP7/AAAOAAUAAAACAP//AAAOAAUAAAD7//v/AAAOAAUAAAD7//z/AAAOAAUAAAD7//3/AAAOAAUAAAD7//7/AAAOAAUAAAD7////AAAOAAUAAAD7/wAAAAAOAAUAAAD7/wEAAAAOAAUAAAD7/wIAAAAOAAUAAAD8//v/AAAOAAUAAAD8/wAAAAAOAAUAAAD8/wEAAAAOAAUAAAD8/wIAAAAOAAUAAAD9//v/AAAOAAUAAAD+//v/AAAOAAUAAAD///v/AAAOAAUAAAAAAPv/AAAOAAUAAAD9//z/AAAOAAYAAAA=")
+tile_set = ExtResource("1_b1i6x")
+script = ExtResource("2_sl0w2")
+
+[node name="Player" type="AnimatedSprite2D" parent="."]
+position = Vector2(39, 34)
+sprite_frames = SubResource("SpriteFrames_bx4lf")
+animation = &"run"
+frame_progress = 0.124735
+speed_scale = 3.0
+script = ExtResource("9_ix8ov")
