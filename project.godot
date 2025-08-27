@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="战棋RPG"
-run/main_scene="uid://datpgnyw8dvwa"
+run/main_scene="uid://bq70anfw0ul0m"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -28,7 +28,11 @@ directories/dch_directory={
 directories/dtl_directory={
 "timeline/timeline_test": "res://asset/Dialogic/timeline/timeline_test.dtl"
 }
-variables={}
+variables={
+"Folder": {
+"Var_test": 0.0
+}
+}
 extensions_folder="res://addons/dialogic_additions"
 text/letter_speed=0.01
 text/initial_text_reveal_skippable=true
@@ -49,6 +53,9 @@ choices/reveal_by_input=false
 save/autosave_delay=60.0
 save/encryption_on_exports_only=true
 text/autopauses={}
+layout/style_list=["res://asset/Dialogic/style/New_File.tres"]
+layout/default_style="res://asset/Dialogic/style/New_File.tres"
+choices/hotkey_behaviour=1
 
 [display]
 

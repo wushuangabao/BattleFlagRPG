@@ -1,0 +1,16 @@
+111
+character_test: 1111
+character_test: 222
+join character_test center [z_index="1"]
+- 1
+	- 1111111
+	- 22222222222
+	- 33333333333333333
+- 2
+	- 21
+		character_test: 211
+		set {Folder.Var_test} = range(0,100).pick_random()
+		[signal arg="dia_event_123"]
+- 3
+- 4
+- 5
