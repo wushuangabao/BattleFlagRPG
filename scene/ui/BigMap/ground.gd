@@ -1,21 +1,23 @@
 extends TileMapLayer
+class_name Ground
 
 @export var color_range: Color = Color(0.2, 0.6, 1.0, 0.28)
 @export var color_path_line: Color = Color(0.9, 0.95, 1.0, 0.95)
 @export var color_path_node: Color = Color(0.2, 0.6, 1.0, 0.95)
 @export var path_line_width: float = 3.0
 
-var overlay: Node2D = null
+var overlay: OverLay = null
 var reachable: Dictionary = {} # cell->steps
 var path_cells: Array[Vector2i] = []
 
 func _ready():
 	# 创建overlay节点用于绘制移动范围和路径
 	if overlay == null:
-		overlay = Node2D.new()
-		overlay.set_script(load("res://script/Overlay.gd"))
+		overlay = OverLay.new()
 		overlay.grid = self
 		add_child(overlay)
+	# 让整个 TileMapLayer 半透明
+	modulate.a = 0.5
 
 func set_reachable(cells: Dictionary):
 	reachable = cells

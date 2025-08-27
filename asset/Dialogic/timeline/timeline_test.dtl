@@ -1,7 +1,6 @@
 111
-character_test: 1111
+join character_test left
 character_test: 222
-join character_test center [z_index="1"]
 - 1
 	- 1111111
 	- 22222222222

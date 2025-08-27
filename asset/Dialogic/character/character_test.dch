@@ -8,12 +8,22 @@
 "sound_moods": {},
 "style": ""
 },
-&"default_portrait": "",
+&"default_portrait": "New portrait",
 &"description": "desc_test",
 &"display_name": "character_test",
 &"mirror": false,
 &"nicknames": ["nickname_test"],
 &"offset": Vector2(0, 0),
-&"portraits": {},
+&"portraits": {
+"New portrait": {
+"export_overrides": {
+"image": "\"res://asset/png/character/portrait/young_man_1.png\""
+},
+"mirror": false,
+"offset": Vector2(0, 0),
+"scale": 1,
+"scene": ""
+}
+},
 &"scale": 1.0
 }

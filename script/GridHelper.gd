@@ -1,5 +1,5 @@
 # GridHelper.gd (Godot 4.x, GDScript)
-extends Node
+# 这个类可以改造成 C++ 类（引擎核心类）以提高性能
 class_name GridHelper
 
 static var cell_size: Vector2i = Vector2i(64, 64)

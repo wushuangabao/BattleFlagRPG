@@ -1,0 +1,74 @@
+[gd_scene load_steps=14 format=4 uid="uid://datpgnyw8dvwa"]
+
+[ext_resource type="Texture2D" uid="uid://cn42efyewbr8i" path="res://asset/png/map/world.png" id="1_hxm1c"]
+[ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="2_g43hy"]
+[ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://scene/ui/BigMap/ground.gd" id="3_eiqjw"]
+[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="4_7vg8a"]
+[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://asset/png/character/run_animation/run-2.png" id="5_bxslm"]
+[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://asset/png/character/run_animation/run-3.png" id="6_1afde"]
+[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://asset/png/character/run_animation/run-4.png" id="7_vyapc"]
+[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://asset/png/character/run_animation/run-5.png" id="8_7cd5r"]
+[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="9_ib6sk"]
+[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="10_aa2l2"]
+[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="11_x71tx"]
+[ext_resource type="Script" uid="uid://k6fkpi6blm72" path="res://scene/ui/BigMap/player.gd" id="12_1s3vn"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bx4lf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_7vg8a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_bxslm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_1afde")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_vyapc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_7cd5r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ib6sk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_aa2l2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_x71tx")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}]
+
+[node name="BigMap" type="Node2D"]
+
+[node name="Map" type="Sprite2D" parent="."]
+texture = ExtResource("1_hxm1c")
+centered = false
+
+[node name="Ground" type="TileMapLayer" parent="."]
+position = Vector2(333, 325)
+tile_map_data = PackedByteArray("AAADAAMAAAAOAAUAAAAEAAMAAAAOAAUAAAAFAAMAAAAOAAUAAAAGAAMAAAAOAAUAAAAHAAMAAAAOAAUAAAAGAAQAAAAOAAUAAAADAAQAAAAOAAUAAAAEAAIAAAAOAAUAAAAEAAEAAAAOAAUAAAAFAAEAAAAOAAUAAAADAAUAAAAOAAUAAAADAAYAAAAOAAUAAAADAAcAAAAOAAUAAAAEAAYAAAAOAAUAAAAEAAcAAAAOAAUAAAAFAAYAAAAOAAUAAAAFAAcAAAAOAAUAAAAGAAUAAAAOAAUAAAAHAAYAAAAOAAUAAAAHAAcAAAAOAAUAAAAFAAIAAAAOAAUAAAAGAAIAAAAOAAUAAAAJAAIAAAAOAAUAAAAJAAMAAAAOAAUAAAAJAAcAAAAOAAUAAAAKAAQAAAAOAAUAAAAKAAYAAAAOAAUAAAAKAAcAAAAOAAUAAAAKAAMAAAAOAAUAAAAKAAgAAAAOAAUAAAALAAcAAAAOAAUAAAALAAgAAAAOAAUAAAADAAgAAAAOAAUAAAAEAAgAAAAOAAUAAAAFAAgAAAAOAAUAAAAGAAgAAAAOAAUAAAAHAAgAAAAOAAUAAAAIAAgAAAAOAAUAAAAJAAgAAAAOAAUAAAAGAAkAAAAOAAUAAAAHAAkAAAAOAAUAAAAGAAoAAAAOAAUAAAAHAAoAAAAOAAUAAAAJAP//AAAOAAUAAAAJAAAAAAAOAAUAAAAJAAEAAAAOAAUAAAAIAP//AAAOAAUAAAAIAAAAAAAOAAUAAAAHAAAAAAAOAAUAAAAGAAEAAAAOAAUAAAAGAAAAAAAOAAUAAAAFAAAAAAAOAAUAAAAEAAAAAAAOAAUAAAADAAAAAAAOAAUAAAACAAAAAAAOAAUAAAAKAP7/AAAOAAUAAAAKAP//AAAOAAUAAAAKAAAAAAAOAAUAAAALAP//AAAOAAUAAAALAAAAAAAOAAUAAAALAAEAAAAOAAUAAAAMAP3/AAAOAAUAAAAMAP7/AAAOAAUAAAAMAP//AAAOAAUAAAAMAAAAAAAOAAUAAAALAPz/AAAOAAUAAAALAP3/AAAOAAUAAAALAP7/AAAOAAUAAAAKAPz/AAAOAAUAAAAKAP3/AAAOAAUAAAAJAP3/AAAOAAUAAAAJAP7/AAAOAAUAAAANAP3/AAAOAAUAAAANAP7/AAAOAAUAAAANAP//AAAOAAUAAAABAAAAAAAOAAUAAAABAAEAAAAOAAUAAAABAAIAAAAOAAUAAAAAAAAAAAAOAAUAAAAAAAEAAAAOAAUAAAAAAAIAAAAOAAUAAAD//wEAAAAOAAUAAAD//wIAAAAOAAUAAAAJAAQAAAAOAAUAAAAHAAQAAAAOAAUAAAAIAAQAAAAOAAUAAAAIAAUAAAAOAAUAAAAHAAUAAAAOAAUAAAABAAMAAAAOAAUAAAACAAMAAAAOAAUAAAAIAAMAAAAOAAUAAAAHAAIAAAAOAAUAAAAIAAEAAAAOAAUAAAAHAAEAAAAOAAUAAAAKAAEAAAAOAAUAAAAJAAUAAAAOAAUAAAAKAAIAAAAOAAUAAAAKAAUAAAAOAAUAAAAIAAYAAAAOAAUAAAAIAAcAAAAOAAUAAAAGAAcAAAAOAAUAAAA=")
+tile_set = ExtResource("2_g43hy")
+script = ExtResource("3_eiqjw")
+
+[node name="Player" type="AnimatedSprite2D" parent="."]
+position = Vector2(626, 420)
+sprite_frames = SubResource("SpriteFrames_bx4lf")
+animation = &"run"
+frame_progress = 0.124735
+speed_scale = 3.0
+script = ExtResource("12_1s3vn")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+limit_left = 0
+limit_top = 0
+limit_right = 1536
+limit_bottom = 1024
+limit_smoothed = true
+position_smoothing_enabled = true

@@ -1,6 +1,7 @@
 extends Node2D
+class_name OverLay
 
-var grid: TileMapLayer # 指向 TileMapLayer 类型的父节点
+var grid: Ground # 指向 Ground 类型的父节点
 
 func _draw():
 	# 可达范围

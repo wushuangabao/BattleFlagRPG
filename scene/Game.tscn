@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2wub0ms8es6m"]
+
+[ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
+[ext_resource type="Script" uid="uid://b5tl5tdpd0gmr" path="res://scene/scene_manager.gd" id="2_e7hha"]
+[ext_resource type="Script" uid="uid://ur0u8m7o7v4u" path="res://script/ui/btn_big_map.gd" id="3_t585p"]
+
+[node name="Game" type="Node"]
+
+[node name="GameRoot" type="Node" parent="."]
+script = ExtResource("2_e7hha")
+
+[node name="UI" type="Node" parent="."]
+
+[node name="BtnExit" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnSetting" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnContinue" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnNewGame" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="debug" type="GridContainer" parent="CanvasLayer"]
+offset_left = 1169.0
+offset_top = 627.0
+offset_right = 1260.0
+offset_bottom = 693.0
+
+[node name="Btn_Battle" type="Button" parent="CanvasLayer/debug"]
+layout_mode = 2
+text = "Battle Test"
+script = ExtResource("1_4aemu")
+
+[node name="Btn_BigMap" type="Button" parent="CanvasLayer/debug"]
+layout_mode = 2
+text = "Big Map"
+script = ExtResource("3_t585p")
+
+[connection signal="pressed" from="CanvasLayer/debug/Btn_Battle" to="CanvasLayer/debug/Btn_Battle" method="_on_pressed"]
+[connection signal="pressed" from="CanvasLayer/debug/Btn_BigMap" to="CanvasLayer/debug/Btn_BigMap" method="_on_pressed"]

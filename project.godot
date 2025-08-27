@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="战棋RPG"
-run/main_scene="uid://bq70anfw0ul0m"
+run/main_scene="uid://b2wub0ms8es6m"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 

@@ -2,7 +2,7 @@ extends AnimatedSprite2D
 
 @export var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 @export var move_time: float = 0.5
-@export var map: TileMapLayer = null
+@export var map: Ground = null
 
 var _cell: Vector2i # 当前所在格子
 var _hover_cell: Vector2i # 鼠标悬停的格子
@@ -26,7 +26,18 @@ func _compute_reachable():
 
 func _process(_delta):
 	if _is_moving:
+		# 根据移动向左还是向右，翻转角色
+		if _current_path.size() > 1:
+			var idx = _current_path.find(_cell)
+			if idx != -1 and idx < _current_path.size() - 1:
+				var next_cell = _current_path[idx + 1]
+				if next_cell.x < _cell.x and not flip_h:
+					flip_h = true
+				elif next_cell.x > _cell.x and flip_h:
+					flip_h = false
 		play("run")
+		map.set_reachable({}) # 移动时不显示可达范围
+		return
 	else:
 		#stop() # 停止动画会回到第一帧，看起来不自然
 		play("run")
@@ -119,8 +130,9 @@ func _move_by_current_path():
 	for i in range(1, _current_path.size()):
 		var c = _current_path[i]
 		tween.tween_property(self, "global_position", GridHelper.to_world_player(map, c), move_time)
-	_cell = _current_path.back()
+		tween.tween_callback(func(): _cell = c) # 每到一个格子就更新位置
 	tween.finished.connect(func():
+		_cell = _current_path.back() # 不要立刻设置_cell到目标位置，要等移动完
 		_is_moving = false
 		# 移动完刷新可达范围（从新位置出发）
 		_compute_reachable()
