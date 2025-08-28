@@ -16,7 +16,7 @@ public partial class DataService : Node
 	// Luban 约定的加载函数：给定表名，返回该表的二进制 ByteBuf
 	private ByteBuf LoadByteBuf(string file)
 	{
-		var path = $"res://data/gen/Table/{file}.bytes"; // 你的输出扩展名可能是 .bin，自行对应
+		var path = $"res://luban/Table/{file}.bytes"; // 你的输出扩展名可能是 .bin，自行对应
 		using var f = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 		f.Seek(0);
 		var bytes = f.GetBuffer((long)f.GetLength());
