@@ -20,8 +20,6 @@ extends Node3D
 @export var transparent_bg := true
 # 是否使用无光照卡通效果（像素图常用）
 @export var unshaded := true
-# 是否禁用纹理过滤（像素风建议true）
-@export var use_nearest_sampling := true
 
 @onready var camera := get_node(camera_path) as Camera3D
 @onready var board_plane := get_node(board_plane_path) as MeshInstance3D
@@ -89,8 +87,6 @@ func _hook_subviewport_texture_to_plane() -> void:
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	else:
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
-	if use_nearest_sampling:
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	board_plane.set_surface_override_material(0, mat)
 
 func _frame_camera_to_board() -> void:

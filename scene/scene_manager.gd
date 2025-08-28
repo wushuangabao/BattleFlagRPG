@@ -1,7 +1,26 @@
 extends Node
+@export var packed_scene: PackedSceneDictionary
 
-func goto_scene(scene_name):
+# 缓存常用的场景，避免反复释放加载
+var _scene_cache: Dictionary = {}
+
+# 切换场景
+func goto_scene(scene_name: String) -> void:
 	if get_child_count() > 0:
-		get_child(0).queue_free()
-	var packed = Game.scene.get(scene_name)
-	add_child(packed.instantiate())
+		get_child(0).queue_free() # 释放当前场景
+	# 尝试用三种方式加载场景：
+	# 1 从缓存中取场景
+	var scene = _scene_cache.get(scene_name)
+	# 2 用预加载的 PackedScene 实例化场景
+	if not scene and Game.scene_cached.has(scene_name):
+		var packed = Game.scene_cached[scene_name]
+		if packed:
+			scene = packed.instantiate()
+			_scene_cache[scene_name] = scene # 加入缓存
+	# 3 动态加载场景
+	if not scene and packed_scene.exists(scene_name):
+		var packed = packed_scene.packed_scene[scene_name]
+		scene = load(packed).instantiate()
+	if scene:
+		add_child(scene) # 添加新场景到当前节点
+		
