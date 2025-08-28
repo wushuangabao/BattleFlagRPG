@@ -13,18 +13,18 @@ namespace cfg
 {
 public partial class Tables
 {
-	public item.Tbitem Tbitem {get; }
+    public item.Tbitem Tbitem {get; }
 
-	public Tables(System.Func<string, ByteBuf> loader)
-	{
-		Tbitem = new item.Tbitem(loader("item_tbitem"));
-		ResolveRef();
-	}
-	
-	private void ResolveRef()
-	{
-		Tbitem.ResolveRef(this);
-	}
+    public Tables(System.Func<string, ByteBuf> loader)
+    {
+        Tbitem = new item.Tbitem(loader("item_tbitem"));
+        ResolveRef();
+    }
+    
+    private void ResolveRef()
+    {
+        Tbitem.ResolveRef(this);
+    }
 }
 
 }
