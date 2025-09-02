@@ -2,6 +2,8 @@ extends TileMapLayer
 class_name Ground
 
 @export var color_range: Color = Color(0.2, 0.6, 1.0, 0.28)
+@export var color_hgihtlight_reachable: Color = Color(0.1, 0.9, 0.1, 0.95)
+@export var color_hgihtlight_unreachable: Color = Color(0.9, 0.1, 0.1, 0.95)
 @export var color_path_line: Color = Color(0.9, 0.95, 1.0, 0.95)
 @export var color_path_node: Color = Color(0.2, 0.6, 1.0, 0.95)
 @export var path_line_width: float = 3.0
@@ -9,6 +11,8 @@ class_name Ground
 var overlay: OverLay = null
 var reachable: Dictionary = {} # cell->steps
 var path_cells: Array[Vector2i] = []
+var hightlight_cell_reachable := Vector2i(-1, -1)
+var hightlight_cell_unreachable := Vector2i(-1, -1)
 
 func _ready():
 	# 创建overlay节点用于绘制移动范围和路径
@@ -29,6 +33,15 @@ func set_path(path: Array[Vector2i]):
 
 func clear_path():
 	path_cells.clear()
+	overlay.queue_redraw()
+
+func highlight_cell(cell: Vector2i, is_reachable: bool):
+	if is_reachable and hightlight_cell_reachable != cell:
+		hightlight_cell_reachable = cell
+		hightlight_cell_unreachable = Vector2i(-1, -1)
+	elif not is_reachable and hightlight_cell_unreachable != cell:
+		hightlight_cell_unreachable = cell
+		hightlight_cell_reachable = Vector2i(-1, -1)
 	overlay.queue_redraw()
 
 # 可扩展点

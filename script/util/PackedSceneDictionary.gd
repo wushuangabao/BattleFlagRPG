@@ -14,3 +14,6 @@ extends Resource
 
 func exists(key) -> bool:
 	return packed_scene.has(key)
+
+func get_scene(key) -> PackedScene:
+	return packed_scene[key]

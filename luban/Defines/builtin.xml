@@ -3,6 +3,10 @@
         <var name="x" type="float"/>
         <var name="y" type="float"/>
     </bean>
+    <bean name="vector2i" valueType="1" sep=",">
+        <var name="x" type="int"/>
+        <var name="y" type="int"/>
+    </bean>
     <bean name="vector3" valueType="1" sep=",">
         <var name="x" type="float"/>
         <var name="y" type="float"/>
@@ -14,4 +18,16 @@
         <var name="z" type="float"/>
         <var name="w" type="float"/>
     </bean>
+    <enum name="SkillType_NeiWai">
+        <var name="NEI" alias="内功"/>
+        <var name="WAI" alias="外功"/>
+    </enum>
+    <enum name="SkillType_Weapon">
+        <var name="QUAN" alias="拳法"/>
+        <var name="TUI" alias="腿法"/>
+        <var name="JIAN" alias="剑法"/>
+        <var name="DAO" alias="刀法"/>
+        <var name="AN" alias="暗器"/>
+        <var name="NEI" alias="内功"/>
+    </enum>
 </module>
