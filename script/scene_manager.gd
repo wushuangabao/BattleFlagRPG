@@ -25,7 +25,7 @@ func goto_scene(scene_name: String) -> void:
 	# 3 动态加载场景
 	if not scene and packed_scene.exists(scene_name):
 		var packed = packed_scene.get_scene(scene_name)
-		scene = load(packed).instantiate()
+		scene = packed.instantiate()
 	if scene:
 		add_child(scene) # 添加新场景到当前节点
 		_current_scene = scene_name

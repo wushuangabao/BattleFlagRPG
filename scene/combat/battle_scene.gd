@@ -1,20 +1,20 @@
 extends Node3D
 
-# 可在编辑器中拖拽赋值，或用 @onready 路径获取
 @export var board_plane_path: NodePath
 @export var camera_path: NodePath
 @export var subviewport_path: NodePath
-@export var unit_path: NodePath
-@export var ground_layer_path: NodePath # Ground
+@export var unit_template: PackedScene
 
 # 是否在SubViewport背景透明（若想保留透明区域）
 @export var transparent_bg := true
 
 @onready var camera := get_node(camera_path) as Camera3D
 @onready var board_plane := get_node(board_plane_path) as MeshInstance3D
-@onready var subvp := get_node(subviewport_path) as SubViewport
-@onready var unit := get_node(unit_path) as UnitBase3D
-@onready var ground_layer := get_node_or_null(ground_layer_path) as Ground
+@onready var subvp := get_node(subviewport_path) as BattleMapContainer
+
+var units : Array[UnitBase3D]
+var _cur_unit : UnitBase3D
+var ground_layer : Ground
 
 # 地图行列数（用于计算SubViewport size与Plane尺寸）
 var map_cols: int = 12
@@ -24,14 +24,20 @@ var cell_pixel_size = Game.cell_pixel_size
 var cell_world_size = Game.cell_world_size
 
 func _ready() -> void:
-	# 可选：在启动时填充一个简单图案，验证渲染是否成功
-	# _debug_fill_ground_if_empty()
+	if subvp.get_child_count() == 0:
+		subvp.start_battle("test")
+	ground_layer = subvp.get_child(0).get_child(0).get_child(0) # CanvasLayer/TilemapRoot2D/Ground
 	_configure_subviewport()
 	_configure_board_plane()
 	_hook_subviewport_texture_to_plane()
 	# 如果地图是静态的，可只刷新一次
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)	
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_cur_unit = unit_template.instantiate()
+	_cur_unit.map = ground_layer
+	add_child(_cur_unit)
+	units.append(_cur_unit)
+	camera.set_target_gradually(_cur_unit)
 
 func _configure_board_plane() -> void:
 	var plane := board_plane.mesh
@@ -60,23 +66,6 @@ func _hook_subviewport_texture_to_plane() -> void:
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
 	board_plane.set_surface_override_material(0, mat)
 
-func _debug_fill_ground_if_empty() -> void:
-	if not ground_layer:
-		return
-	# 如果没有任何cell，则填充棋盘测试
-	var any_cell := false
-	for y in range(map_rows):
-		for x in range(map_cols):
-			if ground_layer.get_cell_source_id(Vector2i(x, y)) != -1:
-				any_cell = true
-				break
-		if any_cell: break
-	if not any_cell:
-		# 用TileSet中的第一个Tile填充（确保TileSet中source_id=0存在）
-		for y in range(map_rows):
-			for x in range(map_cols):
-				ground_layer.set_cell(Vector2i(x, y), 0, Vector2i(0, 0)) # source_id=0, atlas_coord=(0,0)
-
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var mouse_pos = get_viewport().get_mouse_position()
@@ -97,8 +86,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_cell_clicked(cell)
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	print("Clicked cell: ", cell)
-	ground_layer.highlight_cell(cell, unit.set_target_cell(cell))
+	if Game.Debug == 1:
+		print("Clicked cell: ", cell)
+	ground_layer.highlight_cell(cell, _cur_unit.set_target_cell(cell))
 	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
