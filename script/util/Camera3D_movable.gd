@@ -1,10 +1,13 @@
 extends Camera3D
 
-@export var move_sensitivity := 0.001      # 移动灵敏度
-@export var sensitivity      := 0.001      # 旋转灵敏度
-@export var follow_target    : Node3D      # 跟随目标
+#@export var move_sensitivity := 0.001      # 移动灵敏度
+#@export var sensitivity      := 0.001      # 旋转灵敏度
+@export var edge_threshold   := 25.0       # 屏幕边缘区域的像素大小
+@export var move_speed       := 10.0       # 镜头移动速度
 @export var dist_to_target   := 12.0       # 相机到目标的距离（初始值）
 @export var fix_dz_to_target := -3.0
+@export var follow_target    : Node3D      # 跟随目标
+@export var ui_area_detector : UI_Area_Detector
 
 # 到 follow_target 的偏移向量
 var _dx_to_target := 0.0
@@ -13,8 +16,8 @@ var _dz_to_target := fix_dz_to_target
 # 当前极坐标（水平角 yaw，垂直角 pitch）
 var _yaw   := 0.0
 var _pitch := 0.9
-var _is_moving   := false
-var _is_rotating := false
+#var _is_moving   := false
+#var _is_rotating := false
 var _moving_to_target := false
 
 func set_target_immediately(t: Node3D) -> void:
@@ -49,23 +52,49 @@ func _process(delta) -> void:
 		else:
 			global_position = global_position.lerp(my_target_pos, clampf(delta, 0.03, 0.3))
 		return
-		
-	if _is_moving:
-		var rel := Input.get_last_mouse_velocity()
-		var dx = clampf(rel.x * move_sensitivity, -0.4, 0.4)
-		var dy = clampf(rel.y * move_sensitivity, -0.4, 0.4)
-		_dx_to_target += dx
-		_dz_to_target += dy
-		global_position = global_position - Vector3(dx, 0, dy)
-		_is_moving = false
-	elif _is_rotating:
-		var rel := Input.get_last_mouse_velocity()
-		# _yaw   -= rel.x * sensitivity
-		_pitch -= rel.y * sensitivity
-		_pitch = clamp(_pitch, 0.23, 0.88)
-		if Game.Debug == 1:
-			print("yaw =", _yaw, ", pitch =", _pitch)
-		_update_camera()
+	
+	#if _is_moving:
+		#var rel := Input.get_last_mouse_velocity()
+		#var dx = clampf(rel.x * move_sensitivity, -0.4, 0.4)
+		#var dy = clampf(rel.y * move_sensitivity, -0.4, 0.4)
+		#_dx_to_target += dx
+		#_dz_to_target += dy
+		#global_position = global_position - Vector3(dx, 0, dy)
+		#_is_moving = false
+	#elif _is_rotating:
+		#var rel := Input.get_last_mouse_velocity()
+		## _yaw   -= rel.x * sensitivity
+		#_pitch -= rel.y * sensitivity
+		#_pitch = clamp(_pitch, 0.23, 0.88)
+		#if Game.Debug == 1:
+			#print("yaw =", _yaw, ", pitch =", _pitch)
+		#_update_camera()
+	
+	if ui_area_detector.is_mouse_over_ui:
+		return
+	
+	var viewport := get_viewport()
+	var mouse_pos := viewport.get_mouse_position()
+	var viewport_size := viewport.get_visible_rect().size
+	var move_direction := Vector3.ZERO 
+	
+	# 检测屏幕边缘
+	if mouse_pos.x < edge_threshold and _dx_to_target > -6.0:
+		move_direction.x -= 1  # 向左移动
+	elif mouse_pos.x > viewport_size.x - edge_threshold and _dx_to_target < 6.0:
+		move_direction.x += 1  # 向右移动
+	if mouse_pos.y < edge_threshold and _dz_to_target > -10.0:
+		move_direction.z -= 1  # 向前移动
+	elif mouse_pos.y > viewport_size.y - edge_threshold and _dz_to_target < 5.0:
+		move_direction.z += 1  # 向后移动
+	
+	# 标准化移动方向并应用速度
+	if move_direction.length() > 0:
+		var mv = move_direction.normalized() * move_speed * delta
+		_dx_to_target += mv.x
+		_dz_to_target += mv.z
+		print(_dx_to_target, ",", _dz_to_target)
+		global_translate(mv)
 
 func _update_camera() -> void:
 	var target = follow_target.global_position
