@@ -16,9 +16,28 @@ const scene_cached: Dictionary = {
 	BattleScene = preload("res://scene/combat/BattleScene.tscn")
 }
 
+# 节点路径表
 const global_node_path: Dictionary = {
 	SceneManager = "/root/Game/GameRoot"
 }
 
 static func scene_manager_path() -> String:
 	return global_node_path["SceneManager"]
+
+# 阵营
+enum Camp {
+	Player,
+	Neutral,
+	Enemy
+	}
+
+# 队伍
+const MAX_TEAM_SIZE := 5
+enum TeamID {
+	Red,
+	Yellow,
+	Blue,
+	Green,
+	White,
+	Black
+	}

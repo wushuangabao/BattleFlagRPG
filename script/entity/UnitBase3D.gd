@@ -5,6 +5,7 @@ class_name UnitBase3D extends Marker3D
 @export var move_time: float = 0.5
 @export var map: Ground = null
 @export var anim: AnimatedSprite3D = null
+@export var actor: ActorController = null
 
 var _cell: Vector2i # 当前所在格子
 var _dir: Vector2i # 当前朝向
@@ -33,9 +34,7 @@ func set_target_cell(cell: Vector2i) -> bool:
 func _ready():
 	# 初始化位置到最近的格子中心
 	if map == null:
-		map = get_node_or_null("../Ground")
-	if map == null:
-		map = get_node("../SubViewport/CanvasLayer/TilemapRoot2D/Ground")
+		return
 	_dir = Vector2i(1, 0)
 	_cell = GridHelper.to_cell(map, get_pos_2d())
 	global_position = GridHelper.to_world_player_3d(map, _cell)

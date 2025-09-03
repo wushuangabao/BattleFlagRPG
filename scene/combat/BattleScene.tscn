@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=12 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/combat/unit.tscn" id="2_0eov1"]
@@ -18,7 +18,10 @@ packed_scene = {
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0eov1"]
-size = Vector2(27.6991, 14.2246)
+size = Vector2(365, 106)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vpcar"]
+size = Vector2(270, 73)
 
 [node name="BattleScene" type="Node3D"]
 script = ExtResource("1_1h8kx")
@@ -48,11 +51,25 @@ render_target_update_mode = 4
 script = ExtResource("3_4gioj")
 packed_scene = SubResource("Resource_dwjhn")
 
+[node name="MenuButton" type="MenuButton" parent="."]
+offset_left = 1205.0
+offset_top = 674.0
+offset_right = 1277.0
+offset_bottom = 705.0
+text = "动作菜单"
+item_count = 1
+popup/item_0/text = "攻击"
+popup/item_0/id = 0
+
 [node name="Area2D" type="Area2D" parent="."]
 disable_mode = 1
 script = ExtResource("7_vpcar")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(1026.5, 637.5)
-scale = Vector2(18.5205, 11.8808)
+[node name="Collision1" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(1133.5, 702)
 shape = SubResource("RectangleShape2D_0eov1")
+debug_color = Color(0.917647, 0.235294, 0.411765, 0.917647)
+
+[node name="Collision2" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(1176, -3.5)
+shape = SubResource("RectangleShape2D_vpcar")

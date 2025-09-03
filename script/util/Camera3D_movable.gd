@@ -70,7 +70,7 @@ func _process(delta) -> void:
 			#print("yaw =", _yaw, ", pitch =", _pitch)
 		#_update_camera()
 	
-	if ui_area_detector.is_mouse_over_ui:
+	if ui_area_detector.is_mouse_inside:
 		return
 	
 	var viewport := get_viewport()

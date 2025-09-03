@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=13 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_5kexg"]
 [ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_3vweo"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_4ssb8"]
 [ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_ovx7j"]
 [ext_resource type="Script" uid="uid://c0hdhvpwb53u3" path="res://script/entity/AnimateBase3D.gd" id="10_v0ril"]
+[ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://scene/combat/ActorController.gd" id="11_3vweo"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5n8sn"]
 animations = [{
@@ -43,9 +44,10 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="unit" type="Marker3D" node_paths=PackedStringArray("anim")]
+[node name="unit" type="Marker3D" node_paths=PackedStringArray("anim", "actor")]
 script = ExtResource("1_5kexg")
 anim = NodePath("anim")
+actor = NodePath("controller")
 
 [node name="anim" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
@@ -56,3 +58,6 @@ render_priority = 1
 sprite_frames = SubResource("SpriteFrames_5n8sn")
 animation = &"run"
 script = ExtResource("10_v0ril")
+
+[node name="controller" type="Node" parent="."]
+script = ExtResource("11_3vweo")
