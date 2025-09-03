@@ -37,7 +37,7 @@ func _ready() -> void:
 	_cur_unit.map = ground_layer
 	add_child(_cur_unit)
 	units.append(_cur_unit)
-	camera.set_target_gradually(_cur_unit)
+	camera.set_target_immediately(_cur_unit)
 
 func _configure_board_plane() -> void:
 	var plane := board_plane.mesh

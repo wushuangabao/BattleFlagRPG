@@ -2,6 +2,7 @@ extends TileMapLayer
 class_name Ground
 
 @export var color_range: Color = Color(0.2, 0.6, 1.0, 0.28)
+@export var color_range_border: Color = Color(0.1, 0.9, 0.1, 0.95)
 @export var color_hgihtlight_reachable: Color = Color(0.1, 0.9, 0.1, 0.95)
 @export var color_hgihtlight_unreachable: Color = Color(0.9, 0.1, 0.1, 0.95)
 @export var color_path_line: Color = Color(0.9, 0.95, 1.0, 0.95)

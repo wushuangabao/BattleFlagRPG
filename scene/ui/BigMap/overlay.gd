@@ -7,11 +7,13 @@ func _draw():
 	# 可达范围
 	var cells: Array[Vector2i] = []
 	for cell in grid.reachable.keys():
+		# 注释掉的 3 行是直接填充每格的矩形。目前不这样做，目前要绘制可达范围的边界
 		# var center: Vector2 = grid.map_to_local(cell)
 		# var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
 		# draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_range, false, 2.0)
 		cells.push_back(cell)
-	_draw_boundary(cells, grid.color_range, 2.0)
+	_draw_boundary(cells, grid.color_range_border, 2.0)
+
 	# 路径
 	if grid.path_cells.size() > 1:
 		var points: PackedVector2Array = []
@@ -38,8 +40,6 @@ func _draw_boundary(cells: Array[Vector2i], color: Color, width: float) -> void:
 		var cell_set = {}
 		for cell in cells:
 			cell_set[cell] = true
-		# 按顺序收集多边形的顶点
-		var edges = []
 		for cell in cells:
 			for i in range(4):
 				var dir = GridHelper.DIRECTIONS[i]
@@ -47,12 +47,24 @@ func _draw_boundary(cells: Array[Vector2i], color: Color, width: float) -> void:
 				# 如果邻居不在集合中，则这条边是边界
 				if not cell_set.has(neighbor):
 					var vertices = GridHelper.get_edge_vertices(grid, cell, i)
-					edges.append(vertices)
-		if edges.size() == 0:
-			return
-		var boundary = connect_edges(edges)
-		if boundary.size() >= 4:
-			draw_polyline(PackedVector2Array(boundary), color, width)
+					# 绘制这条边
+					draw_line(vertices[0], vertices[1], color, width)
+		# 下面这个连接成多边形的方法在“有洞”的情况下不好使
+		# 收集多边形的顶点
+		# var edges = []
+		# for cell in cells:
+		# 	for i in range(4):
+		# 		var dir = GridHelper.DIRECTIONS[i]
+		# 		var neighbor = cell + dir
+		# 		# 如果邻居不在集合中，则这条边是边界
+		# 		if not cell_set.has(neighbor):
+		# 			var vertices = GridHelper.get_edge_vertices(grid, cell, i)
+		# 			edges.append(vertices)
+		# if edges.size() == 0:
+		# 	return
+		# var boundary = connect_edges(edges)
+		# if boundary.size() >= 4:
+		# 	draw_polyline(PackedVector2Array(boundary), color, width)
 	
 # 连接边界边形成连续的多边形
 func connect_edges(edges: Array) -> Array:
