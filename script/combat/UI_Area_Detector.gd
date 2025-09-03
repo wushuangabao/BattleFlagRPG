@@ -49,11 +49,11 @@ func _check_mouse_in(shape : CollisionShape2D) -> bool:
 		return false
 	# 创建一个圆形代表鼠标位置
 	var mouse_pos = get_global_mouse_position()
-	var point_transform = Transform2D(0, mouse_pos)
-	var point_shape = CircleShape2D.new()
-	point_shape.radius = 1
-	# 区域检测（不用碰撞检测）
+	# var point_transform = Transform2D(0, mouse_pos)
+	# var point_shape = CircleShape2D.new()
+	# point_shape.radius = 1
 	#if shape.get_shape().collide(shape.global_transform, point_shape, point_transform):
+	# 区域检测（不用碰撞检测）
 	if shape.shape.get_rect().has_point(mouse_pos):
 		queue_redraw()
 		return true

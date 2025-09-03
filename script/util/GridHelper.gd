@@ -2,6 +2,9 @@
 # 这个类可以改造成 C++ 类（引擎核心类）以提高性能
 class_name GridHelper
 
+# 方向向量数组（顺时针排列）
+const DIRECTIONS = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
+
 static var cell_size = Game.cell_pixel_size
 
 static func pos2d_to_3d(v: Vector2) -> Vector3:
@@ -25,6 +28,24 @@ static func to_world_player_2d(tilemap: TileMapLayer, cell: Vector2i) -> Vector2
 static func to_world_player_3d(tilemap: TileMapLayer, cell: Vector2i) -> Vector3:
 	var local = tilemap.map_to_local(cell)
 	return Vector3(local.x / cell_size.x * Game.cell_world_size.x, 0, local.y / cell_size.y * Game.cell_world_size.y)
+
+# 获取单元格某条边的两个顶点
+static func get_edge_vertices(map: TileMapLayer, cell: Vector2i, direction: int) -> Array:
+	var cell_origin = map.map_to_local(cell) - cell_size * 0.5
+	match direction:
+		0: # 上边
+			return [cell_origin, 
+					cell_origin + Vector2(cell_size.x, 0)]
+		1: # 右边
+			return [cell_origin + Vector2(cell_size.x, 0), 
+					cell_origin + Vector2(cell_size.x, cell_size.y)]
+		2: # 下边
+			return [cell_origin + Vector2(cell_size.x, cell_size.y), 
+					cell_origin + Vector2(0, cell_size.y)]
+		3: # 左边
+			return [cell_origin + Vector2(0, cell_size.y), 
+					cell_origin]
+	return []
 
 # 获取步进方向（4邻域单位向量）
 static func clamp_to_4dir(from_cell: Vector2i, target_cell: Vector2i) -> Vector2i:
