@@ -93,7 +93,7 @@ func _process(delta) -> void:
 		var mv = move_direction.normalized() * move_speed * delta
 		_dx_to_target += mv.x
 		_dz_to_target += mv.z
-		print(_dx_to_target, ",", _dz_to_target)
+		#print(_dx_to_target, ",", _dz_to_target)
 		global_translate(mv)
 
 func _update_camera() -> void:
