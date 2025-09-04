@@ -41,3 +41,6 @@ enum TeamID {
 	White,
 	Black
 	}
+
+static func is_mouse_in_viewport(vp: Viewport) -> bool:
+	return vp.get_visible_rect().has_point(vp.get_mouse_position())
