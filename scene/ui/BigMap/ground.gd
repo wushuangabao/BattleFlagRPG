@@ -50,3 +50,9 @@ func highlight_cell(cell: Vector2i, is_reachable: bool):
 # 单位阻挡：在 is_blocked 中并入“占用格”字典，避免穿人；若允许穿队友可按 team 区分。
 # 视觉增强：使用 NinePatchRect 或 MultiMeshInstance2D 批量绘制，或者在 Overlay 中缓存 Mesh，减少 draw 调用。
 # 补间中断：移动中忽略输入；或提供“排队”系统，将后续路径入队。
+
+func get_tilemap_dimensions() -> Vector2i:
+	var used_rect := get_used_rect()
+	var columns: int = roundi(float(used_rect.size.x) / Game.cell_pixel_size.x)
+	var rows: int = roundi(float(used_rect.size.y) / Game.cell_pixel_size.y)
+	return Vector2i(columns, rows)

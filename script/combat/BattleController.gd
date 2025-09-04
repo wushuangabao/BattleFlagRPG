@@ -1,0 +1,28 @@
+class_name BattleController
+
+var scene : BattleScene
+var units : Array[UnitBase3D]
+
+var cur_battle_name := ""
+
+func set_scene_node(node: BattleScene) -> void:
+	scene = node
+	
+func on_battle_start() -> void:
+	if cur_battle_name.is_empty():
+		push_error("on_battle_start but battle_name is empty")
+		return
+	if scene == null:
+		push_error("on_battle_start but battle scene is null")
+		return
+	scene.load_battle_map(cur_battle_name)
+
+	# 根据 TileMap 上设置的标记，生成初始单位，设置摄像头
+	var map = scene.flag_layer as FlagLayer
+	var flag_units = map.get_flag_units()
+	for unit_name in flag_units.keys():
+		var actor = Game.g_actors.get_actor_by_name(unit_name)
+		var unit = scene.add_unit_to(actor, flag_units[unit_name], true)
+		units.append(unit)
+
+	# battle_scene.add_unit_to()

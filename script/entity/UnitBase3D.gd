@@ -1,11 +1,12 @@
 # 负责单位的移动逻辑
 class_name UnitBase3D extends Marker3D
 
-@export var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 @export var move_time: float = 0.5
-@export var map: Ground = null
-@export var anim: AnimatedSprite3D = null
-@export var actor: ActorController = null
+
+var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
+var anim: AnimatedSprite3D = null
+var map: Ground = null
+var actor: ActorController = null
 
 var _cell: Vector2i # 当前所在格子
 var _dir: Vector2i # 当前朝向
@@ -19,6 +20,10 @@ func get_pos_2d() -> Vector2:
 	
 func get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
+
+func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
+	_cell = cell
+	_dir = dir
 	
 func set_target_cell(cell: Vector2i) -> bool:
 	if not _is_moving:
@@ -31,12 +36,19 @@ func set_target_cell(cell: Vector2i) -> bool:
 			return true
 	return false
 
-func _ready():
-	# 初始化位置到最近的格子中心
+func set_actor(a: ActorController) -> void:
+	actor = a
+	a.base3d = self
+
+func _ready() -> void:
+	anim = get_child(0)
+	actor.set_animsprite_node(anim)
 	if map == null:
+		push_error("unit base ready: not find map")
 		return
-	_dir = Vector2i(1, 0)
-	_cell = GridHelper.to_cell(map, get_pos_2d())
+	if _cell_walkable(_cell) == false:
+		push_error("nit base ready: unwalkable")
+		return
 	global_position = GridHelper.to_world_player_3d(map, _cell)
 	_compute_reachable()
 

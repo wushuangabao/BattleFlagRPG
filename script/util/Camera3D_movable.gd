@@ -1,4 +1,4 @@
-extends Camera3D
+class_name Camera3D_movable extends Camera3D
 
 #@export var move_sensitivity := 0.001      # 移动灵敏度
 #@export var sensitivity      := 0.001      # 旋转灵敏度
@@ -43,6 +43,8 @@ func set_target_gradually(t: Node3D) -> void:
 			#get_viewport().set_input_as_handled() #标记输入事件为已处理
 
 func _process(delta) -> void:
+	if follow_target == null:
+		return
 	if (follow_target.get("_is_moving") != null and follow_target._is_moving):
 		_moving_to_target = true
 	if _moving_to_target:

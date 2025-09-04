@@ -1,13 +1,13 @@
 class_name BattleMapContainer
 extends SubViewport
 
-@export var packed_scene: PackedSceneDictionary
+@export var packed_scene: PackedSceneDictionary # 每添加一个战斗地图，都要在这个字典里加上（todo 改成读表加载）
 
 # 当前地图名称
 var _current_scene: String
 
 # 开始战斗（切换地图）
-func start_battle(scene_name: String) -> void:
+func loadScene_battleMap(scene_name: String) -> void:
 	if _current_scene and _current_scene == scene_name:
 		return
 	if get_child_count() > 0:
@@ -19,3 +19,6 @@ func start_battle(scene_name: String) -> void:
 		if scene:
 			add_child(scene)
 			_current_scene = scene_name
+	else:
+		push_error("loadScene_battleMap, not find ", scene_name)
+		return
