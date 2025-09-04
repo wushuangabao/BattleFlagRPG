@@ -1,10 +1,10 @@
 [gd_scene load_steps=12 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
-[ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/combat/unit.tscn" id="2_0eov1"]
+[ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/combat/unit/unit.tscn" id="2_0eov1"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
-[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/test/canvas_layer.tscn" id="3_ldyea"]
+[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/canvas_layer.tscn" id="3_ldyea"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
 
