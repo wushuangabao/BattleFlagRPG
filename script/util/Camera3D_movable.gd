@@ -82,10 +82,13 @@ func _process(delta) -> void:
 	
 	if ui_area_detector.is_mouse_inside:
 		return
-	
+
 	var viewport := get_viewport()
+	var viewport_rect := viewport.get_visible_rect()
+	var viewport_size := viewport_rect.size
 	var mouse_pos := viewport.get_mouse_position()
-	var viewport_size := viewport.get_visible_rect().size
+	if not viewport_rect.grow(15.0).has_point(mouse_pos): # 鼠标移出视口（且超出视口15.0）
+		return
 	var move_direction := Vector3.ZERO 
 	
 	# 检测屏幕边缘
@@ -103,7 +106,7 @@ func _process(delta) -> void:
 		var mv = move_direction.normalized() * move_speed * delta
 		_dx_to_target += mv.x
 		_dz_to_target += mv.z
-		print(_dx_to_target, ",", _dz_to_target)
+		# print(_dx_to_target, ",", _dz_to_target)
 		_update_camera()
 
 func _update_camera() -> void:
