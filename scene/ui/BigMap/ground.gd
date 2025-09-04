@@ -53,6 +53,6 @@ func highlight_cell(cell: Vector2i, is_reachable: bool):
 
 func get_tilemap_dimensions() -> Vector2i:
 	var used_rect := get_used_rect()
-	var columns: int = roundi(float(used_rect.size.x) / Game.cell_pixel_size.x)
-	var rows: int = roundi(float(used_rect.size.y) / Game.cell_pixel_size.y)
+	var columns: int = used_rect.size.x - used_rect.position.x
+	var rows: int = used_rect.size.y - used_rect.position.y
 	return Vector2i(columns, rows)

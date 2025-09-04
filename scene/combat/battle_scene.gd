@@ -25,8 +25,13 @@ var map_rows: int
 var cell_pixel_size = Game.cell_pixel_size
 var cell_world_size = Game.cell_world_size
 
-func load_battle_map(map_name: String) -> void:
-	subvp.loadScene_battleMap(map_name)
+func load_battle_map(map_name: String) -> bool:
+	var new_node = subvp.loadScene_battleMap(map_name)
+	if new_node == null:
+		return false
+	return true
+
+func _on_battle_map_loaded():
 	var map_root = subvp.get_child(0).get_child(0)
 	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
 	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
@@ -40,6 +45,8 @@ func load_battle_map(map_name: String) -> void:
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func add_unit_to(actor: ActorController, cell: Vector2i, islook:= false) -> UnitBase3D:
+	if Game.Debug == 1:
+		print("add actor ", actor.my_name)
 	if ground_layer == null:
 		push_error("add unit to Nil ground!")
 	var new_unit = unit_template.instantiate() as UnitBase3D
@@ -47,13 +54,16 @@ func add_unit_to(actor: ActorController, cell: Vector2i, islook:= false) -> Unit
 	new_unit.map = ground_layer
 	new_unit.set_cur_cell(cell)
 	if islook:
-		new_unit.ready.connect(func():
-			camera.set_target_immediately(new_unit)
-			print("on new unit ready"))
-	add_child(new_unit)
-	if islook:
 		_cur_unit = new_unit
+	new_unit.initialized.connect(_on_actor_initialized)
+	add_child(new_unit)
 	return new_unit
+
+func _on_actor_initialized() -> void:
+	if Game.Debug == 1:
+		print("_on_actor_initialized")
+	_cur_unit.anim.play(&"run")
+	camera.set_target_immediately(_cur_unit)
 
 # 只调用一次，除非手动 request_ready
 # 所有子节点都已经添加到场景树后，才会调用

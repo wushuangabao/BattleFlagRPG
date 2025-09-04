@@ -3,6 +3,8 @@ class_name UnitBase3D extends Marker3D
 
 @export var move_time: float = 0.5
 
+signal initialized
+
 var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 var anim: AnimatedSprite3D = null
 var map: Ground = null
@@ -22,6 +24,8 @@ func get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
 
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
+	if Game.Debug == 1:
+		print("set cell ", cell.x, ", ", cell.y)
 	_cell = cell
 	_dir = dir
 	
@@ -42,7 +46,7 @@ func set_actor(a: ActorController) -> void:
 
 func _ready() -> void:
 	anim = get_child(0)
-	actor.set_animsprite_node(anim)
+	# actor.set_animsprite_node(anim)
 	if map == null:
 		push_error("unit base ready: not find map")
 		return
@@ -50,7 +54,12 @@ func _ready() -> void:
 		push_error("nit base ready: unwalkable")
 		return
 	global_position = GridHelper.to_world_player_3d(map, _cell)
+	if Game.Debug == 1:
+		print("my cell ", _cell.x, ", ", _cell.y)
 	_compute_reachable()
+	if Game.Debug == 1:
+		print("initialized actor ", actor.my_name)
+	initialized.emit()
 
 func _compute_reachable():
 	_reachable = GridHelper.movement_range(_cell, MAX_STEPS, _cell_walkable)

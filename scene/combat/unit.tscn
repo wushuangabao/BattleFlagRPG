@@ -1,8 +1,46 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=11 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_5kexg"]
+[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_2550q"]
+[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://asset/png/character/run_animation/run-2.png" id="3_5kexg"]
+[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://asset/png/character/run_animation/run-3.png" id="4_3vweo"]
+[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://asset/png/character/run_animation/run-4.png" id="5_2u4ii"]
+[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://asset/png/character/run_animation/run-5.png" id="6_1cmya"]
+[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="7_hm8an"]
+[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_8yihh"]
+[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_4fpug"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_2550q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_5kexg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_3vweo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_2u4ii")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_1cmya")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_hm8an")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_8yihh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_4fpug")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}]
 
 [node name="unit" type="Marker3D"]
 script = ExtResource("1_5kexg")
@@ -14,3 +52,4 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
+animation = &"run"

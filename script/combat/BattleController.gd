@@ -15,8 +15,9 @@ func on_battle_start() -> void:
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
-	scene.load_battle_map(cur_battle_name)
-
+	var ok = await scene.load_battle_map(cur_battle_name)
+	if not ok:
+		return
 	# 根据 TileMap 上设置的标记，生成初始单位，设置摄像头
 	var map = scene.flag_layer as FlagLayer
 	var flag_units = map.get_flag_units()
@@ -24,5 +25,3 @@ func on_battle_start() -> void:
 		var actor = Game.g_actors.get_actor_by_name(unit_name)
 		var unit = scene.add_unit_to(actor, flag_units[unit_name], true)
 		units.append(unit)
-
-	# battle_scene.add_unit_to()
