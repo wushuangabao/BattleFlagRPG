@@ -24,13 +24,17 @@ func _ready() -> void:
 
 # 注册到架构时调用
 func on_init():
-	var temp = self.get_model(UnitStat)
-	var temp_hp = temp.HP as AttributeBase
-	temp_hp.register(on_actor_hp_changed)
-	# register_event("event_count", event_count)
+# 	var stat = self.get_model(UnitStat)
+# 	var attr = stat.HP as AttributeBase
+# 	attr.register(on_actor_hp_changed)
+# 	attr = stat.MP as AttributeBase
+# 	attr.register(on_actor_mp_changed)
+	register_event("actor_hp_changed", on_actor_hp_changed)
 
-func on_actor_hp_changed(new_hp):
-	print("收到信号：hp=", new_hp)
+func on_actor_hp_changed(actor, new_hp):
+	print("ActorManager 收到信号：", actor.my_name, " hp=", new_hp)
+func on_actor_mp_changed(actor, new_mp):
+	print("ActorManager 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
 # 获取一个角色的 ActorController 实例
 func get_actor_by_name(actor_name: StringName) -> ActorController:

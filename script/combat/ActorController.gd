@@ -21,15 +21,15 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 @export var anim_player: AnimatedSprite3D # 动画节点的引用
 
 func _ready() -> void:
-	my_stat = UnitStat.new()
+	my_stat = UnitStat.new(self)
 	set_architecture(CombatArchitecture.new(my_stat))
-	get_model(my_stat).HP.register_and_refresh(
+	my_stat.HP.register_and_refresh(
 		func(hp):
-			print("HP = ", hp)
+			print("ActorController 收到信号 HP = ", hp)
 	)
 
 func add_HP(v: int):
-	get_model(UnitStat).HP.value += v
+	my_stat.HP.value += v
 
 func add_MP(v: int):
-	get_model(UnitStat).MP.value += v
+	my_stat.MP.value += v
