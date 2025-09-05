@@ -31,8 +31,6 @@ func load_battle_map(map_name: String) -> bool:
 	return true
 
 func _on_battle_map_loaded():
-	if Game.Debug == 1:
-		print("on_battle_map_loaded: ", subvp._current_scene)
 	var map_root = subvp.get_child(0).get_child(0)
 	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
 	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
@@ -44,6 +42,7 @@ func _on_battle_map_loaded():
 	_hook_subviewport_texture_to_plane()
 	# 如果地图是静态的，可只刷新一次
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	print("战斗地图加载完毕 - ", subvp._current_scene)
 	controller.on_battle_map_loaded()
 
 func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:

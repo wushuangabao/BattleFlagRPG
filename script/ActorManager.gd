@@ -21,6 +21,7 @@ func _ready() -> void:
 			# new_actor.set_actor_data() # 读取存档或者初始化数值表
 			_actors_nameMap[actor_name] = new_actor
 	Game.g_actors = self
+	print("角色管理器初始化完毕")
 
 # 注册到架构时调用
 func on_init():

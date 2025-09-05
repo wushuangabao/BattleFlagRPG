@@ -1,4 +1,4 @@
-class_name BattleController
+class_name BattleController extends AbstractSystem
 
 var scene         : BattleScene   = null
 var actor_manager : ActorManager
@@ -7,6 +7,16 @@ var _cur_battle_name := ""
 
 var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
+
+# 注册到架构时调用
+func on_init():
+	register_event("actor_hp_changed", on_actor_hp_changed)
+	register_event("actor_mp_changed", on_actor_mp_changed)
+
+func on_actor_hp_changed(actor, new_hp):
+	print("BattleController 收到信号：", actor.my_name, " hp=", new_hp)
+func on_actor_mp_changed(actor, new_mp):
+	print("BattleController 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
 func set_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
@@ -21,14 +31,13 @@ func set_scene_node(node: BattleScene) -> void:
 	actor_manager = Game.g_actors
 	
 func on_battle_start() -> void:
+	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
 	if _cur_battle_name.is_empty():
 		push_error("on_battle_start but battle_name is empty")
 		return
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
-	if Game.Debug == 1:
-		print("on_battle_start: ", _cur_battle_name)
 	if scene.load_battle_map(_cur_battle_name):
 		if Game.Debug == 1:
 			print("on_battle_start: scene.load_battle_map ok")
@@ -36,6 +45,7 @@ func on_battle_start() -> void:
 		_cur_battle_name = ""
 
 func on_battle_map_loaded() -> void:
+	print("开始生成战斗单位...")
 	# 根据 TileMap 上设置的标记，生成初始单位
 	var map = scene.flag_layer as FlagLayer
 	var flag_units = map.get_flag_units()
@@ -52,16 +62,15 @@ func on_battle_map_loaded() -> void:
 				cells.remove_at(i)
 		for cell in cells:
 			var look := true if _units.is_empty() else false
-			if Game.Debug == 1:
-				print("add actor ", unit_name)
+			print("开始添加单位 ", _units.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ")")
 			var unit := scene.add_unit_to(template, cell, look)
 			if not actor:
-				actor = unit.get_child(1) # 获取子节点 ActorDefault
+				if Game.Debug == 1:
+					print("获取子节点 ActorDefault")
+				actor = unit.get_child(1)
 			_units.push_back(unit)
 			_actors.push_back(actor)
-	if Game.Debug == 1:
-		print("所有角色已经加载完毕")
-		_actors[0].add_HP(-1)
+	print("战斗单位已加载完毕")
 
 func on_battle_map_unload() -> void:
 	# 释放 _actors 中那些只在本场战斗中使用的角色

@@ -20,7 +20,7 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 @export var base3d   : UnitBase3D     # 在场景中显示用
 @export var anim_player: AnimatedSprite3D # 动画节点的引用
 
-func _ready() -> void:
+func _enter_tree() -> void:
 	my_stat = UnitStat.new(self)
 	set_architecture(CombatArchitecture.new(my_stat))
 	my_stat.HP.register_and_refresh(

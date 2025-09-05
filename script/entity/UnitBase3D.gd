@@ -24,8 +24,6 @@ func get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
 
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
-	if Game.Debug == 1:
-		print("set cell ", cell.x, ", ", cell.y)
 	_cell = cell
 	_dir = dir
 	

@@ -10,6 +10,7 @@ var _current_scene: String
 func _ready() -> void:
 	Game.g_scenes = self
 	goto_scene(&"MainMenu")
+	print("场景管理器初始化完毕")
 
 # 开始战斗
 func start_battle(battle_name: StringName) -> void:
