@@ -4,6 +4,7 @@ extends Node3D
 @export var board_plane_path: NodePath
 @export var camera_path: NodePath
 @export var subviewport_path: NodePath
+@export var timeline_path: NodePath
 
 # 是否在SubViewport背景透明（若想保留透明区域）
 @export var transparent_bg := true
@@ -11,6 +12,7 @@ extends Node3D
 @onready var camera := get_node(camera_path) as Camera3D_movable
 @onready var board_plane := get_node(board_plane_path) as MeshInstance3D
 @onready var subvp := get_node(subviewport_path) as BattleMapContainer   # 战斗地图的容器
+@onready var timeline := get_node(timeline_path) as TimelineController
 
 var _cur_unit : UnitBase3D = null
 var controller : BattleController = null

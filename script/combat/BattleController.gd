@@ -4,9 +4,18 @@ var scene         : BattleScene   = null
 var actor_manager : ActorManager
 
 var _cur_battle_name := ""
+var _turn_controller : TurnController
+var _buff_system : BuffSystem
 
 var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
+
+func get_actors() -> Array[ActorController]:
+	return _actors
+
+func _init() -> void:
+	_turn_controller = TurnController.new()
+	_buff_system = BuffSystem.new()
 
 # 注册到架构时调用
 func on_init():
@@ -28,6 +37,7 @@ func set_scene_node(node: BattleScene) -> void:
 	if scene != null:
 		return
 	scene = node
+	_turn_controller.set_timeline(scene.timeline)
 	actor_manager = Game.g_actors
 	
 func on_battle_start() -> void:
