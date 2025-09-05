@@ -7,9 +7,9 @@ extends SubViewport
 var _current_scene: String
 
 # 开始战斗（切换地图）
-func loadScene_battleMap(scene_name: String) -> Node:
+func loadScene_battleMap(scene_name: String) -> BattleMap:
 	if _current_scene and _current_scene == scene_name:
-		return null
+		return get_child(0)
 	if get_child_count() > 0:
 		get_child(0).queue_free() # 释放当前场景
 	# 动态加载场景

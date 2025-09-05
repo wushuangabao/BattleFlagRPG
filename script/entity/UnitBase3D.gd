@@ -46,6 +46,7 @@ func set_actor(a: ActorController) -> void:
 
 func _ready() -> void:
 	anim = get_child(0)
+	anim.play(&"run")
 	# actor.set_animsprite_node(anim)
 	if map == null:
 		push_error("unit base ready: not find map")
@@ -54,12 +55,10 @@ func _ready() -> void:
 		push_error("nit base ready: unwalkable")
 		return
 	global_position = GridHelper.to_world_player_3d(map, _cell)
-	if Game.Debug == 1:
-		print("my cell ", _cell.x, ", ", _cell.y)
+	initialized.emit(self)
+
+func on_selected() -> void:
 	_compute_reachable()
-	if Game.Debug == 1:
-		print("initialized actor ", actor.my_name)
-	initialized.emit()
 
 func _compute_reachable():
 	_reachable = GridHelper.movement_range(_cell, MAX_STEPS, _cell_walkable)

@@ -32,6 +32,8 @@ func load_battle_map(map_name: String) -> bool:
 	return true
 
 func _on_battle_map_loaded():
+	if Game.Debug == 1:
+		print("on_battle_map_loaded: ", subvp._current_scene)
 	var map_root = subvp.get_child(0).get_child(0)
 	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
 	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
@@ -43,6 +45,7 @@ func _on_battle_map_loaded():
 	_hook_subviewport_texture_to_plane()
 	# 如果地图是静态的，可只刷新一次
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	controller.on_battle_map_loaded()
 
 func add_unit_to(actor: ActorController, cell: Vector2i, islook:= false) -> UnitBase3D:
 	if Game.Debug == 1:
@@ -53,24 +56,27 @@ func add_unit_to(actor: ActorController, cell: Vector2i, islook:= false) -> Unit
 	new_unit.set_actor(actor)
 	new_unit.map = ground_layer
 	new_unit.set_cur_cell(cell)
+	new_unit.initialized.connect(_on_actor_initialized)
 	if islook:
 		_cur_unit = new_unit
-	new_unit.initialized.connect(_on_actor_initialized)
 	add_child(new_unit)
 	return new_unit
 
-func _on_actor_initialized() -> void:
+func _on_actor_initialized(unit_node: UnitBase3D) -> void:
+	if unit_node != _cur_unit:
+		return
 	if Game.Debug == 1:
-		print("_on_actor_initialized")
-	_cur_unit.anim.play(&"run")
+		print("_on_actor_initialized CurUnit")
+	_cur_unit.on_selected()
 	camera.set_target_immediately(_cur_unit)
 
 # 只调用一次，除非手动 request_ready
 # 所有子节点都已经添加到场景树后，才会调用
 func _ready() -> void:
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	controller = Game.g_combat
-	controller.set_scene_node(self)
+	if controller == null:
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		controller = Game.g_combat
+		controller.set_scene_node(self)
 	controller.on_battle_start()
 
 # 每次切到战斗场景都会调用
@@ -122,9 +128,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		var hit = from + dir * t
 		if Game.Debug == 1:
-			#draw_debug_ray(Vector3(from.x, from.y - 0.01, from.z), hit)
+			draw_debug_ray(from, hit)
 			# 将世界坐标映射到格子坐标
-			print("Clicked pos: ", hit.x, ", ",  hit.z)
+			# print("Clicked pos: ", hit.x, ", ",  hit.z)
 		var cell = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
 		_on_cell_clicked(cell)
 
@@ -153,7 +159,7 @@ func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var im := ImmediateMesh.new()
 	im.surface_begin(Mesh.PRIMITIVE_LINES)
 	im.surface_add_vertex(from)
-	im.surface_add_vertex(from + dir * 0.8)
+	im.surface_add_vertex(from + dir)
 	im.surface_end()
 	line.mesh = im
 

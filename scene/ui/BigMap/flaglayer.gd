@@ -4,5 +4,5 @@ extends TileMapLayer
 func get_flag_units() -> Dictionary:
 	var cells := get_used_cells()
 	return {
-		"test_actor" : Vector2i(2, 3)
+		"test_actor" : [Vector2i(2, 3), Vector2i(3, 3),],
 	}

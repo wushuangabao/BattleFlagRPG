@@ -1,3 +1,4 @@
+class_name BattleMap
 extends CanvasLayer
 
 signal battle_map_ready

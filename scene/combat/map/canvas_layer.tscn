@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=4 uid="uid://dp0j1m0xqlrck"]
 
 [ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="1_3gvql"]
-[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://scene/combat/map/canvas_layer.gd" id="1_w3tmn"]
+[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://script/combat/BattleMap.gd" id="1_w3tmn"]
 [ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://scene/ui/BigMap/ground.gd" id="2_2hj5d"]
 [ext_resource type="Script" uid="uid://bbtjguud5g6kt" path="res://scene/ui/BigMap/flaglayer.gd" id="3_hb4mi"]
 
