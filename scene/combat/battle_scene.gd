@@ -4,7 +4,6 @@ extends Node3D
 @export var board_plane_path: NodePath
 @export var camera_path: NodePath
 @export var subviewport_path: NodePath
-@export var unit_template: PackedScene
 
 # 是否在SubViewport背景透明（若想保留透明区域）
 @export var transparent_bg := true
@@ -47,13 +46,10 @@ func _on_battle_map_loaded():
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	controller.on_battle_map_loaded()
 
-func add_unit_to(actor: ActorController, cell: Vector2i, islook:= false) -> UnitBase3D:
-	if Game.Debug == 1:
-		print("add actor ", actor.my_name)
+func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:
 	if ground_layer == null:
 		push_error("add unit to Nil ground!")
 	var new_unit = unit_template.instantiate() as UnitBase3D
-	new_unit.set_actor(actor)
 	new_unit.map = ground_layer
 	new_unit.set_cur_cell(cell)
 	new_unit.initialized.connect(_on_actor_initialized)

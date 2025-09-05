@@ -53,3 +53,5 @@ billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
 animation = &"run"
+
+[node name="ActorDefault" type="Node" parent="."]

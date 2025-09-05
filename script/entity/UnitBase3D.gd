@@ -40,14 +40,9 @@ func set_target_cell(cell: Vector2i) -> bool:
 			return true
 	return false
 
-func set_actor(a: ActorController) -> void:
-	actor = a
-	a.base3d = self
-
 func _ready() -> void:
 	anim = get_child(0)
 	anim.play(&"run")
-	# actor.set_animsprite_node(anim)
 	if map == null:
 		push_error("unit base ready: not find map")
 		return

@@ -7,7 +7,7 @@ extends SubViewport
 var _current_scene: String
 
 # 开始战斗（切换地图）
-func loadScene_battleMap(scene_name: String) -> BattleMap:
+func loadScene_battleMap(scene_name: StringName) -> BattleMap:
 	if _current_scene and _current_scene == scene_name:
 		return get_child(0)
 	if get_child_count() > 0:

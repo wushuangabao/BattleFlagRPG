@@ -10,22 +10,15 @@ const cell_pixel_size: Vector2i = Vector2i(64, 64)
 const cell_world_size: Vector2 = Vector2(1.0, 1.0) # x对应世界X，y对应世界Z
 
 static var g_combat := BattleController.new()
-static var g_actors := ActorManager.new()
+static var g_actors : ActorManager = null
+static var g_scenes : SceneManager = null
 
 # 预加载常用场景，避免频繁加载
 # 这些场景在 goto_scene 中第一次实例化之后会被缓存
 const scene_cached: Dictionary = {
-	BigMap = preload("res://scene/ui/BigMap/BigMap.tscn"),
-	BattleScene = preload("res://scene/combat/BattleScene.tscn")
+	"BigMap" = preload("res://scene/ui/BigMap/BigMap.tscn"),
+	"BattleScene" = preload("res://scene/combat/BattleScene.tscn")
 }
-
-# 节点路径表
-const global_node_path: Dictionary = {
-	SceneManager = "/root/Game/GameRoot"
-}
-
-static func scene_manager_path() -> String:
-	return global_node_path["SceneManager"]
 
 # 阵营
 enum Camp {

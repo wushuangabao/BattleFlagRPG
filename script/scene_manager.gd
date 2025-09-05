@@ -1,4 +1,4 @@
-extends Node
+class_name SceneManager extends Node
 @export var packed_scene: PackedSceneDictionary # todo 改成读表，而不是手动配置
 
 # 缓存常用的场景，避免反复释放加载
@@ -7,13 +7,16 @@ var _scene_cache: Dictionary = {}
 # 当前场景名称
 var _current_scene: String
 
+func _ready() -> void:
+	Game.g_scenes = self
+
 # 开始战斗
-func start_battle(battle_name: String) -> void:
+func start_battle(battle_name: StringName) -> void:
 	Game.g_combat.cur_battle_name = battle_name
 	goto_scene("BattleScene")
 
 # 切换场景
-func goto_scene(scene_name: String) -> void:
+func goto_scene(scene_name: StringName) -> void:
 	if _current_scene and _current_scene == scene_name:
 		return
 	if get_child_count() > 0:

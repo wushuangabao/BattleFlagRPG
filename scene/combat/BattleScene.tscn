@@ -1,7 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=11 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
-[ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/combat/unit/unit.tscn" id="2_0eov1"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
 [ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/canvas_layer.tscn" id="3_ldyea"]
@@ -12,9 +11,9 @@
 
 [sub_resource type="Resource" id="Resource_dwjhn"]
 script = ExtResource("4_hqoxg")
-packed_scene = {
-"test": ExtResource("3_ldyea")
-}
+packed_scene = Dictionary[StringName, PackedScene]({
+&"test": ExtResource("3_ldyea")
+})
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0eov1"]
@@ -28,7 +27,6 @@ script = ExtResource("1_1h8kx")
 board_plane_path = NodePath("plane")
 camera_path = NodePath("Camera3D")
 subviewport_path = NodePath("SubViewport_MapContainer")
-unit_template = ExtResource("2_0eov1")
 
 [node name="Camera3D" type="Camera3D" parent="." node_paths=PackedStringArray("ui_area_detector")]
 transform = Transform3D(1, 0, 0, 0, 0.695236, 0.718782, 0, -0.718782, 0.695236, 0, 1.80018, 1.01038)
