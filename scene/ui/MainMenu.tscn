@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://dn5oeukflvxux"]
+
+[ext_resource type="Texture2D" uid="uid://b27x3a4kwalse" path="res://asset/png/character/portrait/young_man_1.png" id="1_h244o"]
+
+[node name="MainMenu" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(697, 0)
+scale = Vector2(0.474609, 0.474609)
+texture = ExtResource("1_h244o")
+centered = false
+
+[node name="UI" type="Node" parent="."]
+
+[node name="BtnExit" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnSetting" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnContinue" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnNewGame" type="TextureButton" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0

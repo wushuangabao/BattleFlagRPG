@@ -9,6 +9,7 @@ var _current_scene: String
 
 func _ready() -> void:
 	Game.g_scenes = self
+	goto_scene(&"MainMenu")
 
 # 开始战斗
 func start_battle(battle_name: StringName) -> void:

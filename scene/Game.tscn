@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b2wub0ms8es6m"]
+[gd_scene load_steps=11 format=3 uid="uid://b2wub0ms8es6m"]
 
 [ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
 [ext_resource type="Script" uid="uid://c8ya50ntb6sau" path="res://script/ActorManager.gd" id="1_vg7sv"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://df70ys3x6ucts" path="res://scene/unit/enemy.tscn" id="3_qto5f"]
 [ext_resource type="Script" uid="uid://ur0u8m7o7v4u" path="res://script/ui/btn_big_map.gd" id="3_t585p"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_4cigq"]
+[ext_resource type="PackedScene" uid="uid://dn5oeukflvxux" path="res://scene/ui/MainMenu.tscn" id="6_qto5f"]
 
 [sub_resource type="Resource" id="Resource_f6bub"]
 script = ExtResource("4_4cigq")
@@ -16,32 +17,22 @@ packed_scene = {
 }
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
+[sub_resource type="Resource" id="Resource_4cigq"]
+script = ExtResource("4_4cigq")
+packed_scene = Dictionary[StringName, PackedScene]({
+&"MainMenu": ExtResource("6_qto5f")
+})
+metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+
 [node name="Game" type="Node"]
 
 [node name="ActorManager" type="Node" parent="."]
 script = ExtResource("1_vg7sv")
 actors = SubResource("Resource_f6bub")
 
-[node name="GameRoot" type="Node" parent="."]
+[node name="SceneManager" type="Node" parent="."]
 script = ExtResource("2_e7hha")
-
-[node name="UI" type="Node" parent="."]
-
-[node name="BtnExit" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="BtnSetting" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="BtnContinue" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="BtnNewGame" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+packed_scene = SubResource("Resource_4cigq")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
