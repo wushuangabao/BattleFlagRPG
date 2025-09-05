@@ -45,7 +45,7 @@ func _ready() -> void:
 		push_error("unit base ready: not find map")
 		return
 	if _cell_walkable(_cell) == false:
-		push_error("nit base ready: unwalkable")
+		push_error("unit base ready: unwalkable")
 		return
 	global_position = GridHelper.to_world_player_3d(map, _cell)
 	initialized.emit(self)

@@ -27,6 +27,9 @@ func on_actor_hp_changed(actor, new_hp):
 func on_actor_mp_changed(actor, new_mp):
 	print("BattleController 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
+func _on_actor_turn(actor: ActorController) -> void:
+	print("现在是 ", actor.my_name, "的回合...")
+
 func set_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
 		_units.clear()
@@ -38,6 +41,7 @@ func set_scene_node(node: BattleScene) -> void:
 		return
 	scene = node
 	_turn_controller.set_timeline(scene.timeline)
+	scene.timeline.actor_ready.connect(_on_actor_turn)
 	actor_manager = Game.g_actors
 	
 func on_battle_start() -> void:
@@ -66,7 +70,7 @@ func on_battle_map_loaded() -> void:
 		var actor : ActorController = actor_manager.get_actor_by_name(unit_name)
 		var template : PackedScene = actor_manager.actors.get_scene(unit_name)
 		var cells = flag_units[unit_name] as Array
-		if cells.size() > 1 and actor_manager.is_character(template):
+		if actor and cells.size() > 1:
 			push_error("地图 ", _cur_battle_name, " 中的 unit: ", unit_name, " 不能放置超过1个！自动删除到只剩1个")
 			for i in range(cells.size() - 1, 0, -1):
 				cells.remove_at(i)
@@ -74,13 +78,16 @@ func on_battle_map_loaded() -> void:
 			var look := true if _units.is_empty() else false
 			print("开始添加单位 ", _units.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ")")
 			var unit := scene.add_unit_to(template, cell, look)
-			if not actor:
-				if Game.Debug == 1:
-					print("获取子节点 ActorDefault")
-				actor = unit.get_child(1)
+			if not actor_manager.get_actor_by_name(unit_name):
+				actor = unit.get_child(1) # 获取子节点 ActorDefault
+			else:
+				unit.add_child(actor)
+			unit.actor = actor
+			unit.anim = unit.get_child(0)
 			_units.push_back(unit)
 			_actors.push_back(actor)
 	print("战斗单位已加载完毕")
+	scene.timeline.start(_actors)
 
 func on_battle_map_unload() -> void:
 	# 释放 _actors 中那些只在本场战斗中使用的角色

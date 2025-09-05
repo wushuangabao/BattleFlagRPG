@@ -1,10 +1,12 @@
 class_name BrainBase extends Node
 
 enum BrainType {
+	Invalid,
 	AI,
-	Player
+	Player,
 }
 
+var _type := BrainType.Invalid
 var _actor : ActorController
 
 func _init(a: ActorController) -> void:

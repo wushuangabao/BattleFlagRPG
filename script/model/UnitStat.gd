@@ -6,8 +6,8 @@ var HP       := AttributeBase.new()
 var MP       := AttributeBase.new()
 
 func on_init() -> void:
-	HP.register_with_init_value_no_emit_first(0, on_HP_change)
-	MP.register_with_init_value_no_emit_first(0, on_MP_change)
+	HP.register(on_HP_change)
+	MP.register(on_MP_change)
 
 func _init(a) -> void:
 	_actor = a

@@ -42,11 +42,6 @@ func get_actor_by_name(actor_name: StringName) -> ActorController:
 	if _actors_nameMap.has(actor_name):
 		return _actors_nameMap[actor_name]
 	else:
-		if Game.Debug == 1:
-			print("create new actor: ", actor_name)
-		if actors.exists(actor_name) == false:
-			push_error("get_actor_by_name: ", actor_name, " is invalid")
-			return null
 		return null
 
 # 是否为全局唯一的角色（属性是随着游戏进程而变化的）

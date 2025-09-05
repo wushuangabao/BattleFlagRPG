@@ -16,7 +16,9 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 @export var anim_player: AnimatedSprite3D # 动画节点的引用
 
 func _enter_tree() -> void:
+	print("角色已经加载到树中 ", my_name)
 	my_stat = UnitStat.new(self)
+	AP = AttributeBase.new(0, TimelineController.AP_MAX)
 	brain = BrainBase.new(self)
 	set_architecture(CombatArchitecture.new(my_stat))
 
@@ -33,10 +35,10 @@ func pay_AP(v: int) -> void:
 	AP.set_value(AP.value - v)
 
 func get_AP() -> int:
-	return my_stat.AP.value
+	return AP.value
 
-func get_ap_gain_per_sec() -> int:
-	return 1
+func get_ap_gain_per_sec() -> float:
+	return 1.0
 
 func add_buff(buf: BuffBase) -> void:
 	buffs.push_back(buf)

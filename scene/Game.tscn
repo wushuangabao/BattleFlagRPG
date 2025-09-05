@@ -11,10 +11,10 @@
 
 [sub_resource type="Resource" id="Resource_f6bub"]
 script = ExtResource("4_4cigq")
-packed_scene = {
+packed_scene = Dictionary[StringName, PackedScene]({
 &"test_actor": ExtResource("2_0qanc"),
 &"test_enemy": ExtResource("3_qto5f")
-}
+})
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
 [sub_resource type="Resource" id="Resource_4cigq"]
