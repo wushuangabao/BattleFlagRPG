@@ -1,8 +1,7 @@
 # 角色管理器
-class_name ActorManager extends Node
+class_name ActorManager extends AbstractSystem
 
 @export var actors : PackedSceneDictionary # 存储角色对应的 UnitBase3D 节点
-var _actors_nameList : Array[StringName]   # 所有角色的角色名
 var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
 	set(value):
 		var cleaned_dict = {}
@@ -13,11 +12,27 @@ var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
 				push_error("字典键 %s 的值类型错误: 期望 ActorController，得到 %s" % [key, typeof(_actors_nameMap[key])])
 		_actors_nameMap = cleaned_dict
 
+# 初始化：创建具名角色的实例，建立全局引用
 func _ready() -> void:
-	for actor in actors.keys():
-		_actors_nameList.append(actor)
+	for actor_name in actors.keys():
+		if is_character(actor_name):
+			var new_actor = ActorController.new()
+			new_actor.my_name = actor_name
+			# new_actor.set_actor_data() # 读取存档或者初始化数值表
+			_actors_nameMap[actor_name] = new_actor
 	Game.g_actors = self
 
+# 注册到架构时调用
+func on_init():
+	var temp = self.get_model(UnitStat)
+	var temp_hp = temp.HP as AttributeBase
+	temp_hp.register(on_actor_hp_changed)
+	# register_event("event_count", event_count)
+
+func on_actor_hp_changed(new_hp):
+	print("收到信号：hp=", new_hp)
+
+# 获取一个角色的 ActorController 实例
 func get_actor_by_name(actor_name: StringName) -> ActorController:
 	if _actors_nameMap.has(actor_name):
 		return _actors_nameMap[actor_name]
@@ -27,20 +42,28 @@ func get_actor_by_name(actor_name: StringName) -> ActorController:
 		if actors.exists(actor_name) == false:
 			push_error("get_actor_by_name: ", actor_name, " is invalid")
 			return null
-		var new_actor = ActorController.new(actor_name)
-		if _is_character(actor_name):
-			_actors_nameMap[actor_name] = new_actor
-		return new_actor
+		return null
 
 # 是否为全局唯一的角色（属性是随着游戏进程而变化的）
-func _is_character(actor_name: StringName) -> bool:
-	return is_character(actors.get_scene(actor_name))
-# 这种角色需要特殊命名节点
-func is_character(actor_template: PackedScene) -> bool:
+# 这种角色称为具名角色，不存在名为 ActorDefault 的子节点
+func is_character(actor) -> bool:
+	if actor is StringName or actor is String:
+		actor = actors.get_scene(actor)
+	elif actor is UnitBase3D:
+		var child_cnt = actor.get_child_count()
+		if child_cnt > 1:
+			for child in actor.get_children():
+				if child.name == &"ActorDefault":
+					return false
+		return true
+	elif not actor is PackedScene:
+		push_error("错误的参数类型 for ActorManager::is_charactor")
+		return false
+	var actor_template = actor as PackedScene
 	var actor_state := actor_template.get_state()
 	var node_cnt := actor_state.get_node_count()
 	if node_cnt >= 3:
 		for i in range(node_cnt):
 			if actor_state.get_node_name(i) == &"ActorDefault":
-				return true
-	return false
+				return false
+	return true

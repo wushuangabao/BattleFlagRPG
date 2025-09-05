@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 LubanDB="*res://luban/DataService.cs"
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
-CounterAppArchitecture="*res://addons/qframework_godot/examples/simple/architecture/counter_app_architecture.gd"
 
 [dialogic]
 

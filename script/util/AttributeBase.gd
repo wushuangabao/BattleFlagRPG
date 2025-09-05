@@ -1,22 +1,25 @@
-class_name AttributeBase
+class_name AttributeBase extends BindableProperty
 
 signal maximum_changed(maximum)
-signal value_changed(value)
+var _maximum : int
 
-var maximum := 0 :
+var maximum:
+	get():
+		return _maximum
 	set(v):
-		if maximum != v:
-			_set_maximum(v)
-var value := 0 :
-	set(v):
-		if value != v:
-			_set_value(v)
+		if _maximum != v:
+			_maximum = v
+			maximum_changed.emit(_maximum)
+
+func _init(default_value: int = 10, default_maximum: int = 10) -> void:
+	_maximum = default_maximum if default_maximum > 0 else 1
+	_value = clamp(default_value, 0, _maximum)
 
 func fill()-> void:
-	_set_value(maximum)
+	value = _maximum
 
 func empty() -> void:
-	_set_value(0)
+	value = 0
 
 func get_difference() -> int:
 	return maximum - value
@@ -30,10 +33,8 @@ func is_full() -> bool:
 func is_empty() -> bool:
 	return value == 0
 
-func _set_maximum(new_maximum: int) -> void:
+func set_maximum(new_maximum: int) -> void:
 	maximum = new_maximum
-	emit_signal("maximum_changed", maximum)
 
-func _set_value(new_value: int) -> void:
-	value = clamp(new_value, 0, maximum)
-	emit_signal("value_changed", value)
+func set_value(new_value: int) -> void:
+	value = clamp(new_value, 0, _maximum) as int

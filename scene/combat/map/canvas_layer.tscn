@@ -16,6 +16,6 @@ tile_set = ExtResource("1_3gvql")
 script = ExtResource("2_2hj5d")
 
 [node name="Flag" type="TileMapLayer" parent="TilemapRoot2D"]
-tile_map_data = PackedByteArray("AAAEAAQAAAAPAAMAAAAFAAUAAAAPAAQAAAAGAAYAAAAPAAQAAAA=")
+tile_map_data = PackedByteArray("AAAFAAUAAAAPAAQAAAAGAAYAAAAPAAQAAAAHAAQAAAAPAAMAAAA=")
 tile_set = ExtResource("1_3gvql")
 script = ExtResource("3_hb4mi")

@@ -1,3 +1,4 @@
+class_name CounterAppArchitecture
 extends Architecture
 
 func _init() -> void:

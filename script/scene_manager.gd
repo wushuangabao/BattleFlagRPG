@@ -13,7 +13,7 @@ func _ready() -> void:
 
 # 开始战斗
 func start_battle(battle_name: StringName) -> void:
-	Game.g_combat.cur_battle_name = battle_name
+	Game.g_combat.set_battle_name(battle_name)
 	goto_scene("BattleScene")
 
 # 切换场景

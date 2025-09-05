@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://df70ys3x6ucts"]
+[gd_scene load_steps=12 format=3 uid="uid://df70ys3x6ucts"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_fbytp"]
 [ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_xx3ty"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="7_canta"]
 [ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_yvhsp"]
 [ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_jhfff"]
+[ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_xx3ty"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
@@ -53,3 +54,9 @@ billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
 animation = &"run"
+
+[node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
+script = ExtResource("10_xx3ty")
+my_name = &"杂兵"
+base3d = NodePath("..")
+anim_player = NodePath("../anim")

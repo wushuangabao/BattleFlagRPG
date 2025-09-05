@@ -3,7 +3,7 @@
 ## 所有的层都需要向容器去注册。获取其他层的时候也要借助这个容器去获取。
 ## 所有的信号和事件可以借助事件总线去实现。形成多对多关系。
 
-class_name Architecture extends Node
+class_name Architecture
 
 signal on_register_patch(architecture)
 
@@ -28,16 +28,20 @@ func on_init() -> void:
 #region container
 var m_container: IOCContainer = IOCContainer.new()
 
-func register_system(system: GDScript):
+func register_system(system):
 	var instance_system = m_container.register(system)
+	if instance_system == null:
+		return
 	instance_system.set_architecture(self)
 	if !m_inited:
 		m_systems.append(instance_system)
 	else:
 		instance_system.on_init()
 
-func register_model(model: GDScript):
+func register_model(model):
 	var instance_model = m_container.register(model)
+	if instance_model == null:
+		return
 	instance_model.set_architecture(self)
 	if !m_inited:
 		m_models.append(instance_model)
@@ -47,11 +51,11 @@ func register_model(model: GDScript):
 func register_utility(utility: GDScript):
 	var instance_model = m_container.register(utility)
 	
-func get_system(gdscript: GDScript):
-	return m_container.get_value(gdscript)
+func get_system(v):
+	return m_container.get_value(v)
 
-func get_model(gdscript: GDScript):
-	return m_container.get_value(gdscript)
+func get_model(v):
+	return m_container.get_value(v)
 
 func get_utility(gdscript: GDScript):
 	return m_container.get_value(gdscript)
