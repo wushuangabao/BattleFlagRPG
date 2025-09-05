@@ -43,7 +43,9 @@ func on_battle_map_loaded() -> void:
 		var template : PackedScene = actor_manager.actors.get_scene(unit_name)
 		var cells = flag_units[unit_name] as Array
 		if cells.size() > 1 and actor_manager.is_character(template):
-			push_error("地图 ", cur_battle_name, " 中的 unit: ", unit_name, " 不能放置超过1个！")
+			push_error("地图 ", cur_battle_name, " 中的 unit: ", unit_name, " 不能放置超过1个！自动删除到只剩1个")
+			for i in range(cells.size() - 1, 0, -1):
+				cells.remove_at(i)
 		for cell in cells:
 			var look := true if _units.is_empty() else false
 			if Game.Debug == 1:

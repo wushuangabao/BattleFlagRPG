@@ -35,10 +35,12 @@ func get_actor_by_name(actor_name: StringName) -> ActorController:
 # 是否为全局唯一的角色（属性是随着游戏进程而变化的）
 func _is_character(actor_name: StringName) -> bool:
 	return is_character(actors.get_scene(actor_name))
-# 这种角色需要特殊命名 UnitBase3D 的第二个节点
+# 这种角色需要特殊命名节点
 func is_character(actor_template: PackedScene) -> bool:
 	var actor_state := actor_template.get_state()
 	var node_cnt := actor_state.get_node_count()
-	if node_cnt > 1 and actor_state.get_node_name(1) == &"ActorDefault":
-		return true
+	if node_cnt >= 3:
+		for i in range(node_cnt):
+			if actor_state.get_node_name(i) == &"ActorDefault":
+				return true
 	return false
