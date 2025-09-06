@@ -85,7 +85,7 @@ func _ready() -> void:
 	if my_system == null:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		my_system = Game.g_combat
-		my_system.set_scene_node(self)
+		my_system.init_with_scene_node(self)
 	my_system.on_battle_start()
 
 # 每次切到战斗场景都会调用

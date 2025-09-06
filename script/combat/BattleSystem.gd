@@ -9,9 +9,35 @@ var _buff_system : BuffSystem
 
 var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
+var _cell_map : Dictionary[Vector2i, ActorController]
 
 func get_actors() -> Array[ActorController]:
 	return _actors
+
+func get_actors_in_team(id: Game.TeamID) -> Array[ActorController]:
+	var actors = []
+	for actor in _actors:
+		if actor.team_id == id:
+			actors.append(actor)
+	return actors
+
+func get_actors_not_in_team(id: Game.TeamID) -> Array[ActorController]:
+	var actors = []
+	for actor in _actors:
+		if actor.team_id != id:
+			actors.append(actor)
+	return actors
+
+func let_actor_move(a: ActorController) -> void:
+	scene.let_actor_move(a)
+	_cell_map.erase(a.base3d.get_cur_cell())
+	_cell_map[a.base3d.get_cur_path().back()] = a
+
+func get_actor_on_cell(c: Vector2i):
+	if _cell_map.has(c):
+		return _cell_map[c]
+	else:
+		return null
 
 func _init() -> void:
 	_buff_system = BuffSystem.new()
@@ -26,13 +52,14 @@ func on_actor_hp_changed(actor, new_hp):
 func on_actor_mp_changed(actor, new_mp):
 	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
-func set_battle_name(battle_name: StringName) -> void:
+func init_with_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
 		_units.clear()
 		_actors.clear()
+		_cell_map.clear()
 		_cur_battle_name = battle_name
 
-func set_scene_node(node: BattleScene) -> void:
+func init_with_scene_node(node: BattleScene) -> void:
 	if scene != null:
 		return
 	scene = node
@@ -53,10 +80,8 @@ func on_battle_start() -> void:
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
-	if scene.load_battle_map(_cur_battle_name):
-		if Game.Debug == 1:
-			print("on_battle_start: scene.load_battle_map ok")
-	else:
+	if not scene.load_battle_map(_cur_battle_name):
+		print("加载地图失败：", _cur_battle_name)
 		_cur_battle_name = ""
 
 func on_battle_map_loaded() -> void:
@@ -77,7 +102,7 @@ func on_battle_map_loaded() -> void:
 				cells.remove_at(i)
 		for cell in cells:
 			var look := true if _units.is_empty() else false
-			print("开始添加单位 ", _units.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ")")
+			print("开始添加单位 ", _units.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
 			var unit := scene.add_unit_to(template, cell, look)
 			if not actor_manager.get_actor_by_name(unit_name):
 				actor = unit.get_child(1) # 获取子节点 ActorDefault
@@ -87,8 +112,10 @@ func on_battle_map_loaded() -> void:
 			unit.anim = unit.get_child(0)
 			actor.base3d = unit
 			actor.anim_player = unit.anim
+			actor.team_id = map.get_team_by_cell(cell)
 			_units.push_back(unit)
 			_actors.push_back(actor)
+			_cell_map[cell] = actor
 	print("战斗单位已加载完毕")
 	scene.timeline.start(_actors)
 
@@ -98,6 +125,4 @@ func on_battle_map_unload() -> void:
 	for i in range(unit_cnt):
 		if actor_manager.is_character(_units[i]) == false:
 			_actors[i].queue_free()
-	_units.clear()
-	_actors.clear()
-	_cur_battle_name = ""
+	init_with_battle_name("")

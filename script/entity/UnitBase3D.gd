@@ -20,8 +20,11 @@ var _current_path: Array[Vector2i] = []
 
 func get_pos_2d() -> Vector2:
 	return Vector2(global_position.x, global_position.z)
-	
+
 func get_cur_cell() -> Vector2i:
+	return _cell
+
+func _get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
 
 func get_cur_path() -> Array[Vector2i]:
@@ -102,7 +105,9 @@ func _cell_walkable(c: Vector2i) -> bool:
 	# 在 TileSet 的该Tile里添加了自定义数据 "walkable"
 	var data = map.get_cell_tile_data(c)
 	if data and data.has_custom_data("walkable") and data.get_custom_data("walkable") == true:
-		return true
+		var a = Game.g_combat.get_actor_on_cell(c)
+		if not a:
+			return true
 	return false
 
 func move_by_current_path():

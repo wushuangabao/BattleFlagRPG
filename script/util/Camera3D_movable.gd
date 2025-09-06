@@ -31,7 +31,7 @@ func follow_target_moving(t: Node3D) -> void:
 	_is_follow_target_moving = true
 	if _moving_to_target:
 		_moving_to_target = false
-	print("相机：开始跟随目标移动")
+	#print("相机：开始跟随目标移动")
 
 #func _unhandled_input(event: InputEvent) -> void:
 	## 开始拖拽
@@ -59,7 +59,7 @@ func _process(delta) -> void:
 				move_direction.z += 1  # 向后移动
 			if move_direction.length() > 0.1:
 				if _is_follow_target_moving:
-					print("相机：停止跟随目标移动")
+					#print("相机：停止跟随目标移动")
 					_is_follow_target_moving = false
 					return
 				var mv = move_direction.normalized() * move_speed * delta
@@ -73,7 +73,7 @@ func _process(delta) -> void:
 		var my_target_pos = _get_my_pos_by(target_pos)
 		var e = my_target_pos.distance_squared_to(global_position)
 		if e < 0.1:
-			print("e = ", e)
+			#print("e = ", e)
 			_moving_to_target = false
 			if _is_follow_target_moving and follow_target.get("_is_moving"):
 				_is_follow_target_moving = follow_target._is_moving

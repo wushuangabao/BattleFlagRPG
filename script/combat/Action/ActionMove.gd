@@ -10,5 +10,5 @@ func get_action_name() -> String:
 
 func execute(actor: ActorController) -> void:
 	print("执行动作 - 行走，消耗AP：", cost[&"AP"])
-	Game.g_combat.scene.let_actor_move(actor)
+	Game.g_combat.let_actor_move(actor)
 	await actor.base3d.reached_target_cell
