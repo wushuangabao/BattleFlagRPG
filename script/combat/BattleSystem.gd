@@ -1,4 +1,4 @@
-class_name BattleController extends AbstractSystem
+class_name BattleSystem extends AbstractSystem
 
 var scene         : BattleScene   = null
 var actor_manager : ActorManager
@@ -14,7 +14,6 @@ func get_actors() -> Array[ActorController]:
 	return _actors
 
 func _init() -> void:
-	_turn_controller = TurnController.new()
 	_buff_system = BuffSystem.new()
 
 # 注册到架构时调用
@@ -23,12 +22,9 @@ func on_init():
 	register_event("actor_mp_changed", on_actor_mp_changed)
 
 func on_actor_hp_changed(actor, new_hp):
-	print("BattleController 收到信号：", actor.my_name, " hp=", new_hp)
+	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)
 func on_actor_mp_changed(actor, new_mp):
-	print("BattleController 收到信号：mp=", actor.my_name, " mp=", new_mp)
-
-func _on_actor_turn(actor: ActorController) -> void:
-	print("现在是 ", actor.my_name, "的回合...")
+	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
 func set_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
@@ -40,9 +36,14 @@ func set_scene_node(node: BattleScene) -> void:
 	if scene != null:
 		return
 	scene = node
+	_turn_controller = scene.turn_controller
 	_turn_controller.set_timeline(scene.timeline)
-	scene.timeline.actor_ready.connect(_on_actor_turn)
+	_turn_controller.turn_started.connect(_on_turn_started)
+	scene.timeline.actor_ready.connect(_turn_controller.do_turn)
 	actor_manager = Game.g_actors
+
+func _on_turn_started(actor: ActorController) -> void:
+	scene.select_actor(actor)
 	
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
@@ -84,6 +85,8 @@ func on_battle_map_loaded() -> void:
 				unit.add_child(actor)
 			unit.actor = actor
 			unit.anim = unit.get_child(0)
+			actor.base3d = unit
+			actor.anim_player = unit.anim
 			_units.push_back(unit)
 			_actors.push_back(actor)
 	print("战斗单位已加载完毕")

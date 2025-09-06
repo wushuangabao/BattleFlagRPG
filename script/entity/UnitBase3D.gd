@@ -4,6 +4,7 @@ class_name UnitBase3D extends Marker3D
 @export var move_time: float = 0.5
 
 signal initialized
+signal reached_target_cell
 
 var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 var anim: AnimatedSprite3D = null
@@ -23,18 +24,22 @@ func get_pos_2d() -> Vector2:
 func get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
 
+func get_cur_path() -> Array[Vector2i]:
+	return _current_path
+
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
 	_cell = cell
 	_dir = dir
+
+func is_target_cell(cell: Vector2i) -> bool:
+	return cell == _target_cell
 	
 func set_target_cell(cell: Vector2i) -> bool:
 	if not _is_moving:
 		if MAX_STEPS == -1 or _reachable.has(cell):
-			if cell != _target_cell:
+			if not is_target_cell(cell):
 				_target_cell = cell
 				_update_path(true)
-			else:
-				_move_by_current_path()
 			return true
 	return false
 
@@ -100,21 +105,21 @@ func _cell_walkable(c: Vector2i) -> bool:
 		return true
 	return false
 
-func _move_by_current_path():
+func move_by_current_path():
 	if _current_path.size() <= 1:
 		return
 	_is_moving = true
 	map.set_reachable({}) # 移动时不显示可达范围
-	var tween = get_tree().create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
 	# 跳过起点
 	for i in range(1, _current_path.size()):
 		var c = _current_path[i]
-		tween.tween_property(self, "global_position", GridHelper.to_world_player_3d(map, c), move_time)
+		tween.tween_property(self, ^"global_position", GridHelper.to_world_player_3d(map, c), move_time)
 		tween.tween_callback(func(): _cell = c) # 每到一个格子就更新位置
 	tween.finished.connect(func():
 		_cell = _current_path.back() # 不要立刻设置_cell到目标位置，要等移动完
 		_is_moving = false
-		# 移动完刷新可达范围（从新位置出发）
-		_compute_reachable()
 		_current_path.clear()
-		map.clear_path())
+		map.clear_path()
+		reached_target_cell.emit()
+	)

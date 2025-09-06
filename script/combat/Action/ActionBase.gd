@@ -8,24 +8,24 @@ enum TargetType {
 var target : TargetType
 var cost   : Dictionary[StringName, int]
 
-func validate() -> bool:
-	return true
+func get_action_name() -> String:
+	return "Base"
 
-func pay_costs(actor: ActorController) -> bool:
-	var ok := true
+func validate(actor: ActorController) -> bool:
 	for s in cost:
 		match s:
 			&"HP":
 				if actor.get_HP() <= cost[s]:
-					ok = false
+					return false
 			&"MP":
 				if actor.get_MP() < cost[s]:
-					ok = false
+					return false
 			&"AP":
 				if actor.get_AP() < cost[s]:
-					ok = false
-		if not ok:
-			return false
+					return false
+	return true
+
+func pay_costs(actor: ActorController) -> void:
 	for s in cost:
 		match s:
 			&"HP":
@@ -34,10 +34,6 @@ func pay_costs(actor: ActorController) -> bool:
 				actor.add_MP(-cost[s])
 			&"AP":
 				actor.pay_AP(cost[s])
-	return true
 
-func execute() -> void: # 可分帧播放
-	pass
-
-func prediction(context): # 供 UI 预览
+func execute(_a: ActorController) -> void:
 	pass

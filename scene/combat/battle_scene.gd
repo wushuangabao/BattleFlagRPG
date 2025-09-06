@@ -5,6 +5,7 @@ extends Node3D
 @export var camera_path: NodePath
 @export var subviewport_path: NodePath
 @export var timeline_path: NodePath
+@export var turn_contr_path : NodePath
 
 # 是否在SubViewport背景透明（若想保留透明区域）
 @export var transparent_bg := true
@@ -13,9 +14,10 @@ extends Node3D
 @onready var board_plane := get_node(board_plane_path) as MeshInstance3D
 @onready var subvp := get_node(subviewport_path) as BattleMapContainer   # 战斗地图的容器
 @onready var timeline := get_node(timeline_path) as TimelineController
+@onready var turn_controller := get_node(turn_contr_path) as TurnController
 
 var _cur_unit : UnitBase3D = null
-var controller : BattleController = null
+var my_system : BattleSystem = null
 var ground_layer : Ground
 var flag_layer   : FlagLayer
 
@@ -45,7 +47,7 @@ func _on_battle_map_loaded():
 	# 如果地图是静态的，可只刷新一次
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	print("战斗地图加载完毕 - ", subvp._current_scene)
-	controller.on_battle_map_loaded()
+	my_system.on_battle_map_loaded()
 
 func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:
 	if ground_layer == null:
@@ -53,35 +55,44 @@ func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> 
 	var new_unit = unit_template.instantiate() as UnitBase3D
 	new_unit.map = ground_layer
 	new_unit.set_cur_cell(cell)
-	new_unit.initialized.connect(_on_actor_initialized)
 	if islook:
 		_cur_unit = new_unit
+		new_unit.initialized.connect(_on_cur_actor_initialized)
 	add_child(new_unit)
 	return new_unit
 
-func _on_actor_initialized(unit_node: UnitBase3D) -> void:
+func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
 	if unit_node != _cur_unit:
 		return
-	if Game.Debug == 1:
-		print("_on_actor_initialized CurUnit")
-	_cur_unit.on_selected()
 	camera.set_target_immediately(_cur_unit)
+
+func select_actor(actor: ActorController) -> void:
+	_cur_unit = actor.base3d
+	_cur_unit.on_selected()
+	camera.set_target_gradually(_cur_unit)
+	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
+	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
+
+func let_actor_move(actor: ActorController) -> void:
+	actor.base3d.move_by_current_path()
+	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
+	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 # 只调用一次，除非手动 request_ready
 # 所有子节点都已经添加到场景树后，才会调用
 func _ready() -> void:
-	if controller == null:
+	if my_system == null:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		controller = Game.g_combat
-		controller.set_scene_node(self)
-	controller.on_battle_start()
+		my_system = Game.g_combat
+		my_system.set_scene_node(self)
+	my_system.on_battle_start()
 
 # 每次切到战斗场景都会调用
 # 此时子节点还未添加
 func _enter_tree() -> void:
-	if controller == null:
+	if my_system == null:
 		return
-	controller.on_battle_start()
+	my_system.on_battle_start()
 
 func _configure_board_plane() -> void:
 	var plane := board_plane.mesh
@@ -132,11 +143,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_cell_clicked(cell)
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	if Game.Debug == 1:
-		print("Clicked cell: ", cell)
-	ground_layer.highlight_cell(cell, _cur_unit.set_target_cell(cell))
+	if _cur_unit.is_target_cell(cell): # 重复点击，发出移动动作
+		turn_controller.on_map_cell_clicked_twice(_cur_unit.get_cur_path())
+		return
+	var can_go := _cur_unit.set_target_cell(cell)
+	ground_layer.highlight_cell(cell, can_go)
 	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
+		
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from

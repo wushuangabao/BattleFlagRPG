@@ -3,7 +3,6 @@ class_name ActorController extends AbstractController
 
 var my_stat  : UnitStat         # 数据
 var AP       : AttributeBase    # 行动点
-var brain    : BrainBase       # 操控
 
 var camp     : = Game.Camp.Player # 阵营
 var team_id  : = Game.TeamID.Red  # 队伍
@@ -19,7 +18,6 @@ func _enter_tree() -> void:
 	print("角色已经加载到树中 ", my_name)
 	my_stat = UnitStat.new(self)
 	AP = AttributeBase.new(0, TimelineController.AP_MAX)
-	brain = BrainBase.new(self)
 	set_architecture(CombatArchitecture.new(my_stat))
 
 func add_HP(v: int) -> void:
@@ -38,7 +36,9 @@ func get_AP() -> int:
 	return AP.value
 
 func get_ap_gain_per_sec() -> float:
-	return 1.0
+	if my_name == &"test_actor":
+		return 3.0
+	return 2.5
 
 func add_buff(buf: BuffBase) -> void:
 	buffs.push_back(buf)

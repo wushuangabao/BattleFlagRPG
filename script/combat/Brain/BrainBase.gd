@@ -1,20 +1,33 @@
-class_name BrainBase extends Node
+class_name BrainBase
 
 enum BrainType {
 	Invalid,
 	AI,
-	Player,
+	Player
 }
+
+signal chose_an_action
 
 var _type := BrainType.Invalid
 var _actor : ActorController
 
-func _init(a: ActorController) -> void:
+func start_new_turn(a: ActorController, t:BrainType) -> void:
 	_actor = a
+	_type = t
 
-func request_action(actor: ActorController) -> ActionBase:
-	await get_tree().create_timer(2.0).timeout
-	return ActionBase.new()
+func get_type() -> BrainType:
+	return _type
+
+func is_valid() -> bool:
+	return not _type == BrainType.Invalid
+
+func set_attack_action() -> void:
+	var action = ActionAttack.new()
+	chose_an_action.emit(action)
+
+func set_move_action(path: Array[Vector2i]) -> void:
+	var action = ActionMove.new(path)
+	chose_an_action.emit(action)
 
 func allow_more_actions(actor: ActorController) -> bool:
 	return false

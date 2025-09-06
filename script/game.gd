@@ -9,7 +9,7 @@ const cell_pixel_size: Vector2i = Vector2i(64, 64)
 # 每格在3D世界中的对应长度
 const cell_world_size: Vector2 = Vector2(1.0, 1.0) # x对应世界X，y对应世界Z
 
-static var g_combat := BattleController.new()
+static var g_combat := BattleSystem.new()
 static var g_actors : ActorManager = null
 static var g_scenes : SceneManager = null
 
