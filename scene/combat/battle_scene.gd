@@ -75,6 +75,7 @@ func select_actor(actor: ActorController) -> void:
 
 func let_actor_move(actor: ActorController) -> void:
 	actor.base3d.move_by_current_path()
+	camera.follow_target_moving(actor.base3d)
 	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
 	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 

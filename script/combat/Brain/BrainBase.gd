@@ -15,6 +15,10 @@ func start_new_turn(a: ActorController, t:BrainType) -> void:
 	_actor = a
 	_type = t
 
+func end_this_turn() -> void:
+	_actor = null
+	_type = BrainBase.BrainType.Invalid
+
 func get_type() -> BrainType:
 	return _type
 

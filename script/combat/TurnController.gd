@@ -35,7 +35,7 @@ func do_turn(actor: ActorController) -> void:
 		# 无可行动或玩家主动结束
 		# if not await _brain.has_affordable_actions(actor):
 		# 	break
-	_brain.set_type(BrainBase.BrainType.Invalid)
+	_brain.end_this_turn()
 	turn_ended.emit(actor)
 	timeline.resume()
 
