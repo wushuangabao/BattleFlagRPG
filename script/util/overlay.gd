@@ -6,7 +6,7 @@ var grid: Ground # 指向 Ground 类型的父节点
 func _draw():
 	# 可达范围
 	var cells: Array[Vector2i] = []
-	for cell in grid.reachable.keys():
+	for cell in grid.reachable_map.keys():
 		# 注释掉的 3 行是直接填充每格的矩形。目前不这样做，目前要绘制可达范围的边界
 		# var center: Vector2 = grid.map_to_local(cell)
 		# var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
@@ -22,17 +22,20 @@ func _draw():
 		for i in range(points.size() - 1):
 			draw_line(points[i], points[i + 1], grid.color_path_line, grid.path_line_width)
 		for p in points:
-			draw_circle(p, min(GridHelper.cell_size.x, GridHelper.cell_size.y) * 0.12, grid.color_path_node)
-	# 高亮可到达格子
-	if grid.hightlight_cell_reachable.x >= 0 and grid.hightlight_cell_reachable.y >= 0:
-		var center: Vector2 = grid.map_to_local(grid.hightlight_cell_reachable)
-		var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
-		draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_hgihtlight_reachable, true)
-	# 高亮不可到达格子
-	elif grid.hightlight_cell_unreachable.x >= 0 and grid.hightlight_cell_unreachable.y >= 0:
-		var center: Vector2 = grid.map_to_local(grid.hightlight_cell_unreachable)
-		var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
-		draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_hgihtlight_unreachable, true)
+			draw_circle(p, GridHelper.cell_size.x * 0.12, grid.color_path_node)
+
+	# 高亮格子
+	for k in grid.hightlight_cell_map:
+		var c = grid.hightlight_cell_map[k]
+		if c.x >= 0 and c.y >= 0:
+			var center: Vector2 = grid.map_to_local(c)
+			if grid.color_hgihtlight_rect.has(k):
+				var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
+				draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_hgihtlight_rect[k], true)
+			elif grid.color_hgihtlight_circle.has(k):
+				draw_circle(center, GridHelper.cell_size.x * 0.501, grid.color_hgihtlight_circle[k])
+			elif grid.color_hgihtlight_circle_border.has(k):
+				draw_circle(center, GridHelper.cell_size.x * 0.51, grid.color_hgihtlight_circle_border[k], false, 1.5)
 
 # 绘制闭合的多边形轮廓
 func _draw_boundary(cells: Array[Vector2i], color: Color, width: float) -> void:

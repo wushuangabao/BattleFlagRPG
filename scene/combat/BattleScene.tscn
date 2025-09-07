@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/TurnController.gd" id="6_wwrlq"]
-[ext_resource type="PackedScene" uid="uid://ddarc1ux5psr7" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
+[ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://scene/ui/btn_attack.gd" id="10_c23fh"]
@@ -60,10 +60,15 @@ packed_scene = SubResource("Resource_dwjhn")
 script = ExtResource("6_wwrlq")
 
 [node name="timeline" type="ProgressBar" parent="UI"]
-offset_left = 50.0
-offset_top = 10.0
-offset_right = 850.0
-offset_bottom = 35.0
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 7.5
+offset_top = -300.0
+offset_right = 17.5
+offset_bottom = 305.0
+grow_vertical = 2
+fill_mode = 3
 show_percentage = false
 script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")

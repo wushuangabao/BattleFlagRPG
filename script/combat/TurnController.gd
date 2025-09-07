@@ -17,7 +17,7 @@ func do_turn(actor: ActorController) -> void:
 	_brain.start_new_turn(actor, BrainBase.BrainType.Player)
 	set_architecture(actor.m_architecture)
 	actor.AP.register(func(_new_ap):
-		timeline.set_actor_sprite_x(actor, true)
+		timeline.move_actor_btn(actor, true)
 	)
 	turn_started.emit(actor)
 	while actor.is_alive():

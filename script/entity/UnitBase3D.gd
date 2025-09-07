@@ -13,7 +13,7 @@ var actor: ActorController = null
 
 var _cell: Vector2i # 当前所在格子
 var _dir: Vector2i # 当前朝向
-var _target_cell: Vector2i # 移动目标格
+var _target_cell = Vector2i(-1, -1)# 移动目标格
 var _is_moving := false
 var _reachable: Dictionary = {} # cell->steps
 var _current_path: Array[Vector2i] = []
@@ -38,9 +38,9 @@ func is_target_cell(cell: Vector2i) -> bool:
 	return cell == _target_cell
 	
 func set_target_cell(cell: Vector2i) -> bool:
-	if not _is_moving:
+	if not _is_moving and cell != _cell:
 		if MAX_STEPS == -1 or _reachable.has(cell):
-			if not is_target_cell(cell):
+			if not is_target_cell(cell) or _current_path.size() == 0:
 				_target_cell = cell
 				_update_path(true)
 			return true
@@ -114,7 +114,7 @@ func move_by_current_path():
 	if _current_path.size() <= 1:
 		return
 	_is_moving = true
-	map.set_reachable({}) # 移动时不显示可达范围
+	map.clear_on_cur_actor_move()
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
 	# 跳过起点
 	for i in range(1, _current_path.size()):
@@ -122,9 +122,10 @@ func move_by_current_path():
 		tween.tween_property(self, ^"global_position", GridHelper.to_world_player_3d(map, c), move_time)
 		tween.tween_callback(func(): _cell = c) # 每到一个格子就更新位置
 	tween.finished.connect(func():
-		_cell = _current_path.back() # 不要立刻设置_cell到目标位置，要等移动完
+		_cell = _target_cell # 不要立刻设置_cell到目标位置，要等移动完
+		_target_cell = Vector2i(-1, -1)
 		_is_moving = false
 		_current_path.clear()
 		map.clear_path()
-		reached_target_cell.emit()
+		reached_target_cell.emit(_target_cell)
 	)

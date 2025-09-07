@@ -1,15 +1,45 @@
 class_name BattleSystem extends AbstractSystem
 
-var scene         : BattleScene   = null
-var actor_manager : ActorManager
+enum BattleState {
+	Init, Prepare, Wait, ChangeCurActor, ActorIdle, ChoseAction, ChoseActionTarget, ActorDoAction, AtEnd
+}
 
+var scene : BattleScene   = null
 var _cur_battle_name := ""
+var _cur_state       := BattleState.Init
+
 var _turn_controller : TurnController
 var _buff_system : BuffSystem
 
 var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
+
+func get_battle_state() -> BattleState:
+	return _cur_state
+
+func get_battle_state_string() -> String:
+	match _cur_state:
+		BattleState.Init:
+			return "Init"
+		BattleState.Prepare:
+			return "Prepare"
+		BattleState.Wait:
+			return "Wait"
+		BattleState.ChangeCurActor:
+			return "ChangeCurActor"
+		BattleState.ActorIdle:
+			return "ActorIdle"
+		BattleState.ChoseAction:
+			return "ChoseAction"
+		BattleState.ChoseActionTarget:
+			return "ChoseActionTarget"
+		BattleState.ActorDoAction:
+			return "ActorDoAction"
+		BattleState.AtEnd:
+			return "AtEnd"
+	push_error("get_battle_state_string: Invalid state!")
+	return "Unknown"
 
 func get_actors() -> Array[ActorController]:
 	return _actors
@@ -54,6 +84,7 @@ func on_actor_mp_changed(actor, new_mp):
 
 func init_with_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
+		_cur_state = BattleState.Init
 		_units.clear()
 		_actors.clear()
 		_cell_map.clear()
@@ -67,10 +98,9 @@ func init_with_scene_node(node: BattleScene) -> void:
 	_turn_controller.set_timeline(scene.timeline)
 	_turn_controller.turn_started.connect(_on_turn_started)
 	scene.timeline.actor_ready.connect(_turn_controller.do_turn)
-	actor_manager = Game.g_actors
 
 func _on_turn_started(actor: ActorController) -> void:
-	scene.select_actor(actor)
+	scene.select_current_actor(actor)
 	
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
@@ -87,6 +117,7 @@ func on_battle_start() -> void:
 func on_battle_map_loaded() -> void:
 	print("开始生成战斗单位...")
 	# 根据 TileMap 上设置的标记，生成初始单位
+	var actor_manager = Game.g_actors
 	var map = scene.flag_layer as FlagLayer
 	var flag_units = map.get_flag_units()
 	for unit_name in flag_units.keys():
@@ -118,11 +149,12 @@ func on_battle_map_loaded() -> void:
 			_cell_map[cell] = actor
 	print("战斗单位已加载完毕")
 	scene.timeline.start(_actors)
+	_cur_state = BattleState.Wait
 
 func on_battle_map_unload() -> void:
 	# 释放 _actors 中那些只在本场战斗中使用的角色
 	var unit_cnt = _units.size()
 	for i in range(unit_cnt):
-		if actor_manager.is_character(_units[i]) == false:
+		if Game.g_actors.is_character(_units[i]) == false:
 			_actors[i].queue_free()
 	init_with_battle_name("")

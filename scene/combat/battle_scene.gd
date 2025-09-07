@@ -28,6 +28,9 @@ var map_rows: int
 var cell_pixel_size = Game.cell_pixel_size
 var cell_world_size = Game.cell_world_size
 
+signal on_click_actor_teammember
+signal on_click_actor_other_team
+
 func load_battle_map(map_name: String) -> bool:
 	var new_node = subvp.loadScene_battleMap(map_name)
 	if new_node == null:
@@ -44,8 +47,7 @@ func _on_battle_map_loaded():
 	_configure_subviewport()
 	_configure_board_plane()
 	_hook_subviewport_texture_to_plane()
-	# 如果地图是静态的，可只刷新一次
-	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	print("战斗地图加载完毕 - ", subvp._current_scene)
 	my_system.on_battle_map_loaded()
 
@@ -66,18 +68,15 @@ func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
 		return
 	camera.set_target_immediately(_cur_unit)
 
-func select_actor(actor: ActorController) -> void:
+func select_current_actor(actor: ActorController) -> void:
+	ground_layer.clear_on_change_cur_actor_to(actor)
 	_cur_unit = actor.base3d
 	_cur_unit.on_selected()
 	camera.set_target_gradually(_cur_unit)
-	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
-	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func let_actor_move(actor: ActorController) -> void:
 	actor.base3d.move_by_current_path()
 	camera.follow_target_moving(actor.base3d)
-	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
-	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 # 只调用一次，除非手动 request_ready
 # 所有子节点都已经添加到场景树后，才会调用
@@ -105,11 +104,6 @@ func _configure_board_plane() -> void:
 func _configure_subviewport() -> void:
 	subvp.size = Vector2i(map_cols * cell_pixel_size.x, map_rows * cell_pixel_size.y)
 	subvp.render_target_clear_mode = SubViewport.CLEAR_MODE_ALWAYS
-	# 更新模式：调试期实时，发布期改为 UPDATE_ONCE 并在需要时手动触发
-	if Game.Debug == 1:
-		subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	else:
-		subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func _hook_subviewport_texture_to_plane() -> void:
 	var tex := subvp.get_texture()
@@ -148,10 +142,25 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 		turn_controller.on_map_cell_clicked_twice(_cur_unit.get_cur_path())
 		return
 	var can_go := _cur_unit.set_target_cell(cell)
-	ground_layer.highlight_cell(cell, can_go)
-	# 由于我们把SubViewport设置为UPDATE_ONCE，这里需要触发一次刷新：
-	subvp.render_target_update_mode = SubViewport.UPDATE_ONCE
-		
+	if can_go:
+		ground_layer.highlight_cell(cell, &"reachable")
+	else:
+		if ground_layer.path_cells.size() > 0:
+			ground_layer.clear_path()
+		var a = my_system.get_actor_on_cell(cell)
+		if a:
+			_on_actor_clicked(a, cell)
+		else:
+			ground_layer.highlight_cell(cell, &"unreachable")
+
+func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
+	if a != _cur_unit.actor:
+		if a.team_id == _cur_unit.actor.team_id:
+			ground_layer.highlight_cell(cell, &"select_teammember")
+			on_click_actor_teammember.emit(a)
+		else:
+			ground_layer.highlight_cell(cell, &"select_other_team_actor")
+			on_click_actor_other_team.emit(a)
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from
