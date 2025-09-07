@@ -10,9 +10,11 @@ const timeline_h := 590.0   # 行动条高度 = size.y - 10
 signal actor_ready # 通知到 BattleSystem._turn_controller.do_turn
 
 @export var packed_sprite : PackedScene
+@export var packed_arrow : PackedScene
 
 var running     : bool
 var len_per_ap  : float
+var arrow_anmi  : AnimatedSprite2D
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
 var texture_map  : Dictionary[ActorController, TextureButton]
@@ -29,12 +31,15 @@ func _physics_process(delta: float) -> void:
 		return
 	if ready_queue.size() > 0:
 		running = false
-		actor_ready.emit(ready_queue.pop_front())
+		var cur_actor = ready_queue.pop_front()
+		_set_actor_arrow_on_timeline(cur_actor)
+		actor_ready.emit(cur_actor)
 		return
 	set_array_map.clear()
 	var actor_y_map : Dictionary[ActorController, float] = {}
 	var actors := HashSet.new()
 	var any_ready := false
+	arrow_anmi.lost_focus()
 	# 增加 AP
 	for a in Game.g_combat.get_actors():
 		if not a.is_alive():
@@ -85,20 +90,31 @@ func _physics_process(delta: float) -> void:
 					set_array_map[hash_set].append(a)
 	# 设置各个角色的头像坐标
 	for actor_set in set_array_map:
-		var new_x := btn_origin_x
+		var index := 0
 		for a in set_array_map[actor_set].get_data():
+			var new_x := btn_origin_x
 			var new_y = actor_y_map[a]
 			actor_y_map.erase(a)
+			if index > 0:
+				for i in range(index):
+					var y_at_i = texture_map[set_array_map[actor_set].at(i)].position.y
+					if y_at_i < new_y + 0.1:
+						var dy = absf(new_y - y_at_i)
+						var po = pow(btn_spacing, 1 - dy)
+						new_x += po
+						print(new_x)
 			texture_map[a].position.y = new_y
 			texture_map[a].position.x = new_x
-			new_x += btn_spacing
+			index += 1
 	for a in actor_y_map:
 		texture_map[a].position.y = actor_y_map[a]
 		texture_map[a].position.x = btn_origin_x
 	# 等待回合行动
 	if any_ready and ready_queue.size() > 0:
 		running = false
-		actor_ready.emit(ready_queue.pop_front())
+		var cur_actor = ready_queue.pop_front()
+		_set_actor_arrow_on_timeline(cur_actor)
+		actor_ready.emit(cur_actor)
 
 func _on_actor_die(a: ActorController) -> void:
 	ready_queue.erase(a)
@@ -121,6 +137,8 @@ func start() -> void:
 		gain_ap_map[a] = 0.0
 		texture_map[a] = btn
 	ready_queue.clear()
+	arrow_anmi = packed_arrow.instantiate() as AnimatedSprite2D
+	add_child(arrow_anmi)
 	running = true
 
 func resume() -> void:
@@ -161,3 +179,12 @@ func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> b
 		return String(a1.my_name) < String(a2.my_name)
 	else:
 		return h1 < h2
+
+func _set_actor_arrow_on_timeline(a: ActorController) -> void:
+	if texture_map.has(a):
+		arrow_anmi.get_parent().remove_child(arrow_anmi)
+		texture_map[a].add_child(arrow_anmi)
+		arrow_anmi.on_focus()
+		var p = arrow_anmi.position
+		print("_set_actor_arrow", p)
+		arrow_anmi.position = p

@@ -16,8 +16,8 @@ tile_set = ExtResource("1_3gvql")
 script = ExtResource("2_2hj5d")
 
 [node name="Flag" type="TileMapLayer" parent="TilemapRoot2D"]
-tile_map_data = PackedByteArray("AAAXAAoAAAAPAAQAAAARAAoAAAAPAAMAAAAXAAkAAAAPAAQAAAA=")
+tile_map_data = PackedByteArray("AAAXAAoAAAAPAAQAAAARAAoAAAAPAAMAAAAWAAoAAAAPAAQAAAASAAsAAAAOAAMAAAA=")
 tile_set = ExtResource("1_3gvql")
 script = ExtResource("3_hb4mi")
-red_team = Vector2i(15, 3)
-green_team = Vector2i(15, 4)
+red_team = Array[Vector2i]([Vector2i(15, 3), Vector2i(14, 3)])
+green_team = Array[Vector2i]([Vector2i(15, 4), Vector2i(14, 4)])

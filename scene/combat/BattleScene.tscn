@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=17 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/TurnController.gd" id="6_wwrlq"]
 [ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
+[ext_resource type="PackedScene" uid="uid://dm3222rd8lg28" path="res://scene/combat/arrow_timeline.tscn" id="9_fi3ub"]
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://scene/ui/btn_attack.gd" id="10_c23fh"]
 
@@ -72,6 +73,7 @@ fill_mode = 3
 show_percentage = false
 script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")
+packed_arrow = ExtResource("9_fi3ub")
 
 [node name="attack" type="TextureButton" parent="UI"]
 anchors_preset = 3

@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3 uid="uid://dm3222rd8lg28"]
+
+[ext_resource type="Texture2D" uid="uid://b200fsl2gmkso" path="res://asset/png/icon/arrow-1.png" id="1_1vbd2"]
+[ext_resource type="Texture2D" uid="uid://8abww1a2pl8v" path="res://asset/png/icon/arrow-2.png" id="2_uyh84"]
+[ext_resource type="Texture2D" uid="uid://vmoim1a4djdp" path="res://asset/png/icon/arrow-3.png" id="3_rquwx"]
+[ext_resource type="Texture2D" uid="uid://da8f7yh4nii1i" path="res://asset/png/icon/arrow-4.png" id="4_kigob"]
+[ext_resource type="Texture2D" uid="uid://im4nvcvusa2s" path="res://asset/png/icon/arrow-5.png" id="5_tnyij"]
+[ext_resource type="Script" uid="uid://cdgcbg4q5keby" path="res://scene/combat/timeline_arrow.gd" id="6_bt3nx"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ymhnl"]
+animations = [{
+"frames": [{
+"duration": 1.5,
+"texture": ExtResource("1_1vbd2")
+}, {
+"duration": 1.2,
+"texture": ExtResource("2_uyh84")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_rquwx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_kigob")
+}, {
+"duration": 1.2,
+"texture": ExtResource("5_tnyij")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="arrow" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_ymhnl")
+centered = false
+offset = Vector2(-10, 28)
+script = ExtResource("6_bt3nx")

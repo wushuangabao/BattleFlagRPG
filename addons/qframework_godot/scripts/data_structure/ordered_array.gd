@@ -49,3 +49,7 @@ func merge(values: Array) -> void:
 
 func get_data() -> Array:
 	return _data
+
+func at(i: int):
+	if _data.size() > i and i >= 0:
+		return _data[i]
