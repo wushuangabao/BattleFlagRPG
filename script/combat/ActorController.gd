@@ -37,8 +37,8 @@ func get_AP() -> int:
 
 func get_ap_gain_per_sec() -> float:
 	if my_name == &"test_actor":
-		return 3.0
-	return 2.5
+		return 5.0
+	return 3.5
 
 func add_buff(buf: BuffBase) -> void:
 	buffs.push_back(buf)

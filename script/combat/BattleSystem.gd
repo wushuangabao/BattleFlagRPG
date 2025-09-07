@@ -113,7 +113,7 @@ func on_battle_start() -> void:
 	var ok = await scene.load_battle_map(_cur_battle_name)
 	if ok:
 		create_initial_units_on_battle_map()
-		scene.timeline.start(_actors)
+		scene.timeline.start()
 		_cur_state = BattleState.Wait
 	else:
 		print("加载地图失败：", _cur_battle_name)

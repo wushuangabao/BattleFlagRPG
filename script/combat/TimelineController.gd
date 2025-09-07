@@ -1,7 +1,7 @@
 class_name TimelineController extends ProgressBar
 
-const AP_THRESHOLD := 6
-const AP_MAX := 6
+const AP_THRESHOLD := 10
+const AP_MAX := 10
 const btn_origin_x := 11.5  # 头像初始横坐标
 const btn_origin_y := 568.0 # 头像初始纵坐标 = size.y - 32
 const btn_spacing := 66.0   # 头像横向排列间距 = 64 + 2
@@ -82,15 +82,19 @@ func _physics_process(delta: float) -> void:
 			for a in tmp[cur_a].to_array():
 				if not hash_set.has(a):
 					hash_set.append(a)
-					set_array_map[hash_set].append(a)		
+					set_array_map[hash_set].append(a)
 	# 设置各个角色的头像坐标
 	for actor_set in set_array_map:
 		var new_x := btn_origin_x
 		for a in set_array_map[actor_set].get_data():
 			var new_y = actor_y_map[a]
+			actor_y_map.erase(a)
 			texture_map[a].position.y = new_y
 			texture_map[a].position.x = new_x
 			new_x += btn_spacing
+	for a in actor_y_map:
+		texture_map[a].position.y = actor_y_map[a]
+		texture_map[a].position.x = btn_origin_x
 	# 等待回合行动
 	if any_ready and ready_queue.size() > 0:
 		running = false
@@ -103,8 +107,8 @@ func _on_actor_die(a: ActorController) -> void:
 	if texture_map.has(a):
 		texture_map.erase(a)
 
-func start(actors_list: Array[ActorController]) -> void:
-	for a in actors_list:
+func start() -> void:
+	for a in Game.g_combat.get_actors():
 		a.AP._value = 0 # 这样赋值可以不触发事件
 		#a.AP.register(func(new_ap):
 			#print("Timeline 接收到AP变更信号：", new_ap, " - ", a.my_name)
@@ -112,6 +116,7 @@ func start(actors_list: Array[ActorController]) -> void:
 		var btn = packed_sprite.instantiate() as TextureButton
 		btn.position.x = btn_origin_x
 		btn.position.y = btn_origin_y
+		btn.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(a.my_name)
 		add_child(btn)
 		gain_ap_map[a] = 0.0
 		texture_map[a] = btn

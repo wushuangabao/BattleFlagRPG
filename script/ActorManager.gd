@@ -2,6 +2,8 @@
 class_name ActorManager extends AbstractSystem
 
 @export var actors : PackedSceneDictionary # 存储角色对应的 UnitBase3D 节点
+@export var timeline_icons : Dictionary[StringName, Texture2D]
+
 var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
 	set(value):
 		var cleaned_dict = {}
@@ -67,3 +69,11 @@ func is_character(actor) -> bool:
 			if actor_state.get_node_name(i) == &"ActorDefault":
 				return false
 	return true
+
+func get_timeline_icon_by_actor_name(n: StringName) -> Texture2D:
+	if timeline_icons.has(n):
+		var texture: Texture2D = timeline_icons[n]
+		if texture:
+			return texture
+	push_warning("加载 timeline 图标失败，角色名：", n)
+	return timeline_icons[&"default"]
