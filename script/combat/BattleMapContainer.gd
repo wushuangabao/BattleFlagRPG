@@ -18,9 +18,8 @@ func loadScene_battleMap(scene_name: StringName) -> BattleMap:
 		var scene = packed.instantiate()
 		if scene:
 			_current_scene = scene_name
-			scene.battle_map_ready.connect(func():
-				get_parent()._on_battle_map_loaded())
 			add_child(scene)
+			await scene.battle_map_ready
 			return scene
 	else:
 		push_error("loadScene_battleMap, not find ", scene_name)

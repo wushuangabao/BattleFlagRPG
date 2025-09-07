@@ -16,7 +16,7 @@ var len_per_ap  : float
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
 var texture_map  : Dictionary[ActorController, TextureButton]
-var ap_array_map : Dictionary[int, OrderedArray]
+var set_array_map : Dictionary[HashSet, OrderedArray]
 
 func _ready() -> void:
 	running = false
@@ -31,16 +31,19 @@ func _physics_process(delta: float) -> void:
 		running = false
 		actor_ready.emit(ready_queue.pop_front())
 		return
-	ap_array_map.clear()
+	set_array_map.clear()
+	var actor_y_map : Dictionary[ActorController, float] = {}
+	var actors := HashSet.new()
 	var any_ready := false
-	var actors = Game.g_combat.get_actors()
 	# 增加 AP
-	for a in actors:
+	for a in Game.g_combat.get_actors():
 		if not a.is_alive():
 			if texture_map.has(a):
-				_on_actor_die(a)
+				_on_actor_die(a) # 去除死亡角色的头像
 			continue
-		if a.get_AP() >= AP_THRESHOLD:
+		actors.append(a)
+		if a.get_AP() >= AP_MAX:
+			actor_y_map[a] = texture_map[a].position.y
 			continue
 		var gain = a.get_ap_gain_per_sec() * delta
 		gain_ap_map[a] += gain
@@ -50,17 +53,41 @@ func _physics_process(delta: float) -> void:
 		if a.get_AP() >= AP_THRESHOLD:
 			ready_queue.push_back(a)
 			any_ready = true
-	# 把 AP 相等的角色排个序（不让头像重叠在一起）
-	for a in actors:
-		var a_ap := a.get_AP()
-		if not ap_array_map.has(a_ap):
-			ap_array_map[a_ap] = OrderedArray.new(_sort_actor_by_name)
-		ap_array_map[a_ap].append(a)
+		actor_y_map[a] = btn_origin_y - (a.get_AP() + gain_ap_map[a]) * len_per_ap
+	# 不让头像重叠
+	# 首先为每个头像建立临时的重叠集
+	var tmp : Dictionary[ActorController, HashSet]  # key: actor, value: 与 actor 重叠的或即将重叠的角色集合
+	for cur_a in actors.to_array():
+		var cur_set = null
+		var cur_y := actor_y_map[cur_a]
+		for a in actors.to_array():
+			if a == cur_a:
+				continue
+			if abs(cur_y - actor_y_map[a]) < btn_spacing:
+				if not tmp.has(a):
+					if cur_set == null:
+						cur_set = HashSet.new([cur_a])
+					cur_set.append(a)
+		if cur_set != null:
+			tmp[cur_a] = cur_set
+	# 把 tmp 填充到 set_array_map 中
+	for cur_a in tmp:
+		var hash_set = _is_in_setArrayMap(cur_a)
+		if hash_set == null:
+			hash_set = tmp[cur_a]
+			set_array_map[hash_set] = OrderedArray.new(_sort_actor_by_ap_gain_speed)
+			for a in hash_set.to_array():
+				set_array_map[hash_set].append(a)
+		else:
+			for a in tmp[cur_a].to_array():
+				if not hash_set.has(a):
+					hash_set.append(a)
+					set_array_map[hash_set].append(a)		
 	# 设置各个角色的头像坐标
-	for ap in ap_array_map:
+	for actor_set in set_array_map:
 		var new_x := btn_origin_x
-		for a in ap_array_map[ap]:
-			var new_y = btn_origin_y - (ap + gain_ap_map[a]) * len_per_ap
+		for a in set_array_map[actor_set].get_data():
+			var new_y = actor_y_map[a]
 			texture_map[a].position.y = new_y
 			texture_map[a].position.x = new_x
 			new_x += btn_spacing
@@ -96,21 +123,9 @@ func resume() -> void:
 
 func move_actor_btn(a: ActorController, gradually: bool = false) -> void:
 	var new_y = btn_origin_y - (a.get_AP() + gain_ap_map[a]) * len_per_ap
-	var new_x := btn_origin_x
-	
-	var oa := OrderedArray.new(_sort_actor_by_name)
-	oa.append(a)
-	var xa := {a : new_x}
-	var actors := Game.g_combat.get_actors()
-	for actor in actors:
-		if texture_map.has(actor) and absf(new_y - texture_map[a].position.y) < 32.0:
-			xa[a] = texture_map[a].position.x
-			oa.append(actor)
-	var x_ordered = btn_origin_x
-	for a_orderd in oa.get_data():
-		if texture_map[a_orderd].position.x != x_ordered:
-			texture_map[a_orderd].position.x = x_ordered
-		x_ordered += btn_spacing
+	# var new_x := btn_origin_x
+	# if set_array_map.has(a.get_AP()):
+	# 	ap.a
 	if gradually:
 		var current_p = texture_map[a].position
 		var new_p = current_p
@@ -122,7 +137,19 @@ func move_actor_btn(a: ActorController, gradually: bool = false) -> void:
 		
 		texture_map[a].position.y = new_y
 
-func _sort_actor_by_name(a1: ActorController, a2: ActorController) -> bool:
+func _is_in_setArrayMap(a: ActorController):
+	if set_array_map.size() > 0:
+		for hash_set in set_array_map:
+			if hash_set.has(a):
+				return hash_set
+	return null
+
+func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> bool:
+	var s1 := a1.get_ap_gain_per_sec()
+	var s2 := a2.get_ap_gain_per_sec()
+	if not is_equal_approx(s1, s2):
+		return s1 < s2
+	# 如果AP获得速度差不多，则根据名字排序
 	var h1 := a1.my_name.hash()
 	var h2 := a2.my_name.hash()
 	if h1 == h2:

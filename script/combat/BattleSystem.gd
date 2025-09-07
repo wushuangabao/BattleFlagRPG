@@ -110,11 +110,16 @@ func on_battle_start() -> void:
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
-	if not scene.load_battle_map(_cur_battle_name):
+	var ok = await scene.load_battle_map(_cur_battle_name)
+	if ok:
+		create_initial_units_on_battle_map()
+		scene.timeline.start(_actors)
+		_cur_state = BattleState.Wait
+	else:
 		print("加载地图失败：", _cur_battle_name)
 		_cur_battle_name = ""
 
-func on_battle_map_loaded() -> void:
+func create_initial_units_on_battle_map() -> void:
 	print("开始生成战斗单位...")
 	# 根据 TileMap 上设置的标记，生成初始单位
 	var actor_manager = Game.g_actors
@@ -148,8 +153,7 @@ func on_battle_map_loaded() -> void:
 			_actors.push_back(actor)
 			_cell_map[cell] = actor
 	print("战斗单位已加载完毕")
-	scene.timeline.start(_actors)
-	_cur_state = BattleState.Wait
+	
 
 func on_battle_map_unload() -> void:
 	# 释放 _actors 中那些只在本场战斗中使用的角色

@@ -32,12 +32,9 @@ signal on_click_actor_teammember
 signal on_click_actor_other_team
 
 func load_battle_map(map_name: String) -> bool:
-	var new_node = subvp.loadScene_battleMap(map_name)
+	var new_node = await subvp.loadScene_battleMap(map_name)
 	if new_node == null:
 		return false
-	return true
-
-func _on_battle_map_loaded():
 	var map_root = subvp.get_child(0).get_child(0)
 	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
 	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
@@ -49,7 +46,7 @@ func _on_battle_map_loaded():
 	_hook_subviewport_texture_to_plane()
 	subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	print("战斗地图加载完毕 - ", subvp._current_scene)
-	my_system.on_battle_map_loaded()
+	return true
 
 func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:
 	if ground_layer == null:
