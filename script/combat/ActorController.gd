@@ -3,6 +3,7 @@ class_name ActorController extends AbstractController
 
 var my_stat  : UnitStat         # 数据
 var AP       : AttributeBase    # 行动点
+var tmp_timeline_y : float      # 在 timeline 上头像的 y 坐标
 
 var camp     : = Game.Camp.Player # 阵营
 var team_id  : = Game.TeamID.Red  # 队伍
@@ -38,7 +39,7 @@ func get_AP() -> int:
 func get_ap_gain_per_sec() -> float:
 	if my_name == &"test_actor":
 		return 5.0
-	return 3.5
+	return 4.0
 
 func add_buff(buf: BuffBase) -> void:
 	buffs.push_back(buf)

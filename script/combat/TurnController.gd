@@ -26,7 +26,7 @@ func do_turn(actor: ActorController) -> void:
 			print("动作未通过校验 - ", actor.my_name)
 			continue
 		action.pay_costs(actor)
-		timeline.move_actor_btn(actor, true)
+		timeline.update_actor_btn_pos(actor, true)
 		await action.execute(actor)  # 执行动画/效果
 		if not _brain.allow_more_actions(actor):
 			break

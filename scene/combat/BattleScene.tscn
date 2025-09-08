@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
-[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/canvas_layer.tscn" id="3_ldyea"]
+[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/test_battle_map.tscn" id="3_ldyea"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/TurnController.gd" id="6_wwrlq"]

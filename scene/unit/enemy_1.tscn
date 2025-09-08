@@ -1,0 +1,62 @@
+[gd_scene load_steps=12 format=3 uid="uid://df70ys3x6ucts"]
+
+[ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_hnofr"]
+[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_cen02"]
+[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://asset/png/character/run_animation/run-2.png" id="3_5u7m6"]
+[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://asset/png/character/run_animation/run-3.png" id="4_gkyrw"]
+[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://asset/png/character/run_animation/run-4.png" id="5_6wneb"]
+[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://asset/png/character/run_animation/run-5.png" id="6_tjc6u"]
+[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="7_haikx"]
+[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_6en7r"]
+[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_2kdhb"]
+[ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_2d5li"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_cen02")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_5u7m6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_gkyrw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6wneb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_tjc6u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_haikx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_6en7r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_2kdhb")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}]
+
+[node name="unit" type="Marker3D"]
+script = ExtResource("1_hnofr")
+
+[node name="anim" type="AnimatedSprite3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+offset = Vector2(0, 25)
+pixel_size = 0.05
+billboard = 1
+render_priority = 1
+sprite_frames = SubResource("SpriteFrames_wlx1r")
+animation = &"run"
+
+[node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
+script = ExtResource("10_2d5li")
+my_name = &"杂兵1"
+base3d = NodePath("..")
+anim_player = NodePath("../anim")
