@@ -1,8 +1,5 @@
 class_name TurnController extends AbstractController
 
-signal turn_started
-signal turn_ended
-
 var timeline: TimelineController
 var _brain  : BrainBase
 
@@ -16,8 +13,10 @@ func do_turn(actor: ActorController) -> void:
 	print("现在是 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
 	_brain.start_new_turn(actor, BrainBase.BrainType.Player)
 	set_architecture(actor.m_architecture)
-	turn_started.emit(actor)
+	var battle = Game.g_combat
+	battle.turn_started(actor)
 	while actor.is_alive():
+		battle.begin_to_chose_action_for(actor)
 		var action: ActionBase = await _brain.chose_an_action
 		if action == null:
 			print("动作无效 - ", actor.my_name)
@@ -27,16 +26,16 @@ func do_turn(actor: ActorController) -> void:
 			continue
 		action.pay_costs(actor)
 		timeline.update_actor_btn_pos(actor, true)
-		Game.g_combat.begin_to_do_action(actor, action)
+		battle.begin_to_do_action(actor, action)
 		await action.execute(actor)  # 执行动画/效果
+		battle.end_doing_action(actor, action)
 		if not _brain.allow_more_actions(actor):
 			break
-		Game.g_combat.end_doing_action(actor, action)
 		# 无可行动或玩家主动结束
 		# if not await _brain.has_affordable_actions(actor):
 		# 	break
 	_brain.end_this_turn()
-	turn_ended.emit(actor)
+	battle.turn_ended(actor)
 	timeline.resume_timeline()
 
 func _on_attack_button_pressed() -> void:

@@ -97,7 +97,6 @@ func start() -> void:
 	running = true
 
 func resume_timeline() -> void:
-	Game.g_combat.scene.release_preview_actor()
 	running = true
 
 func on_mouse_enter_btn(btn: TextureButton) -> void:

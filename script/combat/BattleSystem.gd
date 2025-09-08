@@ -1,7 +1,7 @@
 class_name BattleSystem extends AbstractSystem
 
 enum BattleState {
-	Init, Prepare, Wait, ChangeCurActor, ActorIdle, ChoseAction, ChoseActionTarget, ActorDoAction, AtEnd
+	Init, Prepare, Wait, ChangeCurActor, ActorIdle, ChoseActionTarget, ActorDoAction, AtEnd
 }
 
 var scene : BattleScene   = null
@@ -18,7 +18,19 @@ var _cell_map : Dictionary[Vector2i, ActorController]
 func get_battle_state() -> BattleState:
 	return _cur_state
 
-func begin_to_do_action(_actor, _action) -> void:
+func turn_started(actor: ActorController) -> void:
+	_cur_state = BattleState.ActorIdle
+	scene.select_current_actor(actor)
+
+func turn_ended(_actor: ActorController) -> void:
+	_cur_state = BattleState.Wait
+
+func begin_to_chose_action_for(actor: ActorController) -> void:
+	scene.select_preview_actor(actor)
+	_cur_state = BattleState.ActorIdle
+
+func begin_to_do_action(actor, _action) -> void:
+	scene.release_preview_actor(actor)
 	_cur_state = BattleState.ActorDoAction
 
 func end_doing_action(_actor, _action) -> void:
@@ -35,9 +47,7 @@ func get_battle_state_string() -> String:
 		BattleState.ChangeCurActor:
 			return "ChangeCurActor"
 		BattleState.ActorIdle:
-			return "ActorIdle"
-		BattleState.ChoseAction:
-			return "ChoseAction"
+			return "ActorIdle" # can chose action
 		BattleState.ChoseActionTarget:
 			return "ChoseActionTarget"
 		BattleState.ActorDoAction:
@@ -102,17 +112,8 @@ func init_with_scene_node(node: BattleScene) -> void:
 	scene = node
 	_turn_controller = scene.turn_controller
 	_turn_controller.set_timeline(scene.timeline)
-	_turn_controller.turn_started.connect(_on_turn_started)
-	_turn_controller.turn_ended.connect(_on_turn_ended)
 	scene.timeline.actor_ready.connect(_turn_controller.do_turn)
 
-func _on_turn_started(actor: ActorController) -> void:
-	_cur_state = BattleState.ActorIdle
-	scene.select_current_actor(actor)
-
-func _on_turn_ended(_actor: ActorController) -> void:
-	_cur_state = BattleState.Wait
-	
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
 	if _cur_battle_name.is_empty():

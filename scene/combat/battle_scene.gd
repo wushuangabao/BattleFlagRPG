@@ -77,13 +77,12 @@ func select_preview_actor(actor: ActorController) -> void:
 			camera.set_target_gradually(actor.base3d)
 
 # 取消高亮
-func release_preview_actor(actor = null) -> void:
+func release_preview_actor(actor: ActorController) -> void:
 	if actor and actor is ActorController:
-		_release_preview_actor()
-		if _cur_unit and _cur_unit != actor:
+		if _cur_unit and Game.g_combat.get_battle_state() == BattleSystem.BattleState.ActorIdle:
+			select_preview_actor(_cur_unit.actor)
 			camera.set_target_gradually(_cur_unit)
-	else: # 结束回合时调用，无参数
-		if camera.follow_target == _cur_unit:
+		else:
 			_release_preview_actor()
 
 func _release_preview_actor() -> void:
@@ -95,7 +94,6 @@ func select_current_actor(actor: ActorController) -> void:
 	ground_layer.clear_on_change_cur_actor_to(actor)
 	_cur_unit = actor.base3d
 	_cur_unit.on_selected()
-	select_preview_actor(actor)
 	camera.set_target_gradually(_cur_unit)
 
 func let_actor_move(actor: ActorController) -> void:
