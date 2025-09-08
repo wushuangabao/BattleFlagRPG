@@ -1,4 +1,4 @@
-class_name TimelineController extends ProgressBar
+class_name TimelineController extends TextureProgressBar
 
 const AP_THRESHOLD := 5
 const AP_MAX := 10
@@ -18,8 +18,9 @@ var btn_moving  : bool
 var btn_jump_h  : float
 var len_per_ap  : float
 var arrow_anmi  : AnimatedSprite2D
+var current_turn_btn : TextureButton
 var mouse_enterd_btn : TextureButton
-
+var tween_move
 var ready_actor : HashSet
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
@@ -33,6 +34,7 @@ func _init() -> void:
 	btn_jump_h = 18.0
 	len_per_ap = timeline_h / AP_MAX
 	ready_actor = HashSet.new()
+	current_turn_btn = null
 	mouse_enterd_btn = null
 
 func _physics_process(delta: float) -> void:
@@ -90,6 +92,7 @@ func start() -> void:
 	ready_actor.clear()
 	arrow_anmi = packed_arrow.instantiate() as AnimatedSprite2D
 	add_child(arrow_anmi)
+	current_turn_btn = null
 	mouse_enterd_btn = null
 	running = true
 
@@ -135,8 +138,8 @@ func add_all_actor_ap_and_btn_y(delta: float) -> void:
 # 动态调整角色头像重叠时“跳起”的高度
 func _set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt: int, delta: float) -> void:
 	var target_jump_high := 32.0
-	if Game.Debug == 1: # 测试时看最紧凑的效果如何
-		target_jump_high = 18.0
+	# if Game.Debug == 1: # 测试时看最紧凑的效果如何
+	# 	target_jump_high = 18.0
 	if live_actor_cnt >= 15:
 		target_jump_high = 18.0
 	elif live_actor_cnt > 5:
@@ -168,6 +171,8 @@ func set_all_actor_btn_pos() -> void:
 	for a in actors:
 		if mouse_enterd_btn and texture_map[a] == mouse_enterd_btn:
 			mouse_enterd_btn.z_index = 1000
+		elif current_turn_btn and texture_map[a] == current_turn_btn:
+			current_turn_btn.z_index = 990
 		else:
 			texture_map[a].z_index = actors[a]
 	# 首先为每个头像建立临时的重叠集
@@ -208,11 +213,14 @@ func update_actor_btn_pos(a: ActorController, gradually: bool = false) -> void:
 		btn_moving = true
 		var current_p = texture_map[a].position
 		var time = absf(new_y - current_p.y) * 3 / timeline_h
-		var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(a, ^"tmp_timeline_y", new_y, time)
-		tween.finished.connect(func():
+		tween_move = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween_move.tween_property(a, ^"tmp_timeline_y", new_y, time)
+		tween_move.finished.connect(func():
 			btn_moving = false
 		)
+		if current_turn_btn and current_turn_btn == texture_map[a]:
+			var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tween.tween_property(arrow_anmi, ^"position", Vector2(arrow_anmi.position.x, new_y), time)
 
 func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> bool:
 	var s1 := a1.get_ap_gain_per_sec()
@@ -230,7 +238,6 @@ func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> b
 # 设置箭头，指示当前回合属于哪个角色
 func _set_actor_arrow_on_timeline(a: ActorController) -> void:
 	if texture_map.has(a):
-		arrow_anmi.get_parent().remove_child(arrow_anmi)
-		texture_map[a].add_child(arrow_anmi)
+		arrow_anmi.position.y = texture_map[a].position.y
 		arrow_anmi.on_focus()
-		texture_map[a].z_index = 100
+		current_turn_btn = texture_map[a]

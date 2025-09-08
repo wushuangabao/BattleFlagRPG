@@ -27,9 +27,11 @@ func do_turn(actor: ActorController) -> void:
 			continue
 		action.pay_costs(actor)
 		timeline.update_actor_btn_pos(actor, true)
+		Game.g_combat.begin_to_do_action(actor, action)
 		await action.execute(actor)  # 执行动画/效果
 		if not _brain.allow_more_actions(actor):
 			break
+		Game.g_combat.end_doing_action(actor, action)
 		# 无可行动或玩家主动结束
 		# if not await _brain.has_affordable_actions(actor):
 		# 	break

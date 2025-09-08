@@ -12,6 +12,8 @@ func get_action_name() -> String:
 	return "Base"
 
 func validate(actor: ActorController) -> bool:
+	if Game.g_combat.get_battle_state() != BattleSystem.BattleState.ActorIdle:
+		return false
 	for s in cost:
 		match s:
 			&"HP":

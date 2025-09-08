@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=19 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -8,7 +8,9 @@
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/TurnController.gd" id="6_wwrlq"]
 [ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
+[ext_resource type="Texture2D" uid="uid://bvndynxhey5fa" path="res://asset/png/icon/timeline_under.png" id="7_7hkn4"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
+[ext_resource type="Texture2D" uid="uid://dyv4isl8flafu" path="res://asset/png/icon/timeline_progress.png" id="8_8xf8q"]
 [ext_resource type="PackedScene" uid="uid://dm3222rd8lg28" path="res://scene/combat/arrow_timeline.tscn" id="9_fi3ub"]
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://scene/ui/btn_attack.gd" id="10_c23fh"]
@@ -60,7 +62,7 @@ packed_scene = SubResource("Resource_dwjhn")
 [node name="UI" type="Node" parent="."]
 script = ExtResource("6_wwrlq")
 
-[node name="timeline" type="ProgressBar" parent="UI"]
+[node name="timeline" type="TextureProgressBar" parent="UI"]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
@@ -70,7 +72,8 @@ offset_right = 17.5
 offset_bottom = 305.0
 grow_vertical = 2
 fill_mode = 3
-show_percentage = false
+texture_under = ExtResource("7_7hkn4")
+texture_progress = ExtResource("8_8xf8q")
 script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")
 packed_arrow = ExtResource("9_fi3ub")

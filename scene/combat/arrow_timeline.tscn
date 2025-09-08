@@ -33,5 +33,5 @@ animations = [{
 [node name="arrow" type="AnimatedSprite2D"]
 sprite_frames = SubResource("SpriteFrames_ymhnl")
 centered = false
-offset = Vector2(-10, 28)
+offset = Vector2(1, 28)
 script = ExtResource("6_bt3nx")
