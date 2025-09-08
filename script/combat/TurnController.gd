@@ -35,7 +35,7 @@ func do_turn(actor: ActorController) -> void:
 		# 	break
 	_brain.end_this_turn()
 	turn_ended.emit(actor)
-	timeline.resume()
+	timeline.resume_timeline()
 
 func _on_attack_button_pressed() -> void:
 	if _brain and _brain.is_valid():

@@ -13,7 +13,7 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 
 @export var my_name  : StringName     # 角色名（唯一）
 @export var base3d   : UnitBase3D     # 在场景中显示用
-@export var anim_player: AnimatedSprite3D # 动画节点的引用
+@export var anim_player: UnitAnimatedSprite3D # 动画节点的引用
 
 func _enter_tree() -> void:
 	print("角色已经加载到树中 ", my_name)

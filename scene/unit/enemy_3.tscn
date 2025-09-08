@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bpofwkdien4ix"]
+[gd_scene load_steps=13 format=3 uid="uid://bpofwkdien4ix"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_egmcp"]
 [ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_5mpbq"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_rndga"]
 [ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_0oyxm"]
 [ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_nan00"]
+[ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_xsood"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
@@ -54,6 +55,7 @@ billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
 animation = &"run"
+script = ExtResource("10_xsood")
 
 [node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
 script = ExtResource("10_nan00")

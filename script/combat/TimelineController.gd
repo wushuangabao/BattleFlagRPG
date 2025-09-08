@@ -4,7 +4,7 @@ const AP_THRESHOLD := 5
 const AP_MAX := 10
 const btn_origin_x := 11.5  # 头像初始横坐标
 const btn_origin_y := 568.0 # 头像初始纵坐标 = size.y - 32
-const btn_spacing  := 64.0  # 头像开始“跳跃”时纵向间距dy的最大值（跳跃高度 = 33 * cos(btn_jump_arg * dy) + 32）
+const btn_spacing  := 69.5  # 头像开始“跳跃”时纵向间距dy的最大值（跳跃高度 = btn_jump_h*cos(btn_jump_arg*dy)+btn_jump_h）
 const btn_jump_arg := 0.045
 const timeline_h := 590.0   # 行动条高度 = size.y - 10
 
@@ -15,8 +15,11 @@ signal actor_ready # 通知到 BattleSystem._turn_controller.do_turn
 
 var running     : bool
 var btn_moving  : bool
+var btn_jump_h  : float
 var len_per_ap  : float
 var arrow_anmi  : AnimatedSprite2D
+var mouse_enterd_btn : TextureButton
+
 var ready_actor : HashSet
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
@@ -27,8 +30,10 @@ func _init() -> void:
 	btn_moving = false
 	max_value = AP_MAX
 	value = AP_THRESHOLD
+	btn_jump_h = 18.0
 	len_per_ap = timeline_h / AP_MAX
 	ready_actor = HashSet.new()
+	mouse_enterd_btn = null
 
 func _physics_process(delta: float) -> void:
 	# 统计存活角色数量，去除死亡角色的头像等数据
@@ -51,6 +56,7 @@ func _physics_process(delta: float) -> void:
 			arrow_anmi.lost_focus()
 		add_all_actor_ap_and_btn_y(delta)
 	# 设置角色头像位置
+	_set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt, delta)
 	set_all_actor_btn_pos()
 	# ready 角色数量有增加，则暂停行动条，进入回合
 	if ready_queue.size() > ready_size or (running and not btn_moving and must_do_turn):
@@ -75,6 +81,8 @@ func start() -> void:
 		btn.position.x = btn_origin_x
 		btn.position.y = btn_origin_y
 		btn.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(a.my_name)
+		btn.mouse_entered.connect(on_mouse_enter_btn.bind(btn))
+		btn.mouse_exited.connect(on_mouse_exit_btn.bind(btn))
 		add_child(btn)
 		gain_ap_map[a] = 0.0
 		texture_map[a] = btn
@@ -82,10 +90,27 @@ func start() -> void:
 	ready_actor.clear()
 	arrow_anmi = packed_arrow.instantiate() as AnimatedSprite2D
 	add_child(arrow_anmi)
+	mouse_enterd_btn = null
 	running = true
 
-func resume() -> void:
+func resume_timeline() -> void:
+	Game.g_combat.scene.release_preview_actor()
 	running = true
+
+func on_mouse_enter_btn(btn: TextureButton) -> void:
+	mouse_enterd_btn = btn # 绘制层级设为最高
+	for a in texture_map:
+		if texture_map[a] == btn:
+			Game.g_combat.scene.select_preview_actor(a)
+			return
+
+func on_mouse_exit_btn(btn: TextureButton) -> void:
+	if btn == mouse_enterd_btn:
+		mouse_enterd_btn = null
+		for a in texture_map:
+			if texture_map[a] == btn:
+				Game.g_combat.scene.release_preview_actor(a)
+				return
 
 # 增加角色 AP，设置 tmp_timeline_y（头像高度）
 func add_all_actor_ap_and_btn_y(delta: float) -> void:
@@ -107,6 +132,25 @@ func add_all_actor_ap_and_btn_y(delta: float) -> void:
 			ready_actor.append(a)
 			ready_queue.push_back(a)
 
+# 动态调整角色头像重叠时“跳起”的高度
+func _set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt: int, delta: float) -> void:
+	var target_jump_high := 32.0
+	if Game.Debug == 1: # 测试时看最紧凑的效果如何
+		target_jump_high = 18.0
+	if live_actor_cnt >= 15:
+		target_jump_high = 18.0
+	elif live_actor_cnt > 5:
+		target_jump_high = 39 - 1.4 * live_actor_cnt # (5,32)->(15,18)
+	if not is_equal_approx(target_jump_high, btn_jump_h):
+		var dh := delta * 6 # 6像素/秒
+		if absf(target_jump_high - btn_jump_h) > dh:
+			if target_jump_high < btn_jump_h:
+				btn_jump_h -= dh
+			else:
+				btn_jump_h += dh
+		else:
+			btn_jump_h = target_jump_high
+
 # 设置角色头像的位置（根据 tmp_timeline_y 等信息）
 func set_all_actor_btn_pos() -> void:
 	# 构建 spd 数组
@@ -122,7 +166,10 @@ func set_all_actor_btn_pos() -> void:
 		actors[spd_arr[i]] = i
 	# 设置头像按钮的绘制顺序
 	for a in actors:
-		texture_map[a].z_index = actors[a]
+		if mouse_enterd_btn and texture_map[a] == mouse_enterd_btn:
+			mouse_enterd_btn.z_index = 1000
+		else:
+			texture_map[a].z_index = actors[a]
 	# 首先为每个头像建立临时的重叠集
 	var tmp : Dictionary[ActorController, Dictionary]  # value: {与 key 角色的间距小于 btn_spacing 且速度慢于 actor 的角色 a, 角色 a 对应的跳跃高度}
 	for cur_a in actors:
@@ -137,7 +184,7 @@ func set_all_actor_btn_pos() -> void:
 				continue
 			var dy = abs(cur_y - a.tmp_timeline_y)
 			if dy < btn_spacing:
-				cur_dict[a] = 33 * cos(btn_jump_arg * dy) + 32
+				cur_dict[a] = (cos(btn_jump_arg * dy) + 1) * btn_jump_h
 		if cur_dict.size() > 0:
 			tmp[cur_a] = cur_dict
 			# print("构建完毕：", cur_dict)
@@ -186,3 +233,4 @@ func _set_actor_arrow_on_timeline(a: ActorController) -> void:
 		arrow_anmi.get_parent().remove_child(arrow_anmi)
 		texture_map[a].add_child(arrow_anmi)
 		arrow_anmi.on_focus()
+		texture_map[a].z_index = 100

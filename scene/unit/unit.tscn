@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=12 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_qk4nm"]
 [ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_rewlt"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="7_yvym4"]
 [ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_uxlc8"]
 [ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_78eof"]
+[ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_y1hu4"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
@@ -53,3 +54,4 @@ billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
 animation = &"run"
+script = ExtResource("10_y1hu4")
