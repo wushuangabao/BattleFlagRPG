@@ -1,42 +1,32 @@
-[gd_scene load_steps=12 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=8 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_qk4nm"]
-[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="2_rewlt"]
-[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://asset/png/character/run_animation/run-2.png" id="3_7si1l"]
-[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://asset/png/character/run_animation/run-3.png" id="4_knh07"]
-[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://asset/png/character/run_animation/run-4.png" id="5_s2744"]
-[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://asset/png/character/run_animation/run-5.png" id="6_1jqhv"]
-[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="7_yvym4"]
-[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="8_uxlc8"]
-[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="9_78eof"]
+[ext_resource type="Texture2D" uid="uid://di17xbm6w6ki6" path="res://asset/png/character/run_animation/test_run_2.png" id="2_qt1e6"]
 [ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_y1hu4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3j4cu"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(0, 0, 52, 62)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rkgpu"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(54, 0, 52, 62)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ccq04"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(108, 0, 52, 62)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_rewlt")
+"texture": SubResource("AtlasTexture_3j4cu")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_7si1l")
+"texture": SubResource("AtlasTexture_rkgpu")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_knh07")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_s2744")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_1jqhv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_yvym4")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_uxlc8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_78eof")
+"texture": SubResource("AtlasTexture_ccq04")
 }],
 "loop": true,
 "name": &"run",

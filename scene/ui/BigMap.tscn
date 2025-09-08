@@ -1,44 +1,69 @@
-[gd_scene load_steps=14 format=4 uid="uid://datpgnyw8dvwa"]
+[gd_scene load_steps=15 format=4 uid="uid://datpgnyw8dvwa"]
 
 [ext_resource type="Texture2D" uid="uid://cn42efyewbr8i" path="res://asset/png/map/world.png" id="1_hxm1c"]
 [ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="2_g43hy"]
 [ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/ground.gd" id="3_eiqjw"]
-[ext_resource type="Texture2D" uid="uid://c7fq7jg1cwp3x" path="res://asset/png/character/run_animation/run-1.png" id="4_7vg8a"]
-[ext_resource type="Texture2D" uid="uid://c5pqk87gwxi3h" path="res://asset/png/character/run_animation/run-2.png" id="5_bxslm"]
-[ext_resource type="Texture2D" uid="uid://b6fwkcywgdhvb" path="res://asset/png/character/run_animation/run-3.png" id="6_1afde"]
-[ext_resource type="Texture2D" uid="uid://cuw4afjr08td4" path="res://asset/png/character/run_animation/run-4.png" id="7_vyapc"]
-[ext_resource type="Texture2D" uid="uid://v68m4wnv38cf" path="res://asset/png/character/run_animation/run-5.png" id="8_7cd5r"]
-[ext_resource type="Texture2D" uid="uid://bsa8v3hw3v3hv" path="res://asset/png/character/run_animation/run-6.png" id="9_ib6sk"]
-[ext_resource type="Texture2D" uid="uid://dlhg8vefde28j" path="res://asset/png/character/run_animation/run-7.png" id="10_aa2l2"]
-[ext_resource type="Texture2D" uid="uid://jmxvx1vtb5y3" path="res://asset/png/character/run_animation/run-8.png" id="11_x71tx"]
+[ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/run_animation/test_run.png" id="4_1e5kq"]
 [ext_resource type="Script" uid="uid://k6fkpi6blm72" path="res://script/entity/player.gd" id="12_1s3vn"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_bx4lf"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_wlwro"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(0, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_prvyt"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(72, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6pyj0"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(144, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_owpaq"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(216, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k8wod"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(288, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qgrg1"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(360, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pny1n"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(432, 0, 70, 67)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w5o8q"]
+atlas = ExtResource("4_1e5kq")
+region = Rect2(504, 0, 70, 67)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3vt4h"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_7vg8a")
+"texture": SubResource("AtlasTexture_wlwro")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5_bxslm")
+"texture": SubResource("AtlasTexture_prvyt")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_1afde")
+"texture": SubResource("AtlasTexture_6pyj0")
 }, {
 "duration": 1.0,
-"texture": ExtResource("7_vyapc")
+"texture": SubResource("AtlasTexture_owpaq")
 }, {
 "duration": 1.0,
-"texture": ExtResource("8_7cd5r")
+"texture": SubResource("AtlasTexture_k8wod")
 }, {
 "duration": 1.0,
-"texture": ExtResource("9_ib6sk")
+"texture": SubResource("AtlasTexture_qgrg1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("10_aa2l2")
+"texture": SubResource("AtlasTexture_pny1n")
 }, {
 "duration": 1.0,
-"texture": ExtResource("11_x71tx")
+"texture": SubResource("AtlasTexture_w5o8q")
 }],
 "loop": true,
 "name": &"run",
@@ -59,9 +84,8 @@ script = ExtResource("3_eiqjw")
 
 [node name="Player" type="AnimatedSprite2D" parent="."]
 position = Vector2(626, 420)
-sprite_frames = SubResource("SpriteFrames_bx4lf")
+sprite_frames = SubResource("SpriteFrames_3vt4h")
 animation = &"run"
-frame_progress = 0.124735
 speed_scale = 3.0
 script = ExtResource("12_1s3vn")
 
