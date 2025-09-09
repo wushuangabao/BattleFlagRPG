@@ -15,11 +15,49 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 @export var base3d   : UnitBase3D     # 在场景中显示用
 @export var anim_player: UnitAnimatedSprite3D # 动画节点的引用
 
+enum ActorState {
+	Idle, DoAction
+}
+
+var _state : ActorState = ActorState.Idle
+var _action: ActionBase = null
+
+func get_state() -> ActorState:
+	return _state
+
+signal begin_to_do_action
+signal end_doing_action
+
+var action:
+	get:
+		return _action
+	set(new_action):
+		if _action == null:
+			_state = ActorState.DoAction
+			if new_action.execute(self) == ActionBase.ActionState.Running:
+				_action = new_action
+				begin_to_do_action.emit(new_action)
+			else:
+				_state = ActorState.Idle # 动作执行一瞬间就结束了，不用发信号
+
 func _enter_tree() -> void:
 	print("角色已经加载到树中 ", my_name)
 	my_stat = UnitStat.new(self)
 	AP = AttributeBase.new(0, TimelineController.AP_MAX)
+	# 新建战斗框架并注册
 	set_architecture(CombatArchitecture.new(my_stat))
+
+func _process(delta: float) -> void:
+	if _state == ActorState.DoAction:
+		if _action == null:
+			push_error("角色状态是DoAction但_action为空！")
+			_state = ActorState.Idle
+			return
+		_action.update(self, delta)
+		if _action.get_state() == ActionBase.ActionState.Terminated:
+			_state = ActorState.Idle
+			end_doing_action.emit(_action)
+			_action = null
 
 func add_HP(v: int) -> void:
 	my_stat.HP.set_value(my_stat.HP.value + v)

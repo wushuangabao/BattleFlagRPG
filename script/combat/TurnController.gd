@@ -14,36 +14,41 @@ func do_turn(actor: ActorController) -> void:
 	_brain.start_new_turn(actor, BrainBase.BrainType.Player)
 	set_architecture(actor.m_architecture)
 	var battle = Game.g_combat
+	
 	battle.turn_started(actor)
+	
 	while actor.is_alive():
+		# 无可用的行动
+		if not _brain.has_affordable_actions(actor):
+			break
+	
 		battle.begin_to_chose_action_for(actor)
 		var action: ActionBase = await _brain.chose_an_action
 		if action == null:
 			print("动作无效 - ", actor.my_name)
+			continue
+		if action.get_action_name() == &"skip_turn":
 			break
 		if not action.validate(actor):
 			print("动作未通过校验 - ", actor.my_name)
 			continue
+		
+		match action.target_type:
+			ActionBase.TargetType.Cell:
+				await battle.chose_action_target_cell(actor, action)
+			ActionBase.TargetType.Unit:
+				await battle.chose_action_target_unit(actor, action)
+		
 		action.pay_costs(actor)
 		timeline.update_actor_btn_pos(actor, true)
-		battle.begin_to_do_action(actor, action)
-		await action.execute(actor)  # 执行动画/效果
-		battle.end_doing_action(actor, action)
-		if not _brain.allow_more_actions(actor):
-			break
-		# 无可行动或玩家主动结束
-		# if not await _brain.has_affordable_actions(actor):
-		# 	break
+		await battle.let_actor_do_action(actor, action)
+
 	_brain.end_this_turn()
 	battle.turn_ended(actor)
+
 	timeline.resume_timeline()
 
 func _on_attack_button_pressed() -> void:
 	if _brain and _brain.is_valid():
 		print("角色选择攻击动作")
 		_brain.set_attack_action()
-
-func on_map_cell_clicked_twice(path: Array[Vector2i]) -> void:
-	if _brain and _brain.is_valid():
-		print("角色选择移动")
-		_brain.set_move_action(path)

@@ -4,7 +4,7 @@ enum BattleState {
 	Init, Prepare, Wait, ChangeCurActor, ActorIdle, ChoseActionTarget, ActorDoAction, AtEnd
 }
 
-var scene : BattleScene   = null
+var scene : BattleScene = null
 var _cur_battle_name := ""
 var _cur_state       := BattleState.Init
 
@@ -29,12 +29,28 @@ func begin_to_chose_action_for(actor: ActorController) -> void:
 	scene.select_preview_actor(actor)
 	_cur_state = BattleState.ActorIdle
 
-func begin_to_do_action(actor, _action) -> void:
-	scene.release_preview_actor(actor)
-	_cur_state = BattleState.ActorDoAction
+func chose_action_target_cell(actor: ActorController, action: ActionBase) -> void:
+	_cur_state = BattleState.ChoseActionTarget
+	var target_cell = await scene.map_cell_chosed
+	while not action.check_target_cell(target_cell, actor):
+		target_cell = await scene.map_cell_chosed
+	action.target = target_cell
 
-func end_doing_action(_actor, _action) -> void:
-	_cur_state = BattleState.ActorIdle
+func chose_action_target_unit(actor: ActorController, action: ActionBase) -> void:
+	_cur_state = BattleState.ChoseActionTarget
+	var target_unit = await scene.an_actor_chosed
+	while not action.check_target_unit(target_unit, actor):
+		target_unit = await scene.an_actor_chosed
+	action.target = target_unit
+
+func let_actor_do_action(actor, action) -> void:
+	actor.action = action
+	if actor.action != null: # 持续性动作
+		_cur_state = BattleState.ActorDoAction
+		await actor.end_doing_action
+		_cur_state = BattleState.ActorIdle
+	scene.release_preview_actor(actor)
+	
 
 func get_battle_state_string() -> String:
 	match _cur_state:

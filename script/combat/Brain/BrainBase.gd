@@ -33,8 +33,5 @@ func set_move_action(path: Array[Vector2i]) -> void:
 	var action = ActionMove.new(path)
 	chose_an_action.emit(action)
 
-func allow_more_actions(actor: ActorController) -> bool:
-	return false
-
 func has_affordable_actions(actor: ActorController) -> bool:
 	return false

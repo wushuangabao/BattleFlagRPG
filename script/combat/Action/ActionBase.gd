@@ -1,15 +1,24 @@
 class_name ActionBase
 
+enum ActionState {
+	Uninitialized, Running, Terminated
+}
+var _state : ActionState = ActionState.Uninitialized
+
 enum TargetType {
 	Unit,
 	Cell,
 	None
 }
-var target : TargetType
+var target_type : TargetType
+var target
 var cost   : Dictionary[StringName, int]
 
-func get_action_name() -> String:
-	return "Base"
+func get_action_name() -> StringName:
+	return &"Base"
+
+func get_state() -> ActionState:
+	return _state
 
 func validate(actor: ActorController) -> bool:
 	if Game.g_combat.get_battle_state() != BattleSystem.BattleState.ActorIdle:
@@ -27,6 +36,12 @@ func validate(actor: ActorController) -> bool:
 					return false
 	return true
 
+func check_target_cell(_cell: Vector2i, _a: ActorController) -> bool:
+	return true
+
+func check_target_unit(_target: ActorController, _me: ActorController) -> bool:
+	return true
+
 func pay_costs(actor: ActorController) -> void:
 	for s in cost:
 		match s:
@@ -37,5 +52,15 @@ func pay_costs(actor: ActorController) -> void:
 			&"AP":
 				actor.pay_AP(cost[s])
 
-func execute(_a: ActorController) -> void:
-	pass
+func execute(a: ActorController) -> ActionState:
+	_state = ActionState.Running
+	start(a)
+	return _state
+
+# 立即执行一次
+func start(_a: ActorController) -> void:
+	_state = ActionState.Terminated
+
+# 在角色_process中执行
+func update(_a: ActorController, _delta: float) -> void:
+	_state = ActionState.Terminated

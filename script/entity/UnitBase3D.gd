@@ -4,7 +4,6 @@ class_name UnitBase3D extends Marker3D
 @export var move_time: float = 0.5
 
 signal initialized
-signal reached_target_cell
 
 var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 var anim: AnimatedSprite3D = null
@@ -38,7 +37,7 @@ func is_target_cell(cell: Vector2i) -> bool:
 	return cell == _target_cell
 	
 func set_target_cell(cell: Vector2i) -> bool:
-	if not _is_moving and cell != _cell:
+	if not _is_moving and cell != _cell and actor.get_state() == ActorController.ActorState.Idle:
 		if MAX_STEPS == -1 or _reachable.has(cell):
 			if not is_target_cell(cell) or _current_path.size() == 0:
 				_target_cell = cell
@@ -113,6 +112,8 @@ func _cell_walkable(c: Vector2i) -> bool:
 func move_by_current_path():
 	if _current_path.size() <= 1:
 		return
+	if is_target_cell(_cell):
+		return
 	_is_moving = true
 	map.clear_on_cur_actor_move()
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
@@ -123,9 +124,10 @@ func move_by_current_path():
 		tween.tween_callback(func(): _cell = c) # 每到一个格子就更新位置
 	tween.finished.connect(func():
 		_cell = _target_cell # 不要立刻设置_cell到目标位置，要等移动完
-		_target_cell = Vector2i(-1, -1)
 		_is_moving = false
 		_current_path.clear()
 		map.clear_path()
-		reached_target_cell.emit(_target_cell)
 	)
+
+func is_arrived_target_cell() -> bool:
+	return is_target_cell(_cell)

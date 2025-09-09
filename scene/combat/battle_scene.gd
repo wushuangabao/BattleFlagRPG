@@ -31,6 +31,9 @@ var cell_world_size = Game.cell_world_size
 signal on_click_actor_teammember
 signal on_click_actor_other_team
 
+signal map_cell_chosed
+signal an_actor_chosed
+
 func load_battle_map(map_name: String) -> bool:
 	var new_node = await subvp.loadScene_battleMap(map_name)
 	if new_node == null:
@@ -160,8 +163,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_cell_clicked(cell)
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	if _cur_unit.is_target_cell(cell): # 重复点击，发出移动动作
-		turn_controller.on_map_cell_clicked_twice(_cur_unit.get_cur_path())
+	if _cur_unit.is_target_cell(cell) and my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
+		map_cell_chosed.emit(cell)
 		return
 	var can_go := _cur_unit.set_target_cell(cell)
 	if can_go:
@@ -183,6 +186,8 @@ func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 		else:
 			ground_layer.highlight_cell(cell, &"select_other_team_actor")
 			on_click_actor_other_team.emit(a)
+		if my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
+			an_actor_chosed.emit(a)
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from
