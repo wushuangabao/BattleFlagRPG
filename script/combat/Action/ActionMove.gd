@@ -1,10 +1,11 @@
 class_name ActionMove extends ActionBase
 
 func _init(path: Array[Vector2i]) -> void:
-	target_type = TargetType.Cell
+	target_type = TargetType.None
 	cost = {
 		&"AP" : path.size() - 1
 	}
+	target = path.back()
 
 func get_action_name() -> StringName:
 	return &"move"

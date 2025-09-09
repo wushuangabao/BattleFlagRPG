@@ -56,6 +56,7 @@ func _process(delta: float) -> void:
 		_action.update(self, delta)
 		if _action.get_state() == ActionBase.ActionState.Terminated:
 			_state = ActorState.Idle
+			print("end_doing_action emit")
 			end_doing_action.emit(_action)
 			_action = null
 

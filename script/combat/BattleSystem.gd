@@ -15,18 +15,19 @@ var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
 
+signal action_chosed
+
 func get_battle_state() -> BattleState:
 	return _cur_state
 
 func turn_started(actor: ActorController) -> void:
-	_cur_state = BattleState.ActorIdle
-	scene.select_current_actor(actor)
+	_turn_controller.do_turn(actor)
 
 func turn_ended(_actor: ActorController) -> void:
 	_cur_state = BattleState.Wait
 
 func begin_to_chose_action_for(actor: ActorController) -> void:
-	scene.select_preview_actor(actor)
+	scene.select_current_actor(actor)
 	_cur_state = BattleState.ActorIdle
 
 func chose_action_target_cell(actor: ActorController, action: ActionBase) -> void:
@@ -48,9 +49,8 @@ func let_actor_do_action(actor, action) -> void:
 	if actor.action != null: # 持续性动作
 		_cur_state = BattleState.ActorDoAction
 		await actor.end_doing_action
+		print("BattleSystem 收到信号 end_doing_action")
 		_cur_state = BattleState.ActorIdle
-	scene.release_preview_actor(actor)
-	
 
 func get_battle_state_string() -> String:
 	match _cur_state:
@@ -106,8 +106,13 @@ func _init() -> void:
 
 # 注册到架构时调用
 func on_init():
+	register_event("event_chose_action", on_chose_action)
 	register_event("actor_hp_changed", on_actor_hp_changed)
 	register_event("actor_mp_changed", on_actor_mp_changed)
+
+func on_chose_action(action: ActionBase):
+	print("选择动作：", action.get_action_name())
+	action_chosed.emit(action)
 
 func on_actor_hp_changed(actor, new_hp):
 	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)
@@ -128,7 +133,6 @@ func init_with_scene_node(node: BattleScene) -> void:
 	scene = node
 	_turn_controller = scene.turn_controller
 	_turn_controller.set_timeline(scene.timeline)
-	scene.timeline.actor_ready.connect(_turn_controller.do_turn)
 
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)

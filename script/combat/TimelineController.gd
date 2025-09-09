@@ -8,20 +8,18 @@ const btn_spacing  := 69.5  # 头像开始“跳跃”时纵向间距dy的最大
 const btn_jump_arg := 0.045
 const timeline_h := 590.0   # 行动条高度 = size.y - 10
 
-signal actor_ready # 通知到 BattleSystem._turn_controller.do_turn
-
 @export var packed_sprite : PackedScene
-@export var packed_arrow : PackedScene
+@export var packed_greenbox : PackedScene
 
 var running     : bool
 var btn_moving  : bool
 var btn_jump_h  : float
 var len_per_ap  : float
-var arrow_anmi  : AnimatedSprite2D
+var select_box  : AnimatedSprite2D
 var current_turn_btn : TextureButton
 var mouse_enterd_btn : TextureButton
 var tween_move
-var ready_actor : HashSet
+var ready_actors : HashSet
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
 var texture_map : Dictionary[ActorController, TextureButton]
@@ -33,7 +31,7 @@ func _init() -> void:
 	value = AP_THRESHOLD
 	btn_jump_h = 18.0
 	len_per_ap = timeline_h / AP_MAX
-	ready_actor = HashSet.new()
+	ready_actors = HashSet.new()
 	current_turn_btn = null
 	mouse_enterd_btn = null
 
@@ -46,31 +44,33 @@ func _physics_process(delta: float) -> void:
 		elif texture_map.has(a):
 			_on_actor_die(a)
 	# 检查 ready 的角色，去掉 AP 低于 AP_THRESHOLD 的
-	for a in ready_queue:
+	var actor_max_ap_cnt := 0
+	for a in ready_actors.to_array():
 		if a.get_AP() < AP_THRESHOLD:
-			ready_queue.erase(a)
-			ready_actor.erase(a)
-	var ready_size := ready_queue.size()
+			ready_actors.erase(a)
+		elif a.get_AP() >= AP_MAX:
+			actor_max_ap_cnt += 1
+	var must_do_turn := true if actor_max_ap_cnt == live_actor_cnt else false
 	# 执行行动条增长逻辑
-	var must_do_turn := true if ready_size == live_actor_cnt else false
-	if running and not btn_moving and not must_do_turn:
-		if arrow_anmi.visible:
-			arrow_anmi.lost_focus()
+	ready_queue.clear()
+	if running and not btn_moving and not must_do_turn and ready_queue.size() == 0:
+		if select_box.visible:
+			select_box.stop()
+			select_box.hide()
 		add_all_actor_ap_and_btn_y(delta)
 	# 设置角色头像位置
 	_set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt, delta)
 	set_all_actor_btn_pos()
 	# ready 角色数量有增加，则暂停行动条，进入回合
-	if ready_queue.size() > ready_size or (running and not btn_moving and must_do_turn):
+	if ready_queue.size() > 0 or (running and not btn_moving and must_do_turn):
 		running = false
 		var cur_actor = ready_queue.front()
 		_set_actor_arrow_on_timeline(cur_actor)
-		actor_ready.emit(cur_actor)
+		Game.g_combat.turn_started(cur_actor)
 
 func _on_actor_die(a: ActorController) -> void:
 	ready_queue.erase(a)
-	if ready_actor.has(a):
-		ready_actor.erase(a)
+	ready_actors.erase(a)
 	if gain_ap_map.has(a):
 		gain_ap_map.erase(a)
 	if texture_map.has(a):
@@ -88,15 +88,14 @@ func start() -> void:
 		add_child(btn)
 		gain_ap_map[a] = 0.0
 		texture_map[a] = btn
-	ready_queue.clear()
-	ready_actor.clear()
-	arrow_anmi = packed_arrow.instantiate() as AnimatedSprite2D
-	add_child(arrow_anmi)
+	ready_actors.clear()
+	select_box = packed_greenbox.instantiate() as AnimatedSprite2D
 	current_turn_btn = null
 	mouse_enterd_btn = null
 	running = true
 
 func resume_timeline() -> void:
+	print("resume_timeline")
 	running = true
 
 func on_mouse_enter_btn(btn: TextureButton) -> void:
@@ -130,9 +129,10 @@ func add_all_actor_ap_and_btn_y(delta: float) -> void:
 				a.add_AP(1)
 			var tmp_y = btn_origin_y - (a.get_AP() + gain_ap_map[a]) * len_per_ap
 			a.tmp_timeline_y = tmp_y
-		if not ready_actor.has(a) and a.get_AP() >= AP_THRESHOLD:
-			ready_actor.append(a)
+		if a.get_AP() >= AP_THRESHOLD:
 			ready_queue.push_back(a)
+			if not ready_actors.has(a):
+				ready_actors.append(a)
 
 # 动态调整角色头像重叠时“跳起”的高度
 func _set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt: int, delta: float) -> void:
@@ -217,9 +217,6 @@ func update_actor_btn_pos(a: ActorController, gradually: bool = false) -> void:
 		tween_move.finished.connect(func():
 			btn_moving = false
 		)
-		if current_turn_btn and current_turn_btn == texture_map[a]:
-			var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-			tween.tween_property(arrow_anmi, ^"position", Vector2(arrow_anmi.position.x, new_y), time)
 
 func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> bool:
 	var s1 := a1.get_ap_gain_per_sec()
@@ -237,6 +234,9 @@ func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> b
 # 设置箭头，指示当前回合属于哪个角色
 func _set_actor_arrow_on_timeline(a: ActorController) -> void:
 	if texture_map.has(a):
-		arrow_anmi.position.y = texture_map[a].position.y
-		arrow_anmi.on_focus()
+		if select_box.get_parent():
+			select_box.get_parent().remove_child(select_box)
+		texture_map[a].add_child(select_box)
+		select_box.show()
+		select_box.play(&"default")
 		current_turn_btn = texture_map[a]

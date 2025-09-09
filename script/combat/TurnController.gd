@@ -15,15 +15,13 @@ func do_turn(actor: ActorController) -> void:
 	set_architecture(actor.m_architecture)
 	var battle = Game.g_combat
 	
-	battle.turn_started(actor)
-	
 	while actor.is_alive():
 		# 无可用的行动
 		if not _brain.has_affordable_actions(actor):
 			break
 	
 		battle.begin_to_chose_action_for(actor)
-		var action: ActionBase = await _brain.chose_an_action
+		var action: ActionBase = await Game.g_combat.action_chosed
 		if action == null:
 			print("动作无效 - ", actor.my_name)
 			continue

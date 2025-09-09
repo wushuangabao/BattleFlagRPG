@@ -11,9 +11,9 @@
 [ext_resource type="Texture2D" uid="uid://bvndynxhey5fa" path="res://asset/png/icon/timeline_under.png" id="7_7hkn4"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
 [ext_resource type="Texture2D" uid="uid://dyv4isl8flafu" path="res://asset/png/icon/timeline_progress.png" id="8_8xf8q"]
-[ext_resource type="PackedScene" uid="uid://dm3222rd8lg28" path="res://scene/combat/arrow_timeline.tscn" id="9_fi3ub"]
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://scene/ui/btn_attack.gd" id="10_c23fh"]
+[ext_resource type="PackedScene" uid="uid://vb2dibitntmx" path="res://scene/combat/green_box_timeline.tscn" id="11_8xf8q"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wponv"]
 
@@ -76,7 +76,7 @@ texture_under = ExtResource("7_7hkn4")
 texture_progress = ExtResource("8_8xf8q")
 script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")
-packed_arrow = ExtResource("9_fi3ub")
+packed_greenbox = ExtResource("11_8xf8q")
 
 [node name="attack" type="TextureButton" parent="UI"]
 anchors_preset = 3

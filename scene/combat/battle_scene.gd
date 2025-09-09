@@ -163,8 +163,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_cell_clicked(cell)
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	if _cur_unit.is_target_cell(cell) and my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
-		map_cell_chosed.emit(cell)
+	var battle_state = my_system.get_battle_state()
+	if _cur_unit.is_target_cell(cell) and battle_state == BattleSystem.BattleState.ActorIdle:
+		if _cur_unit.get_cur_path().size() > 1:
+			my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
+			map_cell_chosed.emit(cell)
+			return
+	if battle_state != BattleSystem.BattleState.ActorIdle:
 		return
 	var can_go := _cur_unit.set_target_cell(cell)
 	if can_go:

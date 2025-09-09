@@ -34,4 +34,7 @@ func set_move_action(path: Array[Vector2i]) -> void:
 	chose_an_action.emit(action)
 
 func has_affordable_actions(actor: ActorController) -> bool:
-	return false
+	if actor.get_AP() > 0:
+		return true
+	else:
+		return false

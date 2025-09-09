@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://vb2dibitntmx"]
+
+[ext_resource type="Texture2D" uid="uid://c78dv0apwaroi" path="res://asset/png/icon/box64green-1.png" id="1_j6df6"]
+[ext_resource type="Texture2D" uid="uid://bksdgceomh3q2" path="res://asset/png/icon/box64green-2.png" id="2_pnb4w"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_j6df6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_j6df6")
+}, {
+"duration": 2.0,
+"texture": ExtResource("2_pnb4w")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="green_box" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_j6df6")
+centered = false
+offset = Vector2(-2, -2)

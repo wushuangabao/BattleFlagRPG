@@ -5,7 +5,6 @@ class_name UnitBase3D extends Marker3D
 
 signal initialized
 
-var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 var anim: AnimatedSprite3D = null
 var map: Ground = null
 var actor: ActorController = null
@@ -38,7 +37,7 @@ func is_target_cell(cell: Vector2i) -> bool:
 	
 func set_target_cell(cell: Vector2i) -> bool:
 	if not _is_moving and cell != _cell and actor.get_state() == ActorController.ActorState.Idle:
-		if MAX_STEPS == -1 or _reachable.has(cell):
+		if _reachable.has(cell):
 			if not is_target_cell(cell) or _current_path.size() == 0:
 				_target_cell = cell
 				_update_path(true)
@@ -61,7 +60,7 @@ func on_selected() -> void:
 	_compute_reachable()
 
 func _compute_reachable():
-	_reachable = GridHelper.movement_range(_cell, MAX_STEPS, _cell_walkable)
+	_reachable = GridHelper.movement_range(_cell, actor.get_AP(), _cell_walkable)
 	map.set_reachable(_reachable)
 
 func _process(_delta):
@@ -89,10 +88,6 @@ func _update_path(preview: bool):
 		_current_path.clear()
 		map.clear_path()
 		return
-	# 安全起见，截断超过 MAX_STEPS 的路径
-	if MAX_STEPS != -1:
-		if path.size() - 1 > MAX_STEPS:
-			path = path.slice(0, MAX_STEPS + 1)
 	_current_path = path
 	if preview:
 		map.set_path(_current_path)
