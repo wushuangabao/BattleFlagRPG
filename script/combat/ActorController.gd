@@ -40,12 +40,21 @@ var action:
 			else:
 				_state = ActorState.Idle # 动作执行一瞬间就结束了，不用发信号
 
+ # 读取存档或者初始化数值表
+func set_actor_data(actor_name) -> void:
+	my_name = actor_name
+	my_stat = UnitStat.new(self)
+	print("角色基础属性数据初始化完毕 - ", actor_name)
+
 func _enter_tree() -> void:
 	print("角色已经加载到树中 ", my_name)
 	my_stat = UnitStat.new(self)
 	AP = AttributeBase.new(0, TimelineController.AP_MAX)
-	# 新建战斗框架并注册
-	set_architecture(CombatArchitecture.new(my_stat))
+	Game.g_combat.get_architecture().register_actor_stat(self)
+
+func _exit_tree() -> void:
+	print("角色已从树中移除 ", my_name)
+	Game.g_combat.get_architecture().unregister_actor_stat(self)
 
 func _process(delta: float) -> void:
 	if _state == ActorState.DoAction:

@@ -104,6 +104,9 @@ func get_actor_on_cell(c: Vector2i):
 func _init() -> void:
 	_buff_system = BuffSystem.new()
 
+func _ready() -> void:
+	set_architecture(CombatArchitecture.new())
+
 # 注册到架构时调用
 func on_init():
 	register_event("event_chose_action", on_chose_action)

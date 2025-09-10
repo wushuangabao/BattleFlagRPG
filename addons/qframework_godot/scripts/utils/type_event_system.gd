@@ -2,8 +2,6 @@
 
 class_name TypeEventSystem extends RefCounted
 
-static var global = TypeEventSystem.new()
-
 ## 推送事件
 func send_event(destination: String, payload = null) -> void:
 	if payload == null:

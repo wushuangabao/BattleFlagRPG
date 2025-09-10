@@ -19,8 +19,7 @@ func _ready() -> void:
 	for actor_name in actors.keys():
 		if is_character(actor_name):
 			var new_actor = ActorController.new()
-			new_actor.my_name = actor_name
-			# new_actor.set_actor_data() # 读取存档或者初始化数值表
+			new_actor.set_actor_data(actor_name)
 			_actors_nameMap[actor_name] = new_actor
 	Game.g_actors = self
 	print("角色管理器初始化完毕")

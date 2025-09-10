@@ -62,14 +62,13 @@ func get_utility(gdscript: GDScript):
 #endregion
 
 #region EventBus
-var m_type_event_system: TypeEventSystem = TypeEventSystem.global
 
 func send_event(destination: String, payload):
-	m_type_event_system.send_event(destination, payload)
+	Game.g_event.send_event(destination, payload)
 
 func register_event(destination: String, on_event: Callable):
-	m_type_event_system.register_event(destination, on_event)
+	Game.g_event.register_event(destination, on_event)
 
 func unregister_event(destination: String, on_event: Callable):
-	m_type_event_system.unregister_event(destination, on_event)
+	Game.g_event.unregister_event(destination, on_event)
 #endregion

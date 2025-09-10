@@ -12,12 +12,12 @@ using Luban;
 
 namespace cfg.item
 {
-public partial class Tbitem
+public partial class TbItem
 {
     private readonly System.Collections.Generic.Dictionary<int, item.Item> _dataMap;
     private readonly System.Collections.Generic.List<item.Item> _dataList;
     
-    public Tbitem(ByteBuf _buf)
+    public TbItem(ByteBuf _buf)
     {
         int n = _buf.ReadSize();
         _dataMap = new System.Collections.Generic.Dictionary<int, item.Item>(n);

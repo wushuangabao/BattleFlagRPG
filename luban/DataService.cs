@@ -10,7 +10,7 @@ public partial class DataService : Node
 	{
 		// 一次性加载全部配置（也可改成延迟加载：把 _tables = new Tables(LoadByteBuf) 放到需要的时机
 		_tables = new Tables(LoadByteBuf);
-		GD.Print($"Luban tables loaded. Item 1: {_tables.Tbitem.Get(1001).Name}"); // 举例
+		GD.Print("LubanDB数据加载完毕");
 	}
 
 	// Luban 约定的加载函数：给定表名，返回该表的二进制 ByteBuf
@@ -27,7 +27,7 @@ public partial class DataService : Node
 	// 方式A：返回具体字段（性能最佳，跨语言开销最小）
 	public string GetItemName(int id)
 	{
-		var row = _tables.Tbitem.Get(id);
+		var row = _tables.TbItem.Get(id);
 		if (row == null)
 		{
 			GD.PushWarning($"[Luban] TbItem 没有 id={id}。");
@@ -39,7 +39,7 @@ public partial class DataService : Node
 	// 方式B：需要更通用时，转成 GDScript 友好的 Dictionary/Array
 	public Godot.Collections.Dictionary GetItemAsDict(int id)
 	{
-		var row = _tables.Tbitem.GetOrDefault(id);
+		var row = _tables.TbItem.GetOrDefault(id);
 		var d = new Godot.Collections.Dictionary();
 		if (row == null) return d;
 		d["Id"] = row.Id;
@@ -47,5 +47,24 @@ public partial class DataService : Node
 		d["Desc"] = row.Desc;
 		// …按你的表结构补充字段
 		return d;
+	}
+
+	// ---------- attr 相关 ----------
+	// 角色初始基础属性
+	public Godot.Collections.Array GetActorBaseAttr(string name)
+	{
+		var row = _tables.TbActorBaseAttr.Get(name);
+		var arr = new Godot.Collections.Array();
+		if (row == null)
+		{
+			GD.PushWarning($"[Luban] TbActorBaseAttr 没有 key={name}。");
+			return d;
+		}
+		arr[0] = row.STR;
+		arr[1] = row.CON;
+		arr[2] = row.AGI;
+		arr[3] = row.WIL;
+		arr[4] = row.INT;
+		return arr;
 	}
 }

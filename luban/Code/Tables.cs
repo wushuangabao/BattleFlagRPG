@@ -13,17 +13,23 @@ namespace cfg
 {
 public partial class Tables
 {
-    public item.Tbitem Tbitem {get; }
+    public item.TbItem TbItem {get; }
+    public attr.TbActorBaseAttr TbActorBaseAttr {get; }
+    public attr.TbBaseAttr TbBaseAttr {get; }
 
     public Tables(System.Func<string, ByteBuf> loader)
     {
-        Tbitem = new item.Tbitem(loader("item_tbitem"));
+        TbItem = new item.TbItem(loader("item_tbitem"));
+        TbActorBaseAttr = new attr.TbActorBaseAttr(loader("attr_tbactorbaseattr"));
+        TbBaseAttr = new attr.TbBaseAttr(loader("attr_tbbaseattr"));
         ResolveRef();
     }
     
     private void ResolveRef()
     {
-        Tbitem.ResolveRef(this);
+        TbItem.ResolveRef(this);
+        TbActorBaseAttr.ResolveRef(this);
+        TbBaseAttr.ResolveRef(this);
     }
 }
 
