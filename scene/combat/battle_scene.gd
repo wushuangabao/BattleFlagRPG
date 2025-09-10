@@ -38,7 +38,7 @@ func load_battle_map(map_name: String) -> bool:
 	var new_node = await subvp.loadScene_battleMap(map_name)
 	if new_node == null:
 		return false
-	var map_root = subvp.get_child(0).get_child(0)
+	var map_root = subvp.get_child(0).get_child(1)
 	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
 	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
 	var dim = ground_layer.get_tilemap_dimensions()
