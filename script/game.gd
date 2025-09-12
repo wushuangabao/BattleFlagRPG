@@ -4,10 +4,10 @@ class_name Game
 const Debug = 1
 
 const MAX_LEVEL = 50
-const MAX_HP    = 10000
-const MAX_MP    = 10000
-const MAX_ATK   = 2500
-const MAX_DEF   = 1500
+const MAX_HP    = 3000
+const MAX_MP    = 3000
+const MAX_ATK   = 1000
+const MAX_DEF   = 1000
 const BASE_SPD  = 5
 
 # TileMap中每格的像素尺寸（与TileSet一致）
