@@ -12,7 +12,6 @@ func _init() -> void:
 func do_turn(actor: ActorController) -> void:
 	print("现在是 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
 	_brain.start_new_turn(actor, BrainBase.BrainType.Player)
-	set_architecture(actor.m_architecture)
 	var battle = Game.g_combat
 	
 	while actor.is_alive():

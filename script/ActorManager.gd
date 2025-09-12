@@ -26,12 +26,7 @@ func _ready() -> void:
 
 # 注册到架构时调用
 func on_init():
-# 	var stat = self.get_model(UnitStat)
-# 	var attr = stat.HP as AttributeBase
-# 	attr.register(on_actor_hp_changed)
-# 	attr = stat.MP as AttributeBase
-# 	attr.register(on_actor_mp_changed)
-	register_event("actor_hp_changed", on_actor_hp_changed)
+	pass
 
 func on_actor_hp_changed(actor, new_hp):
 	print("ActorManager 收到信号：", actor.my_name, " hp=", new_hp)

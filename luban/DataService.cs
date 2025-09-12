@@ -51,20 +51,44 @@ public partial class DataService : Node
 
 	// ---------- attr 相关 ----------
 	// 角色初始基础属性
-	public Godot.Collections.Array GetActorBaseAttr(string name)
+	public Godot.Collections.Array<int> GetActorBaseAttr(string name)
 	{
 		var row = _tables.TbActorBaseAttr.Get(name);
-		var arr = new Godot.Collections.Array();
+		var arr = new Godot.Collections.Array<int>();
 		if (row == null)
 		{
 			GD.PushWarning($"[Luban] TbActorBaseAttr 没有 key={name}。");
-			return d;
+			return arr;
 		}
+		arr.Resize(5);
 		arr[0] = row.STR;
 		arr[1] = row.CON;
 		arr[2] = row.AGI;
 		arr[3] = row.WIL;
 		arr[4] = row.INT;
+		return arr;
+	}
+	// 角色基础属性对战斗属性的贡献乘数
+	public Godot.Collections.Array GetBaseAttrTbl()
+	{
+		var dataList = _tables.TbBaseAttr.DataList;
+		var arr = new Godot.Collections.Array();
+		foreach (var item in dataList)
+		{
+			var d = new Godot.Collections.Dictionary
+			{
+				["name"] = item.Name,
+				["desc"] = item.Desc,
+				["HP"] = item.HP,
+				["MP"] = item.MP,
+				["ATKp"] = item.ATKp,
+				["ATKm"] = item.ATKm,
+				["DEFp"] = item.DEFp,
+				["DEFm"] = item.DEFm,
+				["SPD"] = item.SPD
+			};
+			arr.Add(d);
+		}
 		return arr;
 	}
 }

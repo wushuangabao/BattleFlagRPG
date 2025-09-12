@@ -4,6 +4,11 @@ class_name Game
 const Debug = 1
 
 const MAX_LEVEL = 50
+const MAX_HP    = 10000
+const MAX_MP    = 10000
+const MAX_ATK   = 2500
+const MAX_DEF   = 1500
+const BASE_SPD  = 5
 
 # TileMap中每格的像素尺寸（与TileSet一致）
 const cell_pixel_size: Vector2i = Vector2i(64, 64)
@@ -22,6 +27,15 @@ const scene_cached: Dictionary = {
 	"BigMap" = preload("res://scene/ui/BigMap.tscn"),
 	"BattleScene" = preload("res://scene/combat/BattleScene.tscn")
 }
+
+# 从脚本加载全局常量
+static var _base_attrs = null
+static func get_base_attrs() -> Array:
+	if _base_attrs:
+		return _base_attrs as Array
+	else:
+		_base_attrs = LubanDB.GetBaseAttrTbl() as Array
+		return _base_attrs
 
 # 阵营
 enum Camp {

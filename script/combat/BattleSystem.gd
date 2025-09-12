@@ -104,14 +104,9 @@ func get_actor_on_cell(c: Vector2i):
 func _init() -> void:
 	_buff_system = BuffSystem.new()
 
-func _ready() -> void:
-	set_architecture(CombatArchitecture.new())
-
 # 注册到架构时调用
 func on_init():
 	register_event("event_chose_action", on_chose_action)
-	register_event("actor_hp_changed", on_actor_hp_changed)
-	register_event("actor_mp_changed", on_actor_mp_changed)
 
 func on_chose_action(action: ActionBase):
 	print("选择动作：", action.get_action_name())
@@ -136,6 +131,9 @@ func init_with_scene_node(node: BattleScene) -> void:
 	scene = node
 	_turn_controller = scene.turn_controller
 	_turn_controller.set_timeline(scene.timeline)
+	if get_architecture() == null:
+		set_architecture(CombatArchitecture.new())
+		print("战斗架构 CombatArchitecture 创建完毕")
 
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)

@@ -117,7 +117,19 @@ func _ready() -> void:
 func _enter_tree() -> void:
 	if my_system == null:
 		return
+	# Game.g_event.register_event(destination, on_event)
 	my_system.on_battle_start()
+
+# 战斗架构相关
+func get_architecture():
+	if my_system:
+		return my_system.get_architecture()
+func get_system(v):
+	if my_system:
+		return my_system.get_architecture().get_system(v)
+func get_model(v):
+	if my_system:
+		return my_system.get_architecture().get_model(v)
 
 func _configure_board_plane() -> void:
 	var plane := board_plane.mesh

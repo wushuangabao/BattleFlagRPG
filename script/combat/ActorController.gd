@@ -49,12 +49,12 @@ func set_actor_data(actor_name) -> void:
 func _enter_tree() -> void:
 	print("角色已经加载到树中 ", my_name)
 	my_stat = UnitStat.new(self)
-	AP = AttributeBase.new(0, TimelineController.AP_MAX)
-	Game.g_combat.get_architecture().register_actor_stat(self)
+	AP = AttributeBase.new(self, 0, TimelineController.AP_MAX)
+	Game.g_combat.get_architecture().register_actor(self)
 
 func _exit_tree() -> void:
 	print("角色已从树中移除 ", my_name)
-	Game.g_combat.get_architecture().unregister_actor_stat(self)
+	Game.g_combat.get_architecture().unregister_actor(self)
 
 func _process(delta: float) -> void:
 	if _state == ActorState.DoAction:
@@ -85,9 +85,7 @@ func get_AP() -> int:
 	return AP.value
 
 func get_ap_gain_per_sec() -> float:
-	if my_name == &"test_actor":
-		return 5.0
-	return 4.0
+	return Game.BASE_SPD * (1 + my_stat.SPD.value)
 
 func add_buff(buf: BuffBase) -> void:
 	buffs.push_back(buf)
