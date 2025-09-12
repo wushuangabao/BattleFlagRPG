@@ -24,17 +24,3 @@ func get_type() -> BrainType:
 
 func is_valid() -> bool:
 	return not _type == BrainType.Invalid
-
-func set_attack_action() -> void:
-	var action = ActionAttack.new()
-	chose_an_action.emit(action)
-
-func set_move_action(path: Array[Vector2i]) -> void:
-	var action = ActionMove.new(path)
-	chose_an_action.emit(action)
-
-func has_affordable_actions(actor: ActorController) -> bool:
-	if actor.get_AP() > 0:
-		return true
-	else:
-		return false

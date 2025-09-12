@@ -65,7 +65,7 @@ func _physics_process(delta: float) -> void:
 	if ready_queue.size() > 0 or (running and not btn_moving and must_do_turn):
 		running = false
 		var cur_actor = ready_queue.front()
-		_set_actor_arrow_on_timeline(cur_actor)
+		set_actor_actived_on_timeline(cur_actor)
 		Game.g_combat.turn_started(cur_actor)
 
 func _on_actor_die(a: ActorController) -> void:
@@ -85,6 +85,7 @@ func start() -> void:
 		btn.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(a.my_name)
 		btn.mouse_entered.connect(on_mouse_enter_btn.bind(btn))
 		btn.mouse_exited.connect(on_mouse_exit_btn.bind(btn))
+		btn.set_actor(a)
 		add_child(btn)
 		gain_ap_map[a] = 0.0
 		texture_map[a] = btn
@@ -231,8 +232,8 @@ func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> b
 	# 名字也一样，根据 obj id
 	return a1.get_instance_id() < a2.get_instance_id()
 
-# 设置箭头，指示当前回合属于哪个角色
-func _set_actor_arrow_on_timeline(a: ActorController) -> void:
+# 设置UI，指示当前回合属于哪个角色
+func set_actor_actived_on_timeline(a: ActorController) -> void:
 	if texture_map.has(a):
 		if select_box.get_parent():
 			select_box.get_parent().remove_child(select_box)

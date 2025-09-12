@@ -14,3 +14,5 @@ script = ExtResource("2_h2ous")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("3_xihl1")
 centered = false
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

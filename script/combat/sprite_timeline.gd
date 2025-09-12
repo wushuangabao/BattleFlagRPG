@@ -4,6 +4,7 @@ extends TextureButton
 @export var normal_tint: Color = Color(1, 1, 1, 1)     # 常态颜色
 @export var duration: float = 0.2                     # 渐变时长
 
+var _actor: ActorController
 var tween: Tween
 
 func _ready() -> void:
@@ -22,3 +23,9 @@ func _tween_modulate(target: Color, d: float = duration) -> void:
 		tween.kill()
 	tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_property(self, "modulate", target, d)
+
+func set_actor(a: ActorController) -> void:
+	_actor = a
+
+func _on_pressed() -> void:
+	Game.g_combat.change_cur_actor_to(_actor)

@@ -1,12 +1,12 @@
 class_name BattleSystem extends AbstractSystem
 
 enum BattleState {
-	Init, Prepare, Wait, ChangeCurActor, ActorIdle, ChoseActionTarget, ActorDoAction, AtEnd
+	Uninit, Init, Prepare, Wait, ActorIdle, ChoseActionTarget, ActorDoAction, AtEnd
 }
 
 var scene : BattleScene = null
 var _cur_battle_name := ""
-var _cur_state       := BattleState.Init
+var _cur_state       := BattleState.Uninit
 
 var _turn_controller : TurnController
 var _buff_system : BuffSystem
@@ -17,19 +17,32 @@ var _cell_map : Dictionary[Vector2i, ActorController]
 
 signal action_chosed
 
+#region 流程控制
+
 func get_battle_state() -> BattleState:
 	return _cur_state
 
+# 回合开始
 func turn_started(actor: ActorController) -> void:
 	_turn_controller.do_turn(actor)
 
+# 回合结束
 func turn_ended(_actor: ActorController) -> void:
 	_cur_state = BattleState.Wait
 
+# 更换当前角色
+func change_cur_actor_to(actor: ActorController) -> void:
+	if _cur_state == BattleState.ActorIdle or _cur_state == BattleState.Wait:
+		if _turn_controller.change_cur_actor_to(actor):
+			scene.select_current_actor(actor)
+			_cur_state = BattleState.ActorIdle
+
+# 开始选择动作
 func begin_to_chose_action_for(actor: ActorController) -> void:
 	scene.select_current_actor(actor)
 	_cur_state = BattleState.ActorIdle
 
+# 选择动作目标 - 单元格
 func chose_action_target_cell(actor: ActorController, action: ActionBase) -> void:
 	_cur_state = BattleState.ChoseActionTarget
 	var target_cell = await scene.map_cell_chosed
@@ -37,6 +50,7 @@ func chose_action_target_cell(actor: ActorController, action: ActionBase) -> voi
 		target_cell = await scene.map_cell_chosed
 	action.target = target_cell
 
+# 选择动作目标 - 某个单位
 func chose_action_target_unit(actor: ActorController, action: ActionBase) -> void:
 	_cur_state = BattleState.ChoseActionTarget
 	var target_unit = await scene.an_actor_chosed
@@ -44,34 +58,17 @@ func chose_action_target_unit(actor: ActorController, action: ActionBase) -> voi
 		target_unit = await scene.an_actor_chosed
 	action.target = target_unit
 
+# 开始动作
 func let_actor_do_action(actor, action) -> void:
 	actor.action = action
 	if actor.action != null: # 持续性动作
 		_cur_state = BattleState.ActorDoAction
 		await actor.end_doing_action
 		print("BattleSystem 收到信号 end_doing_action")
-		_cur_state = BattleState.ActorIdle
 
-func get_battle_state_string() -> String:
-	match _cur_state:
-		BattleState.Init:
-			return "Init"
-		BattleState.Prepare:
-			return "Prepare"
-		BattleState.Wait:
-			return "Wait"
-		BattleState.ChangeCurActor:
-			return "ChangeCurActor"
-		BattleState.ActorIdle:
-			return "ActorIdle" # can chose action
-		BattleState.ChoseActionTarget:
-			return "ChoseActionTarget"
-		BattleState.ActorDoAction:
-			return "ActorDoAction"
-		BattleState.AtEnd:
-			return "AtEnd"
-	push_error("get_battle_state_string: Invalid state!")
-	return "Unknown"
+#endregion
+
+#region 角色控制
 
 func get_actors() -> Array[ActorController]:
 	return _actors
@@ -101,8 +98,12 @@ func get_actor_on_cell(c: Vector2i):
 	else:
 		return null
 
+#endregion
+
 func _init() -> void:
 	_buff_system = BuffSystem.new()
+
+#region 战斗架构
 
 # 注册到架构时调用
 func on_init():
@@ -117,6 +118,11 @@ func on_actor_hp_changed(actor, new_hp):
 func on_actor_mp_changed(actor, new_mp):
 	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
+#endregion
+
+#region 装载相关
+
+# 开始战斗时，由 SceneManager 调用
 func init_with_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
 		_cur_state = BattleState.Init
@@ -125,6 +131,7 @@ func init_with_battle_name(battle_name: StringName) -> void:
 		_cell_map.clear()
 		_cur_battle_name = battle_name
 
+# 节点首次加载到场景树完毕时，由 BattleScene 调用
 func init_with_scene_node(node: BattleScene) -> void:
 	if scene != null:
 		return
@@ -195,3 +202,5 @@ func on_battle_map_unload() -> void:
 		if Game.g_actors.is_character(_units[i]) == false:
 			_actors[i].queue_free()
 	init_with_battle_name("")
+
+#endregion

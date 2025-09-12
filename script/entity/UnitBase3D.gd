@@ -57,7 +57,8 @@ func _ready() -> void:
 	initialized.emit(self)
 
 func on_selected() -> void:
-	_compute_reachable()
+	if actor.get_state() == ActorController.ActorState.Idle:
+		_compute_reachable()
 
 func _compute_reachable():
 	_reachable = GridHelper.movement_range(_cell, actor.get_AP(), _cell_walkable)
