@@ -46,15 +46,23 @@ func begin_to_chose_action_for(actor: ActorController) -> void:
 # 选择动作目标
 func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	_cur_state = BattleState.ChoseActionTarget
-	var target_data = null
+	var target_cell = null
 	while true:
-		target_data = await target_chosed
-		if target_data == null:
+		target_cell = await target_chosed
+		if target_cell == null:
 			print("取消动作")
 			break
-		elif target_data is Array:
-			if action.chose_target(target_data, actor):
-				return true
+		elif target_cell is Vector2i:
+			if action.target_type == ActionBase.TargetType.Unit:
+				var a_target = get_actor_on_cell(target_cell)
+				if a_target and action.chose_target(a_target, actor):
+					return true
+			elif action.target_type == ActionBase.TargetType.Cell:
+				if action.chose_target(target_cell, actor):
+					return true
+			else:
+				push_error("目标类型为None的动作竟然在选择动作目标？！")
+				break
 	return false
 
 # 开始动作
@@ -113,10 +121,10 @@ func on_chose_action(action: ActionBase):
 	print("选择动作：", action.get_action_name())
 	action_chosed.emit(action)
 
-func on_chose_target(target, target_type = -1):
+func on_chose_target(target):
 	if _cur_state == BattleState.ChoseActionTarget:
-		if target is Vector2i or target is ActorController:
-			target_chosed.emit(target, target_type)
+		if target is Vector2i:
+			target_chosed.emit(target)
 		elif target == false:
 			target_chosed.emit()
 

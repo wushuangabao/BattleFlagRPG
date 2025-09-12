@@ -28,22 +28,7 @@ var map_rows: int
 var cell_pixel_size = Game.cell_pixel_size
 var cell_world_size = Game.cell_world_size
 
-func load_battle_map(map_name: String) -> bool:
-	var new_node = await subvp.loadScene_battleMap(map_name)
-	if new_node == null:
-		return false
-	var map_root = subvp.get_child(0).get_child(1)
-	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
-	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
-	var dim = ground_layer.get_tilemap_dimensions()
-	map_cols = dim.x
-	map_rows = dim.y
-	_configure_subviewport()
-	_configure_board_plane()
-	_hook_subviewport_texture_to_plane()
-	subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	print("战斗地图加载完毕 - ", subvp._current_scene)
-	return true
+#region 角色控制
 
 func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:
 	if ground_layer == null:
@@ -97,6 +82,24 @@ func let_actor_move(actor: ActorController) -> void:
 	actor.base3d.move_by_current_path()
 	camera.follow_target_moving(actor.base3d)
 
+#endregion
+
+#region 战斗架构相关
+
+func get_architecture():
+	if my_system:
+		return my_system.get_architecture()
+func get_system(v):
+	if my_system:
+		return my_system.get_architecture().get_system(v)
+func get_model(v):
+	if my_system:
+		return my_system.get_architecture().get_model(v)
+
+#endregion
+
+#region 加载战斗地图
+
 # 只调用一次，除非手动 request_ready
 # 所有子节点都已经添加到场景树后，才会调用
 func _ready() -> void:
@@ -114,16 +117,22 @@ func _enter_tree() -> void:
 	# Game.g_event.register_event(destination, on_event)
 	my_system.on_battle_start()
 
-# 战斗架构相关
-func get_architecture():
-	if my_system:
-		return my_system.get_architecture()
-func get_system(v):
-	if my_system:
-		return my_system.get_architecture().get_system(v)
-func get_model(v):
-	if my_system:
-		return my_system.get_architecture().get_model(v)
+func load_battle_map(map_name: String) -> bool:
+	var new_node = await subvp.loadScene_battleMap(map_name)
+	if new_node == null:
+		return false
+	var map_root = subvp.get_child(0).get_child(1)
+	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
+	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
+	var dim = ground_layer.get_tilemap_dimensions()
+	map_cols = dim.x
+	map_rows = dim.y
+	_configure_subviewport()
+	_configure_board_plane()
+	_hook_subviewport_texture_to_plane()
+	subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	print("战斗地图加载完毕 - ", subvp._current_scene)
+	return true
 
 func _configure_board_plane() -> void:
 	var plane := board_plane.mesh
@@ -148,6 +157,10 @@ func _hook_subviewport_texture_to_plane() -> void:
 	else:
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
 	board_plane.set_surface_override_material(0, mat)
+
+#endregion
+
+#region 输入捕获
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
@@ -198,12 +211,8 @@ func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 	if a != _cur_unit.actor:
 		if a.team_id == _cur_unit.actor.team_id:
 			ground_layer.highlight_cell(cell, &"select_teammember")
-			Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.SameTeam])
 		else:
 			ground_layer.highlight_cell(cell, &"select_other_team_actor")
-			Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.OtherTeam])
-	else:
-		Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.Self])
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from
@@ -232,3 +241,5 @@ func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	# 延迟清理
 	await get_tree().create_timer(2.0).timeout
 	line.queue_free()
+
+#endregion
