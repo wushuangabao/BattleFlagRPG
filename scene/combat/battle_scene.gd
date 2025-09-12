@@ -28,12 +28,6 @@ var map_rows: int
 var cell_pixel_size = Game.cell_pixel_size
 var cell_world_size = Game.cell_world_size
 
-signal on_click_actor_teammember
-signal on_click_actor_other_team
-
-signal map_cell_chosed
-signal an_actor_chosed
-
 func load_battle_map(map_name: String) -> bool:
 	var new_node = await subvp.loadScene_battleMap(map_name)
 	if new_node == null:
@@ -156,31 +150,36 @@ func _hook_subviewport_texture_to_plane() -> void:
 	board_plane.set_surface_override_material(0, mat)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var mouse_pos = get_viewport().get_mouse_position()
-		var from = camera.project_ray_origin(mouse_pos)
-		var dir = camera.project_ray_normal(mouse_pos)
-		# 与 y=0 平面求交
-		if absf(dir.y) < 1e-6: # 射线几乎平行于地面
-			return
-		var t = -from.y / dir.y
-		if t <= 0.0: # 交点在摄像机背后
-			return
-		var hit = from + dir * t
-		if Game.Debug == 1:
-			draw_debug_ray(from, hit)
-			# 将世界坐标映射到格子坐标
-			# print("Clicked pos: ", hit.x, ", ",  hit.z)
-		var cell = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
-		_on_cell_clicked(cell)
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			var mouse_pos = get_viewport().get_mouse_position()
+			var from = camera.project_ray_origin(mouse_pos)
+			var dir = camera.project_ray_normal(mouse_pos)
+			# 与 y=0 平面求交
+			if absf(dir.y) < 1e-6: # 射线几乎平行于地面
+				return
+			var t = -from.y / dir.y
+			if t <= 0.0: # 交点在摄像机背后
+				return
+			var hit = from + dir * t
+			if Game.Debug == 1:
+				draw_debug_ray(from, hit)
+				# 将世界坐标映射到格子坐标
+				# print("Clicked pos: ", hit.x, ", ",  hit.z)
+			var cell = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
+			_on_cell_clicked(cell)
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
+			if my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
+				Game.g_event.send_event("event_chose_target", false) # 点击右键取消所选动作
 
 func _on_cell_clicked(cell: Vector2i) -> void:
 	var battle_state = my_system.get_battle_state()
-	if _cur_unit.is_target_cell(cell) and battle_state == BattleSystem.BattleState.ActorIdle:
-		if _cur_unit.get_cur_path().size() > 1:
-			my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
-			map_cell_chosed.emit(cell)
-			return
+	if battle_state == BattleSystem.BattleState.ChoseActionTarget:
+		Game.g_event.send_event("event_chose_target", cell)
+		return
+	if _cur_unit.is_target_cell(cell) and _cur_unit.get_cur_path().size() > 1:
+		my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
+		return
 	if battle_state != BattleSystem.BattleState.ActorIdle:
 		return
 	var can_go := _cur_unit.set_target_cell(cell)
@@ -199,12 +198,12 @@ func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 	if a != _cur_unit.actor:
 		if a.team_id == _cur_unit.actor.team_id:
 			ground_layer.highlight_cell(cell, &"select_teammember")
-			on_click_actor_teammember.emit(a)
+			Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.SameTeam])
 		else:
 			ground_layer.highlight_cell(cell, &"select_other_team_actor")
-			on_click_actor_other_team.emit(a)
-		if my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
-			an_actor_chosed.emit(a)
+			Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.OtherTeam])
+	else:
+		Game.g_event.send_event("event_chose_target", [a, ActionBase.TargetUnitType.Self])
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from

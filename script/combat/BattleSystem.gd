@@ -16,6 +16,7 @@ var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
 
 signal action_chosed
+signal target_chosed
 
 #region 流程控制
 
@@ -42,21 +43,19 @@ func begin_to_chose_action_for(actor: ActorController) -> void:
 	scene.select_current_actor(actor)
 	_cur_state = BattleState.ActorIdle
 
-# 选择动作目标 - 单元格
-func chose_action_target_cell(actor: ActorController, action: ActionBase) -> void:
+# 选择动作目标
+func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	_cur_state = BattleState.ChoseActionTarget
-	var target_cell = await scene.map_cell_chosed
-	while not action.check_target_cell(target_cell, actor):
-		target_cell = await scene.map_cell_chosed
-	action.target = target_cell
-
-# 选择动作目标 - 某个单位
-func chose_action_target_unit(actor: ActorController, action: ActionBase) -> void:
-	_cur_state = BattleState.ChoseActionTarget
-	var target_unit = await scene.an_actor_chosed
-	while not action.check_target_unit(target_unit, actor):
-		target_unit = await scene.an_actor_chosed
-	action.target = target_unit
+	var target_data = null
+	while true:
+		target_data = await target_chosed
+		if target_data == null:
+			print("取消动作")
+			break
+		elif target_data is Array:
+			if action.chose_target(target_data, actor):
+				return true
+	return false
 
 # 开始动作
 func let_actor_do_action(actor, action) -> void:
@@ -108,10 +107,18 @@ func _init() -> void:
 # 注册到架构时调用
 func on_init():
 	register_event("event_chose_action", on_chose_action)
+	register_event("event_chose_target", on_chose_target)
 
 func on_chose_action(action: ActionBase):
 	print("选择动作：", action.get_action_name())
 	action_chosed.emit(action)
+
+func on_chose_target(target, target_type = -1):
+	if _cur_state == BattleState.ChoseActionTarget:
+		if target is Vector2i or target is ActorController:
+			target_chosed.emit(target, target_type)
+		elif target == false:
+			target_chosed.emit()
 
 func on_actor_hp_changed(actor, new_hp):
 	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)

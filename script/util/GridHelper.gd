@@ -151,3 +151,20 @@ static func movement_range(origin: Vector2i, max_steps: int, is_walkable: Callab
 				dist[n] = nd
 				queue.append(n)
 	return dist # Dictionary cell->steps
+
+# 计算技能范围
+static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i) -> Array[Vector2i]:
+	match area_data.ShapeType:
+		SkillAreaShape.ShapeType.Single:
+			if area_data.is_blockable:
+				return [origin] #todo
+			else:
+				if area_data.target_range == 1:
+					return [target]
+				else:
+					return [target]  #todo
+		SkillAreaShape.ShapeType.Line:
+			return [origin]  #todo
+		SkillAreaShape.ShapeType.Ring:
+			return [origin]  #todo
+	return []

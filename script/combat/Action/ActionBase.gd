@@ -5,6 +5,12 @@ enum ActionState {
 }
 var _state : ActionState = ActionState.Uninitialized
 
+enum TargetUnitType {
+	Self,
+	SameTeam,
+	OtherTeam
+}
+
 enum TargetType {
 	Unit,
 	Cell,
@@ -35,6 +41,22 @@ func validate(actor: ActorController) -> bool:
 				if actor.get_AP() < cost[s]:
 					return false
 	return true
+
+func chose_target(target_data: Array, a: ActorController) -> bool:
+	var target_chose = target_data[0]
+	match target_type:
+		TargetType.Cell:
+			if target_chose is Vector2i and check_target_cell(target_chose, a):
+				target = target_chose
+				return true
+		TargetType.Unit:
+			if target_chose is ActorController:
+				var target_unit_type = get(&"_target_unit_type")
+				if target_unit_type and target_unit_type == target_data[1]:
+					if check_target_unit(target_chose, a):
+						target = target_chose
+						return true
+	return false
 
 func check_target_cell(_cell: Vector2i, _a: ActorController) -> bool:
 	return true

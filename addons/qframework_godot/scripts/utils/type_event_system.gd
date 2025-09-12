@@ -9,7 +9,8 @@ func send_event(destination: String, payload = null) -> void:
 	if not payload is Array:
 		payload = [payload]
 	payload.insert(0, _get_destination_signal(destination))	
-	callv("emit_signal", payload)
+	var ret = callv("emit_signal", payload)
+	print("send_event: ", payload[0], " res: ", ret)
 	
 ## 订阅
 func register_event(destination: String, callback: Callable) -> void:

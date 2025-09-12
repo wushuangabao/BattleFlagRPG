@@ -15,7 +15,7 @@ func do_turn(actor: ActorController) -> void:
 		# 无可用的行动
 		if not has_affordable_actions(_actor):
 			break
-	
+		# 选择动作
 		battle.begin_to_chose_action_for(_actor)
 		var action: ActionBase = await Game.g_combat.action_chosed
 		if action == null:
@@ -26,15 +26,15 @@ func do_turn(actor: ActorController) -> void:
 		if not action.validate(_actor):
 			print("动作未通过校验 - ", _actor.my_name)
 			continue
-		
-		match action.target_type:
-			ActionBase.TargetType.Cell:
-				await battle.chose_action_target_cell(_actor, action)
-			ActionBase.TargetType.Unit:
-				await battle.chose_action_target_unit(_actor, action)
-		
+		# 选择目标
+		if action.target_type != ActionBase.TargetType.None:
+			var ok = await battle.chose_action_target(_actor, action)
+			if not ok:
+				continue
+		# 动作消耗
 		action.pay_costs(_actor)
 		timeline.update_actor_btn_pos(_actor, true)
+		# 执行动作
 		await battle.let_actor_do_action(_actor, action)
 	battle.turn_ended(_actor)
 	timeline.resume_timeline()
