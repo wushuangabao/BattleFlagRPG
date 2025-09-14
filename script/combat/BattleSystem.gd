@@ -11,7 +11,6 @@ var _cur_state       := BattleState.Uninit
 var _turn_controller : TurnController
 var _buff_system : BuffSystem
 
-var _units    : Array[UnitBase3D]
 var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
 
@@ -128,9 +127,19 @@ func on_chose_target(target):
 		elif target == false:
 			target_chosed.emit()
 
-func on_actor_hp_changed(actor, new_hp):
+func on_actor_hp_changed(actor, new_hp, old_hp):
 	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)
-func on_actor_mp_changed(actor, new_mp):
+	# 头顶血条
+	var bar_hp = actor.base3d.bar_hp
+	bar_hp.max_value = actor.my_stat.HP.maximum
+	bar_hp.set_value_no_signal(old_hp)
+	actor.base3d.animate_hp_bar(new_hp)
+	# 行动条头像
+	if _turn_controller.timeline.texture_map.has(actor):
+		var p = (bar_hp.max_value - new_hp) / bar_hp.max_value
+		_turn_controller.timeline.texture_map[actor].set_hp_progress(p)
+
+func on_actor_mp_changed(actor, new_mp, _old_mp):
 	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
 #endregion
@@ -141,7 +150,6 @@ func on_actor_mp_changed(actor, new_mp):
 func init_with_battle_name(battle_name: StringName) -> void:
 	if _cur_battle_name != battle_name:
 		_cur_state = BattleState.Init
-		_units.clear()
 		_actors.clear()
 		_cell_map.clear()
 		_cur_battle_name = battle_name
@@ -192,8 +200,8 @@ func create_initial_units_on_battle_map() -> void:
 			for i in range(cells.size() - 1, 0, -1):
 				cells.remove_at(i)
 		for cell in cells:
-			var look := true if _units.is_empty() else false
-			print("开始添加单位 ", _units.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
+			var look := true if _actors.is_empty() else false
+			print("开始添加单位 ", _actors.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
 			var unit := scene.add_unit_to(template, cell, look)
 			if not actor_manager.get_actor_by_name(unit_name):
 				actor = unit.get_child(1) # 获取子节点 ActorDefault
@@ -204,18 +212,17 @@ func create_initial_units_on_battle_map() -> void:
 			actor.base3d = unit
 			actor.anim_player = unit.anim
 			actor.team_id = map.get_team_by_cell(cell)
-			_units.push_back(unit)
 			_actors.push_back(actor)
 			_cell_map[cell] = actor
 	print("战斗单位已加载完毕")
 	
 
 func on_battle_map_unload() -> void:
-	# 释放 _actors 中那些只在本场战斗中使用的角色
-	var unit_cnt = _units.size()
-	for i in range(unit_cnt):
-		if Game.g_actors.is_character(_units[i]) == false:
-			_actors[i].queue_free()
+	# 防止在之后的 base3d 释放时被连带着释放掉
+	for a in _actors:
+		if Game.g_actors.is_character(a.base3d):
+			a.base3d.remove_child(a)
 	init_with_battle_name("")
+	_turn_controller.timeline.clear_on_change_scene()
 
 #endregion

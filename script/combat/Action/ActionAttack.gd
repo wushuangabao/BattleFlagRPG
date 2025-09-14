@@ -21,10 +21,14 @@ func check_target_unit(chosed_target: ActorController, me: ActorController) -> b
 func start(actor: ActorController) -> void:
 	print(actor.my_name, " 对 ", target.my_name, " 发动了攻击！消耗AP：", cost[&"AP"])
 	actor.anim_player.play(&"attack")
+	target.animate_take_damage_after(0.75)
 	_state = ActionState.Running
 
 # 在角色_process中执行
 func update(actor: ActorController, _delta: float) -> void:
 	if not actor.anim_player.is_playing() and actor.anim_player.animation == &"attack":
-		actor.anim_player.play(&"run")
+		actor.anim_player.play(&"idle")
+		target.anim_player.play(&"idle")
 		_state = ActionState.Terminated
+		var target_actor = target as ActorController
+		target_actor.take_damage(80, actor)

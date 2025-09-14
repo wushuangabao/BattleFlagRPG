@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://bu2b3qlmtaw2p"]
+[gd_scene load_steps=6 format=3 uid="uid://bu2b3qlmtaw2p"]
 
 [ext_resource type="Texture2D" uid="uid://b4yi1c7ttdp6c" path="res://asset/png/character/face64/2.png" id="1_18e23"]
 [ext_resource type="Script" uid="uid://3pnl40adkhvk" path="res://script/combat/sprite_timeline.gd" id="2_h2ous"]
 [ext_resource type="Texture2D" uid="uid://dxjlb5s620pu4" path="res://asset/png/character/face64/box.png" id="3_xihl1"]
+[ext_resource type="Texture2D" uid="uid://vx3s8wbgjeld" path="res://asset/png/character/face64/box_under.png" id="4_ymhnl"]
+[ext_resource type="Texture2D" uid="uid://bupctmroe80nj" path="res://asset/png/character/face64/box_red.png" id="5_6kjd0"]
 
 [node name="TextureButton" type="TextureButton"]
 offset_right = 64.0
@@ -12,7 +14,17 @@ texture_normal = ExtResource("1_18e23")
 script = ExtResource("2_h2ous")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
 texture = ExtResource("3_xihl1")
 centered = false
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+fill_mode = 4
+texture_under = ExtResource("4_ymhnl")
+texture_over = ExtResource("3_xihl1")
+texture_progress = ExtResource("5_6kjd0")
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

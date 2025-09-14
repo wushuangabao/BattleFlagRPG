@@ -1,7 +1,7 @@
 # 管理单位的数据
 class_name UnitStat extends AbstractModel
 
-var _actor    : ActorController
+var _actor   : ActorController
 var LV       : AttributeBase
 var my_exp   : AttributeBase
 
@@ -53,8 +53,10 @@ func on_base_attr_changed(attr_type: ActorBaseAttr.BaseAttrName, actor: ActorCon
 	update_all_by_base_attr()
 
 func init_all_by_base_attr() -> void:
-	HP   = AttributeBase.new(_actor, calculate_hp(), Game.MAX_HP)
-	MP   = AttributeBase.new(_actor, calculate_mp(), Game.MAX_MP)
+	HP   = AttributeBase.new(_actor, 0, calculate_hp())
+	HP.fill()
+	MP   = AttributeBase.new(_actor, 0, calculate_hp())
+	MP.fill()
 	SPD  = BindableProperty.new(calculate_spd_x())
 	ATKp = BindableProperty.new(calculate_atk_p())
 	ATKm = BindableProperty.new(calculate_atk_m())

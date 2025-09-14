@@ -1,101 +1,17 @@
-[gd_scene load_steps=18 format=3 uid="uid://d1gt6rid3jyor"]
+[gd_scene load_steps=9 format=3 uid="uid://d1gt6rid3jyor"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_lp5co"]
-[ext_resource type="Texture2D" uid="uid://cx34e0nn24oy1" path="res://asset/png/character/run_animation/Actor_06.png" id="2_mieo4"]
+[ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="5_mh44x"]
+[ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="6_03as2"]
+[ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="7_34vkh"]
 [ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_3mku7"]
 [ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_dqi8v"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1bj5w"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(540, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_t6b1x"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(630, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_mh44x"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(720, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_03as2"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(810, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_34vkh"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(900, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tuedq"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(990, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3mku7"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1080, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_u75mw"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1170, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_phn7f"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1260, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_d85y4"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1350, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0jg2t"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1440, 224, 90, 112)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_br8vi"]
-atlas = ExtResource("2_mieo4")
-region = Rect2(1530, 224, 90, 112)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1bj5w")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_t6b1x")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_mh44x")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_03as2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_34vkh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tuedq")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_3mku7")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_u75mw")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_phn7f")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_d85y4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0jg2t")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_br8vi")
-}],
-"loop": true,
-"name": &"run",
-"speed": 5.0
-}]
+animations = []
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_tuedq"]
+viewport_path = NodePath("SubViewport")
 
 [node name="unit" type="Marker3D"]
 script = ExtResource("1_lp5co")
@@ -107,7 +23,7 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"run"
+animation = &""
 script = ExtResource("10_3mku7")
 
 [node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
@@ -115,3 +31,45 @@ script = ExtResource("10_dqi8v")
 my_name = &"杂兵2"
 base3d = NodePath("..")
 anim_player = NodePath("../anim")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(64, 132)
+render_target_clear_mode = 2
+
+[node name="HP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 8.0
+offset_right = 32.0
+offset_bottom = 12.0
+grow_horizontal = 2
+value = 50.0
+texture_under = ExtResource("5_mh44x")
+texture_progress = ExtResource("6_03as2")
+
+[node name="MP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 14.0
+offset_right = 32.0
+offset_bottom = 18.0
+grow_horizontal = 2
+value = 80.0
+texture_under = ExtResource("5_mh44x")
+texture_progress = ExtResource("7_34vkh")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+centered = false
+offset = Vector2(-32, 0)
+billboard = 1
+no_depth_test = true
+texture_filter = 0
+render_priority = 2
+texture = SubResource("ViewportTexture_tuedq")

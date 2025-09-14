@@ -1,47 +1,104 @@
-[gd_scene load_steps=13 format=3 uid="uid://bpofwkdien4ix"]
+[gd_scene load_steps=25 format=3 uid="uid://bpofwkdien4ix"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_egmcp"]
-[ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/run_animation/test_run.png" id="2_r4n7j"]
+[ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/animation/test_run.png" id="2_r4n7j"]
+[ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="6_7amhf"]
+[ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="7_y8d53"]
+[ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="8_e28yh"]
 [ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_nan00"]
 [ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_xsood"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0yjpj"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_serbc"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(72, 0, 70, 67)
+region = Rect2(0, 64, 132, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_somyf"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_0j0u7"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(144, 0, 70, 67)
+region = Rect2(132, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qi1nm"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(264, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jyogo"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(396, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uwrak"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(576, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rv2ib"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(576, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6i2nf"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(216, 0, 70, 67)
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7amhf"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(288, 0, 70, 67)
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y8d53"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(360, 0, 70, 67)
+region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e28yh"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(432, 0, 70, 67)
+region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xsood"]
 atlas = ExtResource("2_r4n7j")
-region = Rect2(504, 0, 70, 67)
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1l52v"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ywxk"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2qk82"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_flofc"]
+atlas = ExtResource("2_r4n7j")
+region = Rect2(704, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0yjpj")
+"texture": SubResource("AtlasTexture_serbc")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_somyf")
+"texture": SubResource("AtlasTexture_0j0u7")
 }, {
+"duration": 1.2,
+"texture": SubResource("AtlasTexture_qi1nm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jyogo")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uwrak")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rv2ib")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}, {
+"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_6i2nf")
 }, {
@@ -56,11 +113,31 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xsood")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1l52v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ywxk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2qk82")
 }],
 "loop": true,
 "name": &"run",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_flofc")
+}],
+"loop": false,
+"name": &"take_damage",
+"speed": 1.0
 }]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_xsood"]
+viewport_path = NodePath("SubViewport")
 
 [node name="unit" type="Marker3D"]
 script = ExtResource("1_egmcp")
@@ -72,7 +149,8 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"run"
+animation = &"take_damage"
+frame_progress = 1.0
 script = ExtResource("10_xsood")
 
 [node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
@@ -80,3 +158,45 @@ script = ExtResource("10_nan00")
 my_name = &"杂兵3"
 base3d = NodePath("..")
 anim_player = NodePath("../anim")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(64, 132)
+render_target_clear_mode = 2
+
+[node name="HP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 8.0
+offset_right = 32.0
+offset_bottom = 12.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("6_7amhf")
+texture_progress = ExtResource("7_y8d53")
+
+[node name="MP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 14.0
+offset_right = 32.0
+offset_bottom = 18.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("6_7amhf")
+texture_progress = ExtResource("8_e28yh")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+centered = false
+offset = Vector2(-32, 0)
+billboard = 1
+no_depth_test = true
+texture_filter = 0
+render_priority = 2
+texture = SubResource("ViewportTexture_xsood")

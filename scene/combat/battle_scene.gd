@@ -17,6 +17,8 @@ extends Node3D
 @onready var turn_controller := get_node(turn_contr_path) as TurnController
 
 var _cur_unit : UnitBase3D = null
+var _unit_list : Array[UnitBase3D]
+
 var my_system : BattleSystem = null
 var ground_layer : Ground
 var flag_layer   : FlagLayer
@@ -40,6 +42,7 @@ func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> 
 		_cur_unit = new_unit
 		new_unit.initialized.connect(_on_cur_actor_initialized)
 	add_child(new_unit)
+	_unit_list.append(new_unit)
 	return new_unit
 
 func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
@@ -157,6 +160,14 @@ func _hook_subviewport_texture_to_plane() -> void:
 	else:
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
 	board_plane.set_surface_override_material(0, mat)
+
+# 切换场景时释放资源
+func release_on_change_scene():
+	for u in _unit_list:
+		u.queue_free()
+	_unit_list.clear()
+	subvp.release_battleMap()
+	my_system.on_battle_map_unload()
 
 #endregion
 

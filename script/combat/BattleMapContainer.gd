@@ -10,8 +10,6 @@ var _current_scene: String
 func loadScene_battleMap(scene_name: StringName) -> BattleMap:
 	if _current_scene and _current_scene == scene_name:
 		return get_child(0)
-	if get_child_count() > 0:
-		get_child(0).queue_free() # 释放当前场景
 	# 动态加载场景
 	if packed_scene.exists(scene_name):
 		var packed = packed_scene.get_scene(scene_name)
@@ -24,3 +22,8 @@ func loadScene_battleMap(scene_name: StringName) -> BattleMap:
 	else:
 		push_error("loadScene_battleMap, not find ", scene_name)
 	return null
+
+func release_battleMap() -> void:
+	if get_child_count() > 0:
+		_current_scene = ""
+		get_child(0).queue_free() # 释放当前场景

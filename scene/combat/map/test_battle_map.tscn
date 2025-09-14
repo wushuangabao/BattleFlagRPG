@@ -10,8 +10,8 @@
 script = ExtResource("1_gx5we")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(402, -24)
-scale = Vector2(1.44, 1.52)
+position = Vector2(804, -24)
+scale = Vector2(0.908854, 1.11816)
 texture = ExtResource("2_8t45i")
 centered = false
 
@@ -24,7 +24,7 @@ navigation_enabled = false
 script = ExtResource("3_8t45i")
 
 [node name="Flag" type="TileMapLayer" parent="TilemapRoot2D"]
-tile_map_data = PackedByteArray("AAAXAAoAAAANAAQAAAARAAoAAAAPAAMAAAAWAAoAAAAPAAQAAAAVAAoAAAAOAAQAAAA=")
+tile_map_data = PackedByteArray("AAAXAAoAAAANAAQAAAARAAoAAAAPAAMAAAAWAAoAAAAPAAQAAAA=")
 tile_set = ExtResource("2_hbftt")
 navigation_enabled = false
 script = ExtResource("4_ksgvg")

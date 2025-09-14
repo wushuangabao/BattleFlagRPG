@@ -1,37 +1,156 @@
-[gd_scene load_steps=8 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=26 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_qk4nm"]
-[ext_resource type="Texture2D" uid="uid://di17xbm6w6ki6" path="res://asset/png/character/run_animation/test_run_2.png" id="2_qt1e6"]
+[ext_resource type="Texture2D" uid="uid://c17gk8jxbpogq" path="res://asset/png/character/animation/test_run_3.png" id="2_qt1e6"]
+[ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="4_rkgpu"]
+[ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="5_ccq04"]
+[ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="6_ccq04"]
 [ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_y1hu4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qt1e6"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(0, 64, 128, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3j4cu"]
 atlas = ExtResource("2_qt1e6")
-region = Rect2(0, 0, 52, 62)
+region = Rect2(128, 64, 128, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rkgpu"]
 atlas = ExtResource("2_qt1e6")
-region = Rect2(54, 0, 52, 62)
+region = Rect2(256, 64, 128, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ccq04"]
 atlas = ExtResource("2_qt1e6")
-region = Rect2(108, 0, 52, 62)
+region = Rect2(384, 64, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_855lp"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(512, 64, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pp5ks"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(0, 64, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_177ka"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(832, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iplnm"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(832, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0o3le"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_glnlk"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y1hu4"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8eo80"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8spbq"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fyuri"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o0kl2"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l8ug5"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8xn23"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(704, 64, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
 "frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qt1e6")
+}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_3j4cu")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_rkgpu")
 }, {
-"duration": 1.0,
+"duration": 1.3,
 "texture": SubResource("AtlasTexture_ccq04")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_855lp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pp5ks")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_177ka")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iplnm")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0o3le")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_glnlk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y1hu4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8eo80")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8spbq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fyuri")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o0kl2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l8ug5")
 }],
 "loop": true,
 "name": &"run",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8xn23")
+}],
+"loop": false,
+"name": &"take_damage",
+"speed": 1.0
 }]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_855lp"]
+viewport_path = NodePath("SubViewport")
 
 [node name="unit" type="Marker3D"]
 script = ExtResource("1_qk4nm")
@@ -43,5 +162,48 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"run"
+animation = &"take_damage"
+frame_progress = 1.0
 script = ExtResource("10_y1hu4")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(64, 132)
+render_target_clear_mode = 2
+
+[node name="HP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 8.0
+offset_right = 32.0
+offset_bottom = 12.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("4_rkgpu")
+texture_progress = ExtResource("5_ccq04")
+
+[node name="MP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 14.0
+offset_right = 32.0
+offset_bottom = 18.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("4_rkgpu")
+texture_progress = ExtResource("6_ccq04")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+centered = false
+offset = Vector2(-32, 0)
+billboard = 1
+no_depth_test = true
+texture_filter = 0
+render_priority = 2
+texture = SubResource("ViewportTexture_855lp")

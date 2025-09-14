@@ -22,8 +22,10 @@ func goto_scene(scene_name: StringName) -> void:
 	if _current_scene and _current_scene == scene_name:
 		return
 	if get_child_count() > 0:
+		var old_scene = get_child(0)
 		if _scene_cache.has(_current_scene):
 			remove_child(get_child(0)) # 删除当前场景，但不释放内存
+			old_scene.call_deferred(&"release_on_change_scene")
 		else:
 			get_child(0).queue_free() # 释放当前场景
 	# 尝试用三种方式加载场景：

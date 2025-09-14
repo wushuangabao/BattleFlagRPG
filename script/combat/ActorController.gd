@@ -97,8 +97,13 @@ func is_alive() -> bool:
 	return my_stat.HP.value > 0
 
 func take_damage(amount: int, source: ActorController = null) -> void:
+	anim_player.play(&"idle")
 	var final := amount
 	# for b in buffs:
 	# 	final = b.modify_incoming_damage(final, self, source)
 	print(my_name, " 受到伤害", final, "，来自 ", source)
 	add_HP(-final)
+
+func animate_take_damage_after(seconds: float) -> void:
+	await get_tree().create_timer(seconds).timeout
+	anim_player.play(&"take_damage")

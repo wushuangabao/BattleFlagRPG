@@ -22,6 +22,9 @@ func do_turn(actor: ActorController) -> void:
 			print("动作无效 - ", _actor.my_name)
 			continue
 		if action.get_action_name() == &"skip_turn":
+			print("执行动作 - 跳过回合")
+			if timeline.ready_queue.size() > 0:
+				change_cur_actor_to(timeline.ready_queue.pop_front())
 			break
 		if not action.validate(_actor):
 			print("动作未通过校验 - ", _actor.my_name)

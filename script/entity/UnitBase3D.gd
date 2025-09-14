@@ -2,10 +2,12 @@
 class_name UnitBase3D extends Marker3D
 
 @export var move_time: float = 0.5
+@onready var anim: AnimatedSprite3D = $anim
+@onready var bar_hp: TextureProgressBar = $SubViewport/HP
+@onready var bar_mp: TextureProgressBar = $SubViewport/MP
 
 signal initialized
 
-var anim: AnimatedSprite3D = null
 var map: Ground = null
 var actor: ActorController = null
 
@@ -15,6 +17,8 @@ var _target_cell = Vector2i(-1, -1)# 移动目标格
 var _is_moving := false
 var _reachable: Dictionary = {} # cell->steps
 var _current_path: Array[Vector2i] = []
+
+var _tween_hp: Tween
 
 func get_pos_2d() -> Vector2:
 	return Vector2(global_position.x, global_position.z)
@@ -45,8 +49,7 @@ func set_target_cell(cell: Vector2i) -> bool:
 	return false
 
 func _ready() -> void:
-	anim = get_child(0)
-	anim.play(&"run")
+	anim.play(&"idle")
 	if map == null:
 		push_error("unit base ready: not find map")
 		return
@@ -54,7 +57,7 @@ func _ready() -> void:
 		push_error("unit base ready: unwalkable")
 		return
 	global_position = GridHelper.to_world_player_3d(map, _cell)
-	initialized.emit(self)
+	initialized.emit(self) # _on_cur_actor_initialized
 
 func on_selected() -> void:
 	if actor.get_state() == ActorController.ActorState.Idle:
@@ -111,6 +114,7 @@ func move_by_current_path():
 	if is_target_cell(_cell):
 		return
 	_is_moving = true
+	anim.play(&"run")
 	map.clear_on_cur_actor_move()
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
 	# 跳过起点
@@ -121,9 +125,26 @@ func move_by_current_path():
 	tween.finished.connect(func():
 		_cell = _target_cell # 不要立刻设置_cell到目标位置，要等移动完
 		_is_moving = false
+		anim.play(&"idle")
 		_current_path.clear()
 		map.clear_path()
 	)
 
 func is_arrived_target_cell() -> bool:
 	return is_target_cell(_cell)
+
+func _animate_bar(bar: TextureProgressBar, tween: Tween, to_value: float, duration: float) -> void:
+	to_value = clampf(to_value, bar.min_value, bar.max_value)
+	var from_value := bar.value
+	if is_equal_approx(from_value, to_value):
+		return
+	tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_method(func(t):
+		bar.set_value_no_signal(lerp(from_value, to_value, t))
+		, 0.0, 1.0, duration
+	)
+
+func animate_hp_bar(to_value: float, duration := 0.5):
+	if _tween_hp and _tween_hp.is_running():
+		_tween_hp.kill()
+	_animate_bar(bar_hp, _tween_hp, to_value, duration)

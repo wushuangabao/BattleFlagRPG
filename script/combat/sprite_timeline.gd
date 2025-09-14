@@ -4,6 +4,8 @@ extends TextureButton
 @export var normal_tint: Color = Color(1, 1, 1, 1)     # 常态颜色
 @export var duration: float = 0.2                     # 渐变时长
 
+@onready var hp_progress: TextureProgressBar = $TextureProgressBar
+
 var _actor: ActorController
 var tween: Tween
 
@@ -29,3 +31,6 @@ func set_actor(a: ActorController) -> void:
 
 func _on_pressed() -> void:
 	Game.g_combat.change_cur_actor_to(_actor)
+
+func set_hp_progress(percent: float) -> void:
+	hp_progress.set_value_no_signal(percent * 100.0)

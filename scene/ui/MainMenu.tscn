@@ -1,29 +1,51 @@
-[gd_scene load_steps=2 format=3 uid="uid://dn5oeukflvxux"]
+[gd_scene load_steps=6 format=3 uid="uid://dn5oeukflvxux"]
 
-[ext_resource type="Texture2D" uid="uid://b27x3a4kwalse" path="res://asset/png/character/portrait/young_man_1.png" id="1_h244o"]
+[ext_resource type="Texture2D" uid="uid://dlaeeydriqmxr" path="res://asset/png/ui/main_menu.png" id="1_h244o"]
+[ext_resource type="Texture2D" uid="uid://cgjd1d5b3rlli" path="res://asset/png/ui/main_menu_btn_new.png" id="2_r27y4"]
+[ext_resource type="Texture2D" uid="uid://ijog1b28yy65" path="res://asset/png/ui/main_menu_btn_continue.png" id="3_e73yv"]
+[ext_resource type="Texture2D" uid="uid://b51t161ms7fgf" path="res://asset/png/ui/main_menu_btn_setting.png" id="4_fvwo7"]
+[ext_resource type="Texture2D" uid="uid://bohxon6rn71yr" path="res://asset/png/ui/main_menu_btn_exit.png" id="5_tdiey"]
 
-[node name="MainMenu" type="Node2D"]
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(697, 0)
-scale = Vector2(0.474609, 0.474609)
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("1_h244o")
-centered = false
+expand_mode = 2
 
-[node name="UI" type="Node" parent="."]
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.375
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+alignment = 1
 
-[node name="BtnExit" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BtnNewGame" type="TextureButton" parent="Menu"]
+layout_mode = 2
+texture_normal = ExtResource("2_r27y4")
 
-[node name="BtnSetting" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BtnContinue" type="TextureButton" parent="Menu"]
+layout_mode = 2
+texture_normal = ExtResource("3_e73yv")
 
-[node name="BtnContinue" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BtnSetting" type="TextureButton" parent="Menu"]
+layout_mode = 2
+texture_normal = ExtResource("4_fvwo7")
 
-[node name="BtnNewGame" type="TextureButton" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BtnExit" type="TextureButton" parent="Menu"]
+layout_mode = 2
+texture_normal = ExtResource("5_tdiey")

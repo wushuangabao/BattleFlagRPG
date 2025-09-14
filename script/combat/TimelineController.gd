@@ -18,7 +18,7 @@ var len_per_ap  : float
 var select_box  : AnimatedSprite2D
 var current_turn_btn : TextureButton
 var mouse_enterd_btn : TextureButton
-var tween_move
+var tween_move  : Tween
 var ready_actors : HashSet
 var ready_queue : Array[ActorController] = []
 var gain_ap_map : Dictionary[ActorController, float]
@@ -67,6 +67,14 @@ func _physics_process(delta: float) -> void:
 		var cur_actor = ready_queue.front()
 		set_actor_actived_on_timeline(cur_actor)
 		Game.g_combat.turn_started(cur_actor)
+
+func clear_on_change_scene() -> void:
+	ready_actors.clear()
+	ready_queue.clear()
+	gain_ap_map.clear()
+	for a in texture_map:
+		texture_map[a].queue_free()
+	texture_map.clear()
 
 func _on_actor_die(a: ActorController) -> void:
 	ready_queue.erase(a)

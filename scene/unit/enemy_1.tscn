@@ -1,51 +1,104 @@
-[gd_scene load_steps=14 format=3 uid="uid://df70ys3x6ucts"]
+[gd_scene load_steps=25 format=3 uid="uid://df70ys3x6ucts"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_hnofr"]
-[ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/run_animation/test_run.png" id="2_rpfj5"]
+[ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/animation/test_run.png" id="2_rpfj5"]
+[ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="6_bqxqm"]
+[ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="7_77b4y"]
+[ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="8_hnofr"]
 [ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/combat/ActorController.gd" id="10_2d5li"]
 [ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_cen02"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_xqkki"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_gkyrw"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(0, 0, 71, 67)
+region = Rect2(0, 64, 132, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_q0q68"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_6wneb"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(73, 0, 71, 67)
+region = Rect2(132, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tjc6u"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(264, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_haikx"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(396, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6en7r"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(576, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2kdhb"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(576, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qmxt7"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(146, 0, 71, 67)
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bqxqm"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(219, 0, 71, 67)
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_77b4y"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(292, 0, 71, 67)
+region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hnofr"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(365, 0, 71, 67)
+region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cen02"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(438, 0, 71, 67)
+region = Rect2(256, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5u7m6"]
 atlas = ExtResource("2_rpfj5")
-region = Rect2(511, 0, 71, 67)
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2d5li"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hu8au"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w8pho"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(704, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wlx1r"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_xqkki")
+"texture": SubResource("AtlasTexture_gkyrw")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_q0q68")
+"texture": SubResource("AtlasTexture_6wneb")
 }, {
+"duration": 1.2,
+"texture": SubResource("AtlasTexture_tjc6u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_haikx")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6en7r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2kdhb")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}, {
+"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qmxt7")
 }, {
@@ -63,11 +116,28 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5u7m6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2d5li")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hu8au")
 }],
 "loop": true,
 "name": &"run",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w8pho")
+}],
+"loop": false,
+"name": &"take_damage",
+"speed": 1.0
 }]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_cen02"]
+viewport_path = NodePath("SubViewport")
 
 [node name="unit" type="Marker3D"]
 script = ExtResource("1_hnofr")
@@ -79,7 +149,7 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"run"
+animation = &"take_damage"
 script = ExtResource("10_cen02")
 
 [node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]
@@ -87,3 +157,45 @@ script = ExtResource("10_2d5li")
 my_name = &"杂兵1"
 base3d = NodePath("..")
 anim_player = NodePath("../anim")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(64, 132)
+render_target_clear_mode = 2
+
+[node name="HP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 8.0
+offset_right = 32.0
+offset_bottom = 12.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("6_bqxqm")
+texture_progress = ExtResource("7_77b4y")
+
+[node name="MP" type="TextureProgressBar" parent="SubViewport"]
+custom_minimum_size = Vector2(64, 4)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_top = 14.0
+offset_right = 32.0
+offset_bottom = 18.0
+grow_horizontal = 2
+value = 100.0
+texture_under = ExtResource("6_bqxqm")
+texture_progress = ExtResource("8_hnofr")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+centered = false
+offset = Vector2(-32, 0)
+billboard = 1
+no_depth_test = true
+texture_filter = 0
+render_priority = 2
+texture = SubResource("ViewportTexture_cen02")

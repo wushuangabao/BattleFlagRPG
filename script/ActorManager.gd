@@ -4,7 +4,7 @@ class_name ActorManager extends AbstractSystem
 @export var actors : PackedSceneDictionary # 存储角色对应的 UnitBase3D 节点
 @export var timeline_icons : Dictionary[StringName, Texture2D]
 
-var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
+static var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
 	set(value):
 		var cleaned_dict = {}
 		for key in value:
@@ -28,9 +28,9 @@ func _ready() -> void:
 func on_init():
 	pass
 
-func on_actor_hp_changed(actor, new_hp):
+func on_actor_hp_changed(actor, new_hp, _old_hp):
 	print("ActorManager 收到信号：", actor.my_name, " hp=", new_hp)
-func on_actor_mp_changed(actor, new_mp):
+func on_actor_mp_changed(actor, new_mp, _old_mp):
 	print("ActorManager 收到信号：mp=", actor.my_name, " mp=", new_mp)
 
 # 获取一个角色的 ActorController 实例
@@ -45,9 +45,10 @@ func get_actor_by_name(actor_name: StringName) -> ActorController:
 func is_character(actor) -> bool:
 	if actor is StringName or actor is String:
 		actor = actors.get_scene(actor)
-	elif actor is UnitBase3D:
-		var child_cnt = actor.get_child_count()
-		if child_cnt > 1:
+	elif actor is UnitBase3D or actor is ActorController:
+		if actor is ActorController:
+			actor = actor.base3d
+		if actor.get_child_count() > 1:
 			for child in actor.get_children():
 				if child.name == &"ActorDefault":
 					return false

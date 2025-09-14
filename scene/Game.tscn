@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://b2wub0ms8es6m"]
+[gd_scene load_steps=18 format=3 uid="uid://b2wub0ms8es6m"]
 
 [ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
 [ext_resource type="Script" uid="uid://c8ya50ntb6sau" path="res://script/ActorManager.gd" id="1_vg7sv"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bpofwkdien4ix" path="res://scene/unit/enemy_3.tscn" id="5_msms8"]
 [ext_resource type="PackedScene" uid="uid://dn5oeukflvxux" path="res://scene/ui/MainMenu.tscn" id="6_qto5f"]
 [ext_resource type="Texture2D" uid="uid://d4m142u02wuxe" path="res://asset/png/character/face64/3.png" id="6_r3aus"]
+[ext_resource type="Texture2D" uid="uid://diqul6ouvfb8u" path="res://asset/png/character/face64/5.png" id="8_6okl4"]
 [ext_resource type="Texture2D" uid="uid://br6rbubcmpua8" path="res://asset/png/character/face64/6.png" id="11_w73ac"]
 
 [sub_resource type="Resource" id="Resource_f6bub"]
@@ -39,7 +40,7 @@ script = ExtResource("1_vg7sv")
 actors = SubResource("Resource_f6bub")
 timeline_icons = Dictionary[StringName, Texture2D]({
 &"default": ExtResource("5_4cigq"),
-&"test_actor": ExtResource("5_4cigq"),
+&"test_actor": ExtResource("8_6okl4"),
 &"杂兵1": ExtResource("5_f6bub"),
 &"杂兵2": ExtResource("6_r3aus"),
 &"杂兵3": ExtResource("11_w73ac")
