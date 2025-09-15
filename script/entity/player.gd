@@ -11,10 +11,7 @@ var _is_moving := false
 var _reachable: Dictionary = {} # cell->steps
 var _current_path: Array[Vector2i] = []
 
-func _ready():
-	var i = $"/root/LubanDB".GetItemName(1001)
-	print(i)
-	
+func _ready():	
 	_dir = Vector2i(1, 0)
 	
 	# 初始化位置到最近的格子中心

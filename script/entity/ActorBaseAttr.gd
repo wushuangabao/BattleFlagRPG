@@ -15,11 +15,10 @@ var attrs  : Array[AttributeBase]
 
 func _init(actor, name) -> void:
 	_actor = actor
-	var a = LubanDB.GetActorBaseAttr(name)
-	if a and a is Array[int]:
-		for i in a:
-			var attr = AttributeBase.new(actor, i, MAX_VALUE)
-			attrs.push_back(attr)
+	for i in range(5):
+		var a = Game.g_luban.get_actor_attr(name, 0)
+		var attr = AttributeBase.new(actor, a, MAX_VALUE)
+		attrs.push_back(attr)
 
 func register(on_base_attr_change: Callable) -> void:
 	for i in attrs.size():

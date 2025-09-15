@@ -12,12 +12,11 @@ config_version=5
 
 config/name="战棋RPG"
 run/main_scene="uid://b2wub0ms8es6m"
-config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
+config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-LubanDB="*res://luban/DataService.cs"
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
 
 [dialogic]

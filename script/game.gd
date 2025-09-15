@@ -16,6 +16,7 @@ const cell_pixel_size: Vector2i = Vector2i(64, 64)
 # 每格在3D世界中的对应长度
 const cell_world_size: Vector2 = Vector2(1.0, 1.0) # x对应世界X，y对应世界Z
 
+static var g_luban := Luban.new()
 static var g_event := TypeEventSystem.new()
 static var g_combat := BattleSystem.new()
 static var g_actors : ActorManager = null
@@ -29,12 +30,13 @@ const scene_cached: Dictionary = {
 }
 
 # 从脚本加载全局常量
-static var _base_attrs = null
+
+static var _base_attrs
 static func get_base_attrs() -> Array:
 	if _base_attrs:
 		return _base_attrs as Array
 	else:
-		_base_attrs = LubanDB.GetBaseAttrTbl() as Array
+		_base_attrs = g_luban.get_base_attrs() as Array
 		return _base_attrs
 
 # 阵营

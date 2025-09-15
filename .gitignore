@@ -8,3 +8,8 @@
 /global.json
 Datas/~*
 Datas/attr/~*
+modules/*/__pycache__/
+modules/*/*.obj
+modules/*/*.obj.import
+modules/*/*/*.obj
+modules/*/*/*.obj.import
