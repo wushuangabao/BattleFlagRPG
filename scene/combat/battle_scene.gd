@@ -18,7 +18,7 @@ extends Node3D
 
 var _cur_unit : UnitBase3D = null
 var _unit_list : Array[UnitBase3D]
-
+var _cell_mouse_on  # 鼠标指向的单元格
 var my_system : BattleSystem = null
 var ground_layer : Ground
 var flag_layer   : FlagLayer
@@ -175,35 +175,24 @@ func release_on_change_scene():
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
+		var battle_state = my_system.get_battle_state()
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			var mouse_pos = get_viewport().get_mouse_position()
-			var from = camera.project_ray_origin(mouse_pos)
-			var dir = camera.project_ray_normal(mouse_pos)
-			# 与 y=0 平面求交
-			if absf(dir.y) < 1e-6: # 射线几乎平行于地面
-				return
-			var t = -from.y / dir.y
-			if t <= 0.0: # 交点在摄像机背后
-				return
-			var hit = from + dir * t
-			if Game.Debug == 1:
-				draw_debug_ray(from, hit)
-				# 将世界坐标映射到格子坐标
-				# print("Clicked pos: ", hit.x, ", ",  hit.z)
-			var cell = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
-			_on_cell_clicked(cell)
+			if battle_state == BattleSystem.BattleState.ChoseActionTarget:
+				if _cell_mouse_on and ground_layer.chose_area_cells.has(_cell_mouse_on):
+					Game.g_event.send_event("event_chose_target", ground_layer.skill_area_cells) # 选择目标
+					return
+			_cell_mouse_on = _get_cell_mouse_on()
+			if _cell_mouse_on:
+				_on_cell_clicked(_cell_mouse_on)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			if my_system.get_battle_state() == BattleSystem.BattleState.ChoseActionTarget:
+			if battle_state == BattleSystem.BattleState.ChoseActionTarget:
 				Game.g_event.send_event("event_chose_target", false) # 点击右键取消所选动作
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	var battle_state = my_system.get_battle_state()
-	if battle_state == BattleSystem.BattleState.ChoseActionTarget:
-		Game.g_event.send_event("event_chose_target", cell)
-		return
 	if _cur_unit.is_target_cell(cell) and _cur_unit.get_cur_path().size() > 1:
 		my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
 		return
+	var battle_state = my_system.get_battle_state()
 	if battle_state != BattleSystem.BattleState.ActorIdle:
 		return
 	var can_go := _cur_unit.set_target_cell(cell)
@@ -224,6 +213,35 @@ func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 			ground_layer.highlight_cell(cell, &"select_teammember")
 		else:
 			ground_layer.highlight_cell(cell, &"select_other_team_actor")
+
+func _process(_delta: float) -> void:
+	var battle_state = my_system.get_battle_state()
+	if battle_state == BattleSystem.BattleState.ChoseActionTarget and my_system.cur_action and my_system.cur_actor:
+		_cell_mouse_on = _get_cell_mouse_on()
+		if _cell_mouse_on:
+			if ground_layer.chose_area_cells.has(_cell_mouse_on):
+				ground_layer.highlight_cell(_cell_mouse_on, &"reachable")
+				ground_layer.set_skill_area(my_system.cur_action.get_area_skill_range(my_system.cur_actor, _cell_mouse_on))
+			else:
+				ground_layer.highlight_cell(_cell_mouse_on, &"unreachable")
+				ground_layer.set_skill_area([])
+	else:
+		_cell_mouse_on = null
+
+func _get_cell_mouse_on():
+	var mouse_pos = get_viewport().get_mouse_position()
+	var from = camera.project_ray_origin(mouse_pos)
+	var dir = camera.project_ray_normal(mouse_pos)
+	# 与 y=0 平面求交
+	if absf(dir.y) < 1e-6: # 射线几乎平行于地面
+		return null
+	var t = -from.y / dir.y
+	if t <= 0.0: # 交点在摄像机背后
+		return null
+	var hit = from + dir * t
+	# draw_debug_ray(from, hit)
+	# 将世界坐标映射到格子坐标
+	return ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from

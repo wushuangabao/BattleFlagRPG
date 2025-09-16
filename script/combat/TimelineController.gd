@@ -43,26 +43,31 @@ func _physics_process(delta: float) -> void:
 			live_actor_cnt += 1
 		elif texture_map.has(a):
 			_on_actor_die(a)
-	# 检查 ready 的角色，去掉 AP 低于 AP_THRESHOLD 的
-	var actor_max_ap_cnt := 0
-	for a in ready_actors.to_array():
-		if a.get_AP() < AP_THRESHOLD:
-			ready_actors.erase(a)
-		elif a.get_AP() >= AP_MAX:
-			actor_max_ap_cnt += 1
-	var must_do_turn := true if actor_max_ap_cnt == live_actor_cnt else false
-	# 执行行动条增长逻辑
-	ready_queue.clear()
-	if running and not btn_moving and not must_do_turn and ready_queue.size() == 0:
-		if select_box.visible:
-			select_box.stop()
-			select_box.hide()
-		add_all_actor_ap_and_btn_y(delta)
+	if running:
+		# 检查 ready 的角色，去掉 AP 低于 AP_THRESHOLD 的
+		var actor_max_ap_cnt := 0
+		for a in ready_actors.to_array():
+			if a.get_AP() < AP_THRESHOLD:
+				ready_actors.erase(a)
+			elif a.get_AP() >= AP_MAX:
+				actor_max_ap_cnt += 1
+		# 清空行动角色队列
+		ready_queue.clear()
+		if actor_max_ap_cnt == live_actor_cnt:
+			# 所有存活角色的 AP 都已达到最大，必须行动了
+			ready_queue.append_array(ready_actors.to_array())
+		else:
+			# 执行行动条增长逻辑
+			if running and not btn_moving:
+				if select_box.visible:
+					select_box.stop()
+					select_box.hide()
+				add_all_actor_ap_and_btn_y(delta)
 	# 设置角色头像位置
 	_set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt, delta)
 	set_all_actor_btn_pos()
 	# ready 角色数量有增加，则暂停行动条，进入回合
-	if ready_queue.size() > 0 or (running and not btn_moving and must_do_turn):
+	if running and ready_queue.size() > 0:
 		running = false
 		var cur_actor = ready_queue.front()
 		set_actor_actived_on_timeline(cur_actor)
@@ -132,6 +137,8 @@ func add_all_actor_ap_and_btn_y(delta: float) -> void:
 			a.tmp_timeline_y = tmp_y
 		else:
 			var gain = a.get_ap_gain_per_sec() * delta
+			if a.get_state() == ActorController.ActorState.Defend:
+				gain *= 0.5  # 防御状态，AP 增加速度减半
 			gain_ap_map[a] += gain
 			if gain_ap_map[a] >= 1.0:
 				gain_ap_map[a] -= 1.0
@@ -139,9 +146,9 @@ func add_all_actor_ap_and_btn_y(delta: float) -> void:
 			var tmp_y = btn_origin_y - (a.get_AP() + gain_ap_map[a]) * len_per_ap
 			a.tmp_timeline_y = tmp_y
 		if a.get_AP() >= AP_THRESHOLD:
-			ready_queue.push_back(a)
 			if not ready_actors.has(a):
 				ready_actors.append(a)
+				ready_queue.push_back(a)
 
 # 动态调整角色头像重叠时“跳起”的高度
 func _set_btn_jump_hgiht_by_actor_cnt(live_actor_cnt: int, delta: float) -> void:

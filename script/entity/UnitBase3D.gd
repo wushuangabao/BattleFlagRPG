@@ -18,7 +18,8 @@ var _is_moving := false
 var _reachable: Dictionary = {} # cell->steps
 var _current_path: Array[Vector2i] = []
 
-var _tween_hp: Tween
+var _tween_hp : Tween
+var _tween_mp : Tween
 
 func get_pos_2d() -> Vector2:
 	return Vector2(global_position.x, global_position.z)
@@ -40,7 +41,7 @@ func is_target_cell(cell: Vector2i) -> bool:
 	return cell == _target_cell
 	
 func set_target_cell(cell: Vector2i) -> bool:
-	if not _is_moving and cell != _cell and actor.get_state() == ActorController.ActorState.Idle:
+	if not _is_moving and cell != _cell and actor.get_state() != ActorController.ActorState.DoAction:
 		if _reachable.has(cell):
 			if not is_target_cell(cell) or _current_path.size() == 0:
 				_target_cell = cell
@@ -60,7 +61,7 @@ func _ready() -> void:
 	initialized.emit(self) # _on_cur_actor_initialized
 
 func on_selected() -> void:
-	if actor.get_state() == ActorController.ActorState.Idle:
+	if actor.get_state() != ActorController.ActorState.DoAction:
 		_compute_reachable()
 
 func _compute_reachable():
@@ -148,3 +149,8 @@ func animate_hp_bar(to_value: float, duration := 0.5):
 	if _tween_hp and _tween_hp.is_running():
 		_tween_hp.kill()
 	_animate_bar(bar_hp, _tween_hp, to_value, duration)
+
+func animate_mp_bar(to_value: float, duration := 0.5):
+	if _tween_mp and _tween_hp.is_running():
+		_tween_mp.kill()
+	_animate_bar(bar_mp, _tween_mp, to_value, duration)

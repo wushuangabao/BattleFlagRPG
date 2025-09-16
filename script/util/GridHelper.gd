@@ -47,6 +47,8 @@ static func get_edge_vertices(map: TileMapLayer, cell: Vector2i, direction: int)
 					cell_origin]
 	return []
 
+#region 寻路算法
+
 # 获取步进方向（4邻域单位向量）
 static func clamp_to_4dir(from_cell: Vector2i, target_cell: Vector2i) -> Vector2i:
 	# 将任意目标格约束为距离为1的曼哈顿邻格
@@ -152,19 +154,103 @@ static func movement_range(origin: Vector2i, max_steps: int, is_walkable: Callab
 				queue.append(n)
 	return dist # Dictionary cell->steps
 
-# 计算技能范围
-static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i) -> Array[Vector2i]:
-	match area_data.ShapeType:
+#endregion
+
+#region 技能范围
+
+# 返回所有满足 |dx| + |dy| = r 且 check_func(pos) == true 的格子
+static func manhattan_ring(center: Vector2i, r: int, check_func: Callable) -> Array[Vector2i]:
+	if r < 0:
+		return []
+	if r == 0:
+		return [center]
+	var result: Array[Vector2i] = []
+	for dx in range(-r, r + 1):
+		var dy := r - absi(dx)
+		if dy == 0:
+			var pos := center + Vector2i(dx, 0)
+			if check_func.call(pos):
+				result.append(pos)
+		else:
+			var pos := center + Vector2i(dx, dy)
+			if check_func.call(pos):
+				result.append(pos)
+			pos = center + Vector2i(dx, -dy)
+			if check_func.call(pos):
+				result.append(pos)
+	return result
+
+# 返回所有满足 |dx| + |dy| ≤ r 且 check_func(pos) == true 的格子
+static func manhattan_area(center: Vector2i, r: int, check_func: Callable) -> Array[Vector2i]:
+	if r < 0:
+		return []
+	var result: Array[Vector2i] = []
+	for dx in range(-r, r + 1):
+		var max_dy := r - absi(dx)
+		var base := Vector2i(center.x + dx, center.y)
+		for dy in range(-max_dy, max_dy + 1):
+			var pos := base + Vector2i(0, dy)
+			if check_func.call(pos):
+				result.append(pos)
+	return result
+
+# 生成从 origin 到 target 的离散网格路径，并筛选出到 origin 的曼哈顿距离在 [d_inner, d_outer] 区间内的所有点
+static func bresenham_points_in_manhattan_band(origin: Vector2i, target: Vector2i, d_inner: int, d_outer: int, check_func: Callable) -> Array[Vector2i]:
+	if d_outer < d_inner or d_inner < 0:
+		push_error("bresenham_points_in_manhattan_band：错误的参数！")
+		return []
+	var result: Array[Vector2i] = []
+	var x0 := origin.x
+	var y0 := origin.y
+	var x1 := target.x
+	var y1 := target.y
+	var dx := absi(x1 - x0)
+	var sx := 1 if x0 < x1 else -1
+	var dy := -absi(y1 - y0)  # 注意：经典写法将 dy 设为负数并在误差项中使用
+	var sy := 1 if y0 < y1 else -1
+	var err := dx + dy  # 其中 dy 为负，即等价于 err = dx - abs(dy)
+	var x := x0
+	var y := y0
+	while true:
+		var manhattan := absi(x - x0) + absi(y - y0)
+		if manhattan >= d_inner and manhattan <= d_outer:
+		# 如果你想排除起点，可用下面的判断替换上述 append 条件：
+		# if not (x == x0 and y == y0) and manhattan >= d_inner and manhattan <= d_outer:
+			var c = Vector2i(x, y)
+			if check_func.call(c):
+				result.append(c)
+		if x == x1 and y == y1:
+			break
+		var e2 := 2 * err
+		if e2 >= dy: # 误差够大，沿 x 方向迈步
+			err += dy
+			x += sx
+		if e2 <= dx: # 误差够小，沿 y 方向迈步
+			err += dx
+			y += sy
+	return result
+
+# 计算技能范围，check_func 是一个 func(c: Vector2i) -> bool
+static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i, check_func: Callable) -> Array[Vector2i]:
+	match area_data.shape_type:
 		SkillAreaShape.ShapeType.Single:
 			if area_data.is_blockable:
 				return [origin] #todo
 			else:
-				if area_data.target_range == 1:
+				if area_data.target_range == 0:
 					return [target]
 				else:
-					return [target]  #todo
+					return manhattan_area(target, area_data.target_range, check_func)
 		SkillAreaShape.ShapeType.Line:
-			return [origin]  #todo
+			if area_data.is_blockable:
+				return [origin]  #todo
+			else:
+				return bresenham_points_in_manhattan_band(origin, target, area_data.d_inner, area_data.d_outer, check_func)
 		SkillAreaShape.ShapeType.Ring:
-			return [origin]  #todo
+			var res = manhattan_ring(target, area_data.d_outer, check_func)
+			for i in range(area_data.d_inner, area_data.d_outer):
+				res.append_array(manhattan_ring(target, i, check_func))
+			return res
 	return []
+
+#endregion

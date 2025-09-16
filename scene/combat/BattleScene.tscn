@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=29 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -14,7 +14,13 @@
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://script/ui/btn_attack.gd" id="10_c23fh"]
 [ext_resource type="PackedScene" uid="uid://vb2dibitntmx" path="res://scene/combat/green_box_timeline.tscn" id="11_8xf8q"]
-[ext_resource type="Script" uid="uid://ba0gvnqsvcpa" path="res://script/ui/btn_skip.gd" id="14_4gioj"]
+[ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="13_662wh"]
+[ext_resource type="Script" uid="uid://ba0gvnqsvcpa" path="res://script/ui/btn_action.gd" id="14_4gioj"]
+[ext_resource type="Script" uid="uid://byxtnaoo2710d" path="res://script/combat/Action/ActionDefend.gd" id="14_dwjhn"]
+[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="14_pomew"]
+[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="15_662wh"]
+[ext_resource type="Script" uid="uid://5hvrwn0fjsgu" path="res://script/combat/Action/ActionSkipTurn.gd" id="17_5n8sn"]
+[ext_resource type="Script" uid="uid://bkdbyyw7vdvyv" path="res://script/combat/Action/ActionRecover.gd" id="18_rq0px"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wponv"]
 
@@ -24,6 +30,44 @@ packed_scene = Dictionary[StringName, PackedScene]({
 &"test": ExtResource("3_ldyea")
 })
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+
+[sub_resource type="Resource" id="Resource_ga0e4"]
+script = ExtResource("13_662wh")
+custom_id = -1
+shape_type = 2
+d_inner = 1
+d_outer = 1
+target_range = 0
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_662wh"]
+script = ExtResource("13_662wh")
+custom_id = -1
+shape_type = 0
+d_inner = 0
+d_outer = 0
+target_range = 1
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_c3jca"]
+script = ExtResource("15_662wh")
+name = "朴实无华的一拳"
+icon = ExtResource("9_te81e")
+tags = Array[StringName]([])
+cost = Dictionary[StringName, int]({
+&"AP": 1,
+&"MP": 10
+})
+cool_down = 0.0
+charges = 0
+cast_time = 0.0
+area_range = SubResource("Resource_662wh")
+area_chose = SubResource("Resource_ga0e4")
+filters = Array[StringName]([])
+effects = Array[ExtResource("14_pomew")]([])
+metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0eov1"]
 size = Vector2(365, 106)
@@ -80,45 +124,52 @@ packed_sprite = ExtResource("7_1h76q")
 packed_greenbox = ExtResource("11_8xf8q")
 
 [node name="action_list" type="HBoxContainer" parent="UI"]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -5.0
-offset_bottom = -5.0
+anchors_preset = -1
+anchor_left = 0.99
+anchor_top = 0.985
+anchor_right = 0.99
+anchor_bottom = 0.985
 grow_horizontal = 0
 grow_vertical = 0
+alignment = 2
+
+[node name="attack" type="TextureButton" parent="UI/action_list"]
+layout_mode = 2
+script = ExtResource("10_c23fh")
+skill = SubResource("Resource_c3jca")
 
 [node name="skill_list" type="Control" parent="UI/action_list"]
+custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/action_list/skill_list"]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -204.0
-grow_horizontal = 0
+anchors_preset = -1
+anchor_top = 0.9
+anchor_bottom = 0.9
 grow_vertical = 0
+alignment = 2
 
-[node name="skill_1" type="TextureButton" parent="UI/action_list/skill_list/VBoxContainer"]
-layout_mode = 2
-texture_normal = ExtResource("9_te81e")
-script = ExtResource("10_c23fh")
-
-[node name="attack" type="TextureButton" parent="UI/action_list/skill_list/VBoxContainer"]
-layout_mode = 2
-texture_normal = ExtResource("9_te81e")
-script = ExtResource("10_c23fh")
-
-[node name="skip" type="Button" parent="UI/action_list"]
+[node name="skip" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "skip"
 script = ExtResource("14_4gioj")
+action = ExtResource("17_5n8sn")
+
+[node name="defend" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "defend"
+script = ExtResource("14_4gioj")
+action = ExtResource("14_dwjhn")
+
+[node name="recover" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "recover"
+script = ExtResource("14_4gioj")
+action = ExtResource("18_rq0px")
 
 [node name="Area2D" type="Area2D" parent="."]
 visible = false
@@ -134,6 +185,7 @@ debug_color = Color(0.917647, 0.235294, 0.411765, 0.917647)
 position = Vector2(1176, -3.5)
 shape = SubResource("RectangleShape2D_vpcar")
 
-[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/skill_1" to="UI/action_list/skill_list/VBoxContainer/skill_1" method="_on_pressed"]
-[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/attack" to="UI/action_list/skill_list/VBoxContainer/attack" method="_on_pressed"]
-[connection signal="pressed" from="UI/action_list/skip" to="UI/action_list/skip" method="_on_pressed"]
+[connection signal="pressed" from="UI/action_list/attack" to="UI/action_list/attack" method="_on_pressed"]
+[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/skip" to="UI/action_list/skill_list/VBoxContainer/skip" method="_on_pressed"]
+[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/defend" to="UI/action_list/skill_list/VBoxContainer/defend" method="_on_pressed"]
+[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/recover" to="UI/action_list/skill_list/VBoxContainer/recover" method="_on_pressed"]

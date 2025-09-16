@@ -16,7 +16,7 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 @export var anim_player: UnitAnimatedSprite3D # 动画节点的引用
 
 enum ActorState {
-	Idle, DoAction
+	Idle, DoAction, Defend
 }
 
 var _state : ActorState = ActorState.Idle
@@ -25,18 +25,26 @@ var _action: ActionBase = null
 func get_state() -> ActorState:
 	return _state
 
-signal begin_to_do_action
+# signal begin_to_do_action
 signal end_doing_action
 
 var action:
 	get:
 		return _action
 	set(new_action):
+		# 取消防御
+		if _action and _action is ActionDefend and not new_action is ActionDefend:
+			_action.cancel()
+			_action = null
+		# 执行新动作（execute）
 		if _action == null:
-			_state = ActorState.DoAction
+			if new_action is ActionDefend:
+				_state = ActorState.Defend
+			else:
+				_state = ActorState.DoAction
 			if new_action.execute(self) == ActionBase.ActionState.Running:
 				_action = new_action
-				begin_to_do_action.emit(new_action)
+				# begin_to_do_action.emit(new_action)
 			else:
 				_state = ActorState.Idle # 动作执行一瞬间就结束了，不用发信号
 
@@ -57,9 +65,9 @@ func _exit_tree() -> void:
 	Game.g_combat.get_architecture().unregister_actor(self)
 
 func _process(delta: float) -> void:
-	if _state == ActorState.DoAction:
+	if _state != ActorState.Idle:
 		if _action == null:
-			push_error("角色状态是DoAction但_action为空！")
+			push_error("角色状态不是Idle 但_action为空！")
 			_state = ActorState.Idle
 			return
 		_action.update(self, delta)
@@ -72,8 +80,20 @@ func _process(delta: float) -> void:
 func add_HP(v: int) -> void:
 	my_stat.HP.set_value(my_stat.HP.value + v)
 
+func get_HP() -> int:
+	return my_stat.HP.value
+
+func get_MaxHP() -> int:
+	return my_stat.HP.maximum
+
 func add_MP(v: int) -> void:
 	my_stat.MP.set_value(my_stat.MP.value + v)
+
+func get_MP() -> int:
+	return my_stat.MP.value
+
+func get_MaxMP() -> int:
+	return my_stat.MP.maximum
 
 func add_AP(v: int) -> void:
 	AP.set_value(AP.value + v)
@@ -97,11 +117,10 @@ func is_alive() -> bool:
 	return my_stat.HP.value > 0
 
 func take_damage(amount: int, source: ActorController = null) -> void:
-	anim_player.play(&"idle")
 	var final := amount
 	# for b in buffs:
 	# 	final = b.modify_incoming_damage(final, self, source)
-	print(my_name, " 受到伤害", final, "，来自 ", source)
+	print(my_name, " 受到伤害", final, "，来自 ", source.my_name)
 	add_HP(-final)
 
 func animate_take_damage_after(seconds: float) -> void:

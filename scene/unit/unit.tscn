@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c4u5c7mip2iby"]
+[gd_scene load_steps=27 format=3 uid="uid://c4u5c7mip2iby"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_qk4nm"]
 [ext_resource type="Texture2D" uid="uid://c17gk8jxbpogq" path="res://asset/png/character/animation/test_run_3.png" id="2_qt1e6"]
@@ -30,6 +30,10 @@ region = Rect2(512, 64, 128, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_pp5ks"]
 atlas = ExtResource("2_qt1e6")
 region = Rect2(0, 64, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0p1oq"]
+atlas = ExtResource("2_qt1e6")
+region = Rect2(768, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_177ka"]
 atlas = ExtResource("2_qt1e6")
@@ -102,6 +106,14 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_0p1oq")
+}],
+"loop": true,
+"name": &"defend",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_177ka")
 }, {
 "duration": 1.0,
@@ -162,8 +174,7 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"take_damage"
-frame_progress = 1.0
+animation = &"defend"
 script = ExtResource("10_y1hu4")
 
 [node name="SubViewport" type="SubViewport" parent="."]

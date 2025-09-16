@@ -14,6 +14,10 @@ var _buff_system : BuffSystem
 var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
 
+# 正在选择动作目标 - 存储角色和动作
+var cur_actor  : ActorController
+var cur_action : ActionBase = null
+
 signal action_chosed
 signal target_chosed
 
@@ -27,14 +31,13 @@ func turn_started(actor: ActorController) -> void:
 	_turn_controller.do_turn(actor)
 
 # 回合结束
-func turn_ended(_actor: ActorController) -> void:
+func turn_ended() -> void:
 	_cur_state = BattleState.Wait
 
 # 更换当前角色
 func change_cur_actor_to(actor: ActorController) -> void:
 	if _cur_state == BattleState.ActorIdle or _cur_state == BattleState.Wait:
 		if _turn_controller.change_cur_actor_to(actor):
-			scene.select_current_actor(actor)
 			_cur_state = BattleState.ActorIdle
 
 # 开始选择动作
@@ -45,7 +48,11 @@ func begin_to_chose_action_for(actor: ActorController) -> void:
 # 选择动作目标
 func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	_cur_state = BattleState.ChoseActionTarget
+	cur_actor = actor
+	cur_action = action
+	scene.ground_layer.set_chose_area(action.get_area_chose_target(actor))
 	var target_cell = null
+	var ret = false
 	while true:
 		target_cell = await target_chosed
 		if target_cell == null:
@@ -55,19 +62,31 @@ func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 			if action.target_type == ActionBase.TargetType.Unit:
 				var a_target = get_actor_on_cell(target_cell)
 				if a_target and action.chose_target(a_target, actor):
-					return true
+					ret = true
+					break
+				else:
+					print("无效的选择目标！") #todo UI提示
 			elif action.target_type == ActionBase.TargetType.Cell:
 				if action.chose_target(target_cell, actor):
-					return true
+					ret = true
+					break
+				else:
+					print("无效的选择目标！") #todo UI提示
 			else:
 				push_error("目标类型为None的动作竟然在选择动作目标？！")
 				break
-	return false
+	cur_actor = null
+	cur_action = null
+	scene.ground_layer.set_skill_area([])
+	scene.ground_layer.set_chose_area([])
+	return ret
 
 # 开始动作
 func let_actor_do_action(actor, action) -> void:
 	actor.action = action
 	if actor.action != null: # 持续性动作
+		if actor.action is ActionDefend:
+			return
 		_cur_state = BattleState.ActorDoAction
 		await actor.end_doing_action
 		print("BattleSystem 收到信号 end_doing_action")
@@ -122,7 +141,7 @@ func on_chose_action(action: ActionBase):
 
 func on_chose_target(target):
 	if _cur_state == BattleState.ChoseActionTarget:
-		if target is Vector2i:
+		if target is Array[Vector2i]:
 			target_chosed.emit(target)
 		elif target == false:
 			target_chosed.emit()
@@ -131,7 +150,7 @@ func on_actor_hp_changed(actor, new_hp, old_hp):
 	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)
 	# 头顶血条
 	var bar_hp = actor.base3d.bar_hp
-	bar_hp.max_value = actor.my_stat.HP.maximum
+	bar_hp.max_value = actor.get_MaxHP()
 	bar_hp.set_value_no_signal(old_hp)
 	actor.base3d.animate_hp_bar(new_hp)
 	# 行动条头像
@@ -139,8 +158,13 @@ func on_actor_hp_changed(actor, new_hp, old_hp):
 		var p = (bar_hp.max_value - new_hp) / bar_hp.max_value
 		_turn_controller.timeline.texture_map[actor].set_hp_progress(p)
 
-func on_actor_mp_changed(actor, new_mp, _old_mp):
+func on_actor_mp_changed(actor, new_mp, old_mp):
 	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
+	# 头顶蓝条
+	var bar_mp = actor.base3d.bar_mp
+	bar_mp.max_value = actor.my_stat.MP.maximum
+	bar_mp.set_value_no_signal(old_mp)
+	actor.base3d.animate_mp_bar(new_mp)
 
 #endregion
 

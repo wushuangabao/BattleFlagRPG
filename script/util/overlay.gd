@@ -14,6 +14,18 @@ func _draw():
 		cells.push_back(cell)
 	_draw_boundary(cells, grid.color_range_border, 2.0)
 
+	# 技能范围
+	if grid.chose_area_cells.size() >= 1:
+		for c in grid.chose_area_cells:
+			var center: Vector2 = grid.map_to_local(c)
+			var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
+			draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_range_chose)
+	if grid.skill_area_cells.size() >= 1:
+		for c in grid.skill_area_cells:
+			var center: Vector2 = grid.map_to_local(c)
+			var top_left: Vector2 = center - Vector2(GridHelper.cell_size) * 0.5
+			draw_rect(Rect2(top_left, Vector2(GridHelper.cell_size)), grid.color_range_skill)
+
 	# 路径
 	if grid.path_cells.size() > 1:
 		var points: PackedVector2Array = []

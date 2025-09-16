@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://df70ys3x6ucts"]
+[gd_scene load_steps=26 format=3 uid="uid://df70ys3x6ucts"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_hnofr"]
 [ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/animation/test_run.png" id="2_rpfj5"]
@@ -23,6 +23,10 @@ region = Rect2(264, 64, 132, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_haikx"]
 atlas = ExtResource("2_rpfj5")
 region = Rect2(396, 64, 132, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cjxbx"]
+atlas = ExtResource("2_rpfj5")
+region = Rect2(640, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6en7r"]
 atlas = ExtResource("2_rpfj5")
@@ -89,6 +93,14 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_cjxbx")
+}],
+"loop": true,
+"name": &"defend",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_6en7r")
 }, {
 "duration": 1.0,
@@ -149,7 +161,7 @@ pixel_size = 0.05
 billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"take_damage"
+animation = &"defend"
 script = ExtResource("10_cen02")
 
 [node name="ActorDefault" type="Node" parent="." node_paths=PackedStringArray("base3d", "anim_player")]

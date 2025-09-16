@@ -1,8 +1,15 @@
 extends TileMapLayer
 class_name Ground
 
-@export var color_range: Color = Color(0.2, 0.6, 1.0, 0.28)
+@export_group("highlight_area")
+# 移动边界线
 @export var color_range_border: Color = Color(0.1, 0.9, 0.1, 0.95)
+# 目标选择范围
+@export var color_range_chose: Color = Color(0.2, 0.6, 1.0, 0.4)
+# 技能作用范围
+@export var color_range_skill: Color = Color(0.0, 0.86, 0.74, 0.8)
+
+@export_group("highlight_cell")
 @export var color_hgihtlight_rect: Dictionary[StringName, Color] = {
 	&"reachable" : Color(0.1, 0.9, 0.1, 0.9),
 	&"unreachable" : Color(0.9, 0.1, 0.1, 0.9)
@@ -14,13 +21,7 @@ class_name Ground
 	&"select_teammember" : Color(0.1, 0.9, 0.1, 0.98),
 	&"select_other_team_actor" : Color(0.9, 0.1, 0.1, 0.98)
 }
-@export var color_path_line: Color = Color(0.9, 0.95, 1.0, 0.95)
-@export var color_path_node: Color = Color(0.2, 0.6, 1.0, 0.95)
-@export var path_line_width: float = 3.0
 
-var overlay: OverLay = null
-var reachable_map: Dictionary = {} # cell->steps
-var path_cells: Array[Vector2i] = []
 var hightlight_cell_map: Dictionary[StringName, Vector2i] = {
 	&"reachable" : Vector2i(-1, -1),
 	&"unreachable" : Vector2i(-1, -1),
@@ -33,6 +34,18 @@ var exclusive_hightlight_cell_set: HashSet = HashSet.new([
 	&"reachable", &"unreachable", &"select_teammember", &"select_other_team_actor"
 ])
 
+@export_group("move_path")
+@export var color_path_line: Color = Color(0.9, 0.95, 1.0, 0.95)
+@export var color_path_node: Color = Color(0.2, 0.6, 1.0, 0.95)
+@export var path_line_width: float = 3.0
+
+var overlay: OverLay = null
+var reachable_map: Dictionary = {} # cell->steps
+var path_cells: Array[Vector2i] = []
+
+var chose_area_cells: Array[Vector2i] = []
+var skill_area_cells: Array[Vector2i] = []
+
 func _ready():
 	# 创建overlay节点用于绘制移动范围和路径
 	if overlay == null:
@@ -44,6 +57,14 @@ func _ready():
 
 func set_reachable(cells: Dictionary):
 	reachable_map = cells
+	overlay.queue_redraw()
+
+func set_chose_area(area: Array[Vector2i]):
+	chose_area_cells = area
+	overlay.queue_redraw()
+
+func set_skill_area(area: Array[Vector2i]):
+	skill_area_cells = area
 	overlay.queue_redraw()
 
 func set_path(path: Array[Vector2i]):
