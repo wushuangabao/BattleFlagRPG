@@ -15,9 +15,9 @@ class_name Ground
 	&"unreachable" : Color(0.9, 0.1, 0.1, 0.9)
 }
 @export var color_hgihtlight_circle: Dictionary[StringName, Color] = {
-	&"current_actor" : Color(0.1, 0.9, 0.1, 0.98)
 }
 @export var color_hgihtlight_circle_border: Dictionary[StringName, Color] = {
+	&"current_actor" : Color(0.1, 0.9, 0.1, 0.98),
 	&"select_teammember" : Color(0.1, 0.9, 0.1, 0.98),
 	&"select_other_team_actor" : Color(0.9, 0.1, 0.1, 0.98)
 }

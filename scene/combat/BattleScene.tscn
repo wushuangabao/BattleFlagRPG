@@ -5,8 +5,8 @@
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
 [ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/test_battle_map.tscn" id="3_ldyea"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
-[ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/TimelineController.gd" id="6_vpcar"]
-[ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/TurnController.gd" id="6_wwrlq"]
+[ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/Timeline/TimelineController.gd" id="6_vpcar"]
+[ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/Timeline/TurnController.gd" id="6_wwrlq"]
 [ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
 [ext_resource type="Texture2D" uid="uid://bvndynxhey5fa" path="res://asset/png/icon/timeline_under.png" id="7_7hkn4"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
@@ -53,6 +53,7 @@ metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
 
 [sub_resource type="Resource" id="Resource_c3jca"]
 script = ExtResource("15_662wh")
+target_rule = 1
 name = "朴实无华的一拳"
 icon = ExtResource("9_te81e")
 tags = Array[StringName]([])

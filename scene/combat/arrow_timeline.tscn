@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://vmoim1a4djdp" path="res://asset/png/icon/arrow-3.png" id="3_rquwx"]
 [ext_resource type="Texture2D" uid="uid://da8f7yh4nii1i" path="res://asset/png/icon/arrow-4.png" id="4_kigob"]
 [ext_resource type="Texture2D" uid="uid://im4nvcvusa2s" path="res://asset/png/icon/arrow-5.png" id="5_tnyij"]
-[ext_resource type="Script" uid="uid://cdgcbg4q5keby" path="res://scene/combat/timeline_arrow.gd" id="6_bt3nx"]
+[ext_resource type="Script" uid="uid://cdgcbg4q5keby" path="res://script/combat/Timeline/timeline_arrow.gd" id="6_bt3nx"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ymhnl"]
 animations = [{

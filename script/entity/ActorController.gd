@@ -8,6 +8,7 @@ var tmp_timeline_y : float      # 在 timeline 上头像的 y 坐标
 var camp     : = Game.Camp.Player # 阵营
 var team_id  : = Game.TeamID.Red  # 队伍
 
+var tags     : Array[StringName]
 var buffs    : Array[BuffBase]    # buff 列表
 var actions  : Array[ActionBase]  # 待执行动作列表
 
@@ -24,6 +25,12 @@ var _action: ActionBase = null
 
 func get_state() -> ActorState:
 	return _state
+
+func has_tag(_tags: Array[StringName]) -> bool:
+	for t in _tags:
+		if tags.has(t):
+			return true
+	return false
 
 # signal begin_to_do_action
 signal end_doing_action
@@ -101,6 +108,9 @@ func add_AP(v: int) -> void:
 func pay_AP(v: int) -> void:
 	AP.set_value(AP.value - v)
 
+func clear_AP() -> void:
+	AP.set_value(0)
+
 func get_AP() -> int:
 	return AP.value
 
@@ -126,3 +136,4 @@ func take_damage(amount: int, source: ActorController = null) -> void:
 func animate_take_damage_after(seconds: float) -> void:
 	await get_tree().create_timer(seconds).timeout
 	anim_player.play(&"take_damage")
+	anim_player.highlight_with_animation(UnitAnimatedSprite3D.HighLightType.ReceiveDamage, false)

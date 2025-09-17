@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=4 uid="uid://dp0j1m0xqlrck"]
 
-[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://script/combat/BattleMap.gd" id="1_gx5we"]
+[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://scene/combat/map/BattleMap.gd" id="1_gx5we"]
 [ext_resource type="Texture2D" uid="uid://cv118puq1dpgq" path="res://asset/png/map/grass_background.png" id="2_8t45i"]
 [ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="2_hbftt"]
 [ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/ground.gd" id="3_8t45i"]

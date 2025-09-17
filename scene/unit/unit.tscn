@@ -1,11 +1,11 @@
 [gd_scene load_steps=27 format=3 uid="uid://c4u5c7mip2iby"]
 
-[ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/entity/UnitBase3D.gd" id="1_qk4nm"]
+[ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/combat/Unit/UnitBase3D.gd" id="1_qk4nm"]
 [ext_resource type="Texture2D" uid="uid://c17gk8jxbpogq" path="res://asset/png/character/animation/test_run_3.png" id="2_qt1e6"]
 [ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="4_rkgpu"]
 [ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="5_ccq04"]
 [ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="6_ccq04"]
-[ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/unit_animated_sprite3d.gd" id="10_y1hu4"]
+[ext_resource type="Script" uid="uid://bq14ud8a78v3v" path="res://script/combat/Unit/unit_animated_sprite3d.gd" id="10_y1hu4"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qt1e6"]
 atlas = ExtResource("2_qt1e6")
@@ -153,7 +153,7 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.5,
 "texture": SubResource("AtlasTexture_8xn23")
 }],
 "loop": false,
@@ -169,12 +169,11 @@ script = ExtResource("1_qk4nm")
 
 [node name="anim" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
-offset = Vector2(0, 25)
+offset = Vector2(0, 20)
 pixel_size = 0.05
-billboard = 1
 render_priority = 1
 sprite_frames = SubResource("SpriteFrames_wlx1r")
-animation = &"defend"
+animation = &"take_damage"
 script = ExtResource("10_y1hu4")
 
 [node name="SubViewport" type="SubViewport" parent="."]

@@ -11,6 +11,7 @@ enum TargetType {
 	None
 }
 var target_type : TargetType
+var target_highlight_type : UnitAnimatedSprite3D.HighLightType
 var target
 var cost   : Dictionary[StringName, int]
 
@@ -36,22 +37,33 @@ func validate(actor: ActorController) -> bool:
 					return false
 	return true
 
-func chose_target(target_chose, me: ActorController) -> bool:
+func get_targets_on_cells(cells: Array[Vector2i], me: ActorController) -> Array[ActorController]:
+	var targets_chose : Array[ActorController] = []
+	for cell in cells:
+		var a = Game.g_combat.get_actor_on_cell(cell)
+		if a:
+			targets_chose.append(a)
+	if targets_chose.size() > 0:
+		check_target_units(targets_chose, me) # 会过滤掉无效的目标
+	return targets_chose
+
+func chose_target(cells_chose: Array[Vector2i], me: ActorController) -> bool:
 	match target_type:
 		TargetType.Cell:
-			if target_chose is Vector2i and check_target_cell(target_chose, me):
-				target = target_chose
+			if check_target_cells(cells_chose, me):
+				target = cells_chose
 				return true
 		TargetType.Unit:
-			if target_chose is ActorController and check_target_unit(target_chose, me):
-				target = target_chose
+			var targets_chose := get_targets_on_cells(cells_chose, me)
+			if targets_chose.size() > 0:
+				target = targets_chose
 				return true
 	return false
 
-func check_target_cell(_cell: Vector2i, _a: ActorController) -> bool:
+func check_target_cells(_cells: Array[Vector2i], _a: ActorController) -> bool:
 	return true
 
-func check_target_unit(_target: ActorController, _me: ActorController) -> bool:
+func check_target_units(_targets: Array[ActorController], _me: ActorController) -> bool:
 	return true
 
 func pay_costs(actor: ActorController) -> void:

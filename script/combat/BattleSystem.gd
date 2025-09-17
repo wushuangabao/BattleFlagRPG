@@ -51,23 +51,16 @@ func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	cur_actor = actor
 	cur_action = action
 	scene.ground_layer.set_chose_area(action.get_area_chose_target(actor))
-	var target_cell = null
+	var target_cells = null
 	var ret = false
 	while true:
-		target_cell = await target_chosed
-		if target_cell == null:
+		target_cells = await target_chosed
+		if target_cells == null:
 			print("取消动作")
 			break
-		elif target_cell is Vector2i:
-			if action.target_type == ActionBase.TargetType.Unit:
-				var a_target = get_actor_on_cell(target_cell)
-				if a_target and action.chose_target(a_target, actor):
-					ret = true
-					break
-				else:
-					print("无效的选择目标！") #todo UI提示
-			elif action.target_type == ActionBase.TargetType.Cell:
-				if action.chose_target(target_cell, actor):
+		elif target_cells is Array[Vector2i] and target_cells.size() > 0:
+			if action.target_type != ActionBase.TargetType.None:
+				if action.chose_target(target_cells, actor):
 					ret = true
 					break
 				else:

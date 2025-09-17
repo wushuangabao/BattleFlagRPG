@@ -2,7 +2,7 @@
 class_name UnitBase3D extends Marker3D
 
 @export var move_time: float = 0.5
-@onready var anim: AnimatedSprite3D = $anim
+@onready var anim: UnitAnimatedSprite3D = $anim
 @onready var bar_hp: TextureProgressBar = $SubViewport/HP
 @onready var bar_mp: TextureProgressBar = $SubViewport/MP
 

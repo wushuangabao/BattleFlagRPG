@@ -9,7 +9,7 @@ func set_timeline(tl: TimelineController) -> void:
 
 func do_turn(actor: ActorController) -> void:
 	print("现在是 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
-	_actor = actor
+	_actor = actor  # _actor 才是当前选择、执行动作的角色，actor 不是！
 	var battle = Game.g_combat
 	while true:
 		# 角色是否可行动
@@ -24,15 +24,19 @@ func do_turn(actor: ActorController) -> void:
 		if action == null:
 			print("动作无效 - ", _actor.my_name)
 			continue
+		if not action.validate(_actor):
+			print("动作未通过校验 - ", _actor.my_name)
+			continue
+		# 选择动作完毕
+		_actor.anim_player.highlight_off()
 		if action.get_action_name() == &"skip_turn":
 			print("执行动作 - 跳过回合")
+			_actor.clear_AP()
+			timeline.update_actor_btn_pos(_actor, timeline.ready_queue.size() > 0)
 			if _try_next_actor_do_turn():
 				continue
 			else:
 				break
-		if not action.validate(_actor):
-			print("动作未通过校验 - ", _actor.my_name)
-			continue
 		# 选择目标，或者取消动作
 		if action.target_type != ActionBase.TargetType.None:
 			var ok = await battle.chose_action_target(_actor, action)

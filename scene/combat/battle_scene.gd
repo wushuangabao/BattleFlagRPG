@@ -18,7 +18,10 @@ extends Node3D
 
 var _cur_unit : UnitBase3D = null
 var _unit_list : Array[UnitBase3D]
+
 var _cell_mouse_on  # 鼠标指向的单元格
+var _target_units : Array[ActorController] # 动作选择 - 目标单位组
+
 var my_system : BattleSystem = null
 var ground_layer : Ground
 var flag_layer   : FlagLayer
@@ -40,7 +43,7 @@ func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> 
 	new_unit.set_cur_cell(cell)
 	if islook:
 		_cur_unit = new_unit
-		new_unit.initialized.connect(_on_cur_actor_initialized)
+		new_unit.initialized.connect(_on_cur_actor_initialized, CONNECT_ONE_SHOT)
 	add_child(new_unit)
 	_unit_list.append(new_unit)
 	return new_unit
@@ -50,7 +53,7 @@ func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
 		return
 	camera.set_target_immediately(_cur_unit)
 
-# 设置高亮
+# 选择预览角色（相机聚焦、高亮轮廓）
 func select_preview_actor(actor: ActorController) -> void:
 	if actor:
 		for a in my_system.get_actors():
@@ -58,28 +61,24 @@ func select_preview_actor(actor: ActorController) -> void:
 				a.anim_player.highlight_off()
 			else:
 				a.anim_player.highlight_on()
-		if _cur_unit != actor:
-			camera.set_target_gradually(actor.base3d)
+		camera.set_target_gradually(actor.base3d)
 
-# 取消高亮
+# 取消预览角色（可能会回到当前角色）
 func release_preview_actor(actor: ActorController) -> void:
 	if actor and actor is ActorController:
 		if _cur_unit and Game.g_combat.get_battle_state() == BattleSystem.BattleState.ActorIdle:
 			select_preview_actor(_cur_unit.actor)
 			camera.set_target_gradually(_cur_unit)
 		else:
-			_release_preview_actor()
-
-func _release_preview_actor() -> void:
-	for a in my_system.get_actors():
-		a.anim_player.highlight_on()
+			for a in my_system.get_actors():
+				a.anim_player.highlight_off()
 
 # 选取角色（准备做动作）
 func select_current_actor(actor: ActorController) -> void:
 	ground_layer.clear_on_change_cur_actor_to(actor)
 	_cur_unit = actor.base3d
 	_cur_unit.on_selected()
-	camera.set_target_gradually(_cur_unit)
+	select_preview_actor(actor)
 
 func let_actor_move(actor: ActorController) -> void:
 	actor.base3d.move_by_current_path()
@@ -179,6 +178,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if battle_state == BattleSystem.BattleState.ChoseActionTarget:
 				if _cell_mouse_on and ground_layer.chose_area_cells.has(_cell_mouse_on):
+					for tar in _target_units:
+						tar.anim_player.highlight_off()
 					Game.g_event.send_event("event_chose_target", ground_layer.skill_area_cells) # 选择目标
 					return
 			_cell_mouse_on = _get_cell_mouse_on()
@@ -221,10 +222,22 @@ func _process(_delta: float) -> void:
 		if _cell_mouse_on:
 			if ground_layer.chose_area_cells.has(_cell_mouse_on):
 				ground_layer.highlight_cell(_cell_mouse_on, &"reachable")
-				ground_layer.set_skill_area(my_system.cur_action.get_area_skill_range(my_system.cur_actor, _cell_mouse_on))
+				var skill_range = my_system.cur_action.get_area_skill_range(my_system.cur_actor, _cell_mouse_on)
+				ground_layer.set_skill_area(skill_range)
+				var targets := my_system.cur_action.get_targets_on_cells(skill_range, my_system.cur_actor)
+				for tar in _target_units:
+					if not targets.has(tar):
+						tar.anim_player.highlight_off()
+				for tar in targets:
+					if not _target_units.has(tar):
+						tar.anim_player.highlight_on(my_system.cur_action.target_highlight_type)
+				_target_units = targets
 			else:
 				ground_layer.highlight_cell(_cell_mouse_on, &"unreachable")
 				ground_layer.set_skill_area([])
+				for tar in _target_units:
+					tar.anim_player.highlight_off()
+				_target_units.clear()
 	else:
 		_cell_mouse_on = null
 

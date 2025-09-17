@@ -1,5 +1,11 @@
 class_name Skill extends Resource
 
+enum TargetRule {
+	All, Enemy, Friendly
+}
+
+@export var target_rule : TargetRule
+
 var id : int
 @export var name : String
 @export var icon : Texture2D
@@ -19,3 +25,18 @@ var id : int
 
 var scaling # 伤害公式参数
 var hit_formula # 命中公式引用（可在 resolver 中按标签选择）
+
+func filter_targets(targets: Array[ActorController], me: ActorController) -> Array[ActorController]:
+	var filtered : Array[ActorController] = []
+	for t in targets:
+		var is_valid := true
+		match target_rule:
+			TargetRule.Enemy:
+				if t.team_id == me.team_id:
+					is_valid = false
+			TargetRule.Friendly:
+				if t.team_id != me.team_id:
+					is_valid = false
+		if is_valid and not t.has_tag(filters):
+			filtered.append(t)
+	return filtered
