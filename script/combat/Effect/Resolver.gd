@@ -29,14 +29,14 @@ static func calclulate_hit_chance(attacker_hit: float, target_eva: float) -> flo
 	var d = target_eva / UnitStat.MAX_EVA  # 闪避：[0%, 80%] → [0, 1]
 	
 	# 2. 用收益递减函数压缩
-	var kh = 0.75  # 命中收益递减参数
-	var ke = 0.5  # 闪避收益递减参数
+	var kh = 4.20  # 命中收益递减参数
+	var ke = 0.68  # 闪避收益递减参数
 	var h = a / (a + kh)  # 命中软压缩
 	var e = d / (d + ke)  # 闪避软压缩
 	
 	# 3. 真实命中率计算
 	var hit_chance = UnitStat.BASE_HIT + h - e
-	return clampf(hit_chance, 0.05, 0.99)  # 限制在5%-99%之间
+	return clampf(hit_chance, 0.05, 0.999)
 
 ## 检定暴击
 ## @param attacker: 攻击者
