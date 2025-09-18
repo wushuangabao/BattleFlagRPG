@@ -14,6 +14,10 @@ var _buff_system : BuffSystem
 var _actors   : Array[ActorController]
 var _cell_map : Dictionary[Vector2i, ActorController]
 
+# 战斗回放相关 - 随机种子管理
+var _battle_seed : int = 0
+var _replay_data : Array[Dictionary] = []
+
 # 正在选择动作目标 - 存储角色和动作
 var cur_actor  : ActorController
 var cur_action : ActionBase = null
@@ -118,6 +122,43 @@ func get_actor_on_cell(c: Vector2i):
 
 #endregion
 
+#region 战斗回放相关
+
+## 设置战斗随机种子（用于回放）
+func set_battle_seed(the_seed: int) -> void:
+	_battle_seed = the_seed
+	PseudoRandom.set_seed(the_seed)
+	print("战斗随机种子已设置：", the_seed)
+
+## 获取当前战斗种子
+func get_battle_seed() -> int:
+	return _battle_seed
+
+## 重置随机状态到战斗开始
+func reset_random_state() -> void:
+	PseudoRandom.set_seed(_battle_seed)
+	print("随机状态已重置到战斗开始")
+
+## 记录战斗动作（用于回放）
+func record_action(actor_name: StringName, action_name: StringName, targets: Array = []) -> void:
+	var action_data = {
+		"actor": actor_name,
+		"action": action_name,
+		"targets": targets,
+		"random_state": PseudoRandom.get_seed()
+	}
+	_replay_data.append(action_data)
+
+## 获取回放数据
+func get_replay_data() -> Array[Dictionary]:
+	return _replay_data.duplicate()
+
+## 清空回放数据
+func clear_replay_data() -> void:
+	_replay_data.clear()
+
+#endregion
+
 func _init() -> void:
 	_buff_system = BuffSystem.new()
 
@@ -190,6 +231,13 @@ func on_battle_start() -> void:
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
+	
+	# 初始化战斗随机种子（如果没有设置，使用当前时间）
+	if _battle_seed == 0:
+		_battle_seed = Time.get_unix_time_from_system() as int
+	set_battle_seed(_battle_seed)
+	clear_replay_data()
+	
 	var ok = await scene.load_battle_map(_cur_battle_name)
 	if ok:
 		create_initial_units_on_battle_map()

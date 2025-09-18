@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://xpibjnphlwk7"]
+
+[ext_resource type="Script" uid="uid://dbxciiafatg4n" path="res://addons/attribute_viewer/curve.gd" id="1_i0ony"]
+
+[node name="属性模拟器" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 104.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label_A" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "A = 80.00"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HSlider_A" type="HSlider" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label_D" type="Label" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "D = 0.00"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HSlider_D" type="HSlider" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "0.80"
+
+[node name="Canvas" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+script = ExtResource("1_i0ony")
+grid_x = 50
+grid_y = 50
+
+[connection signal="drag_ended" from="VBoxContainer/HBoxContainer/HSlider_A" to="VBoxContainer/Canvas" method="_on_slider_drag_ended"]
+[connection signal="drag_ended" from="VBoxContainer/HBoxContainer2/HSlider_D" to="VBoxContainer/Canvas" method="_on_slider_drag_ended"]

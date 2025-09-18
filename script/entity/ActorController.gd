@@ -117,8 +117,9 @@ func get_AP() -> int:
 func get_ap_gain_per_sec() -> float:
 	return Game.BASE_SPD * (1 + my_stat.SPD.value)
 
-func add_buff(buf: BuffBase) -> void:
+func add_buff(buf: BuffBase) -> bool:
 	buffs.push_back(buf)
+	return true
 
 func add_action(act: ActionBase) -> void:
 	actions.push_back(act)

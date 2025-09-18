@@ -4,12 +4,30 @@ var timeline : TimelineController
 
 var _actor
 
+# 玩家队伍列表：任意一个队伍全部死亡时玩家失败
+var player_teams: Array[Game.TeamID] = []
+# 敌人队伍列表：所有队伍全部死亡时玩家胜利
+var enemy_teams: Array[Game.TeamID] = []
+
 func set_timeline(tl: TimelineController) -> void:
 	timeline = tl
 
+# 设置玩家队伍列表
+func set_player_teams(teams: Array[Game.TeamID]) -> void:
+	player_teams = teams
+
+# 设置敌人队伍列表
+func set_enemy_teams(teams: Array[Game.TeamID]) -> void:
+	enemy_teams = teams
+
+# 设置战斗队伍配置（玩家队伍和敌人队伍）
+func set_battle_teams(player_team_list: Array[Game.TeamID], enemy_team_list: Array[Game.TeamID]) -> void:
+	player_teams = player_team_list
+	enemy_teams = enemy_team_list
+
 func do_turn(actor: ActorController) -> void:
 	print("现在是 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
-	_actor = actor  # _actor 才是当前选择、执行动作的角色，actor 不是！
+	_actor = actor  # _actor 才是当前选择、执行动作的角色，actor 不是！因为在 while 循环中，可能重新赋值 _actor 为其他角色
 	var battle = Game.g_combat
 	while true:
 		# 角色是否可行动
@@ -48,6 +66,16 @@ func do_turn(actor: ActorController) -> void:
 		# 执行动作
 		await battle.let_actor_do_action(_actor, action)
 	battle.turn_ended()
+	var battle_result = _check_battle_end()
+	var is_battle_end = battle_result[0]
+	var player_victory = battle_result[1]
+	
+	if is_battle_end:
+		if player_victory:
+			print("战斗结束！玩家胜利！")
+		else:
+			print("战斗结束！玩家失败！")
+		return
 	timeline.resume_timeline()
 	_actor = null
 
@@ -78,3 +106,85 @@ func has_affordable_actions(actor: ActorController) -> bool:
 		return true
 	else:
 		return false
+
+# 检查战斗结束条件：
+# - 当指定的玩家队伍中任意一个队伍全部死亡时，玩家失败
+# - 当指定的敌人队伍全部队伍中所有角色都死亡时，玩家胜利
+# 返回值: [战斗是否结束, 玩家是否胜利] - [bool, bool]
+func _check_battle_end() -> Array:
+	var battle = Game.g_combat
+	
+	# 如果没有指定队伍，使用默认判断逻辑
+	if player_teams.is_empty() and enemy_teams.is_empty():
+		return [_check_battle_end_legacy(), false]  # 不返回胜负
+	
+	# 检查玩家队伍：任意一个队伍全部死亡则玩家失败
+	for team_id in player_teams:
+		var team_actors = battle.get_actors_in_team(team_id)
+		# 如果队伍中没有角色，跳过检查
+		if team_actors.is_empty():
+			continue
+			
+		var has_alive_actor = false
+		for actor in team_actors:
+			if actor.is_alive():
+				has_alive_actor = true
+				break
+		
+		# 如果某个玩家队伍没有存活的角色，玩家失败
+		if not has_alive_actor:
+			print("玩家队伍 ", team_id, " 全部死亡，玩家失败")
+			return [true, false]  # 战斗结束，玩家失败
+	
+	# 检查敌人队伍：所有队伍的所有角色都死亡则玩家胜利
+	var all_enemies_dead = true
+	for team_id in enemy_teams:
+		var team_actors = battle.get_actors_in_team(team_id)
+		# 如果队伍中没有角色，跳过检查
+		if team_actors.is_empty():
+			continue
+			
+		var has_alive_actor = false
+		for actor in team_actors:
+			if actor.is_alive():
+				has_alive_actor = true
+				break
+		
+		# 如果某个敌人队伍还有存活角色，则不是全部死亡
+		if has_alive_actor:
+			all_enemies_dead = false
+			break
+	
+	# 如果所有敌人队伍都没有存活角色，玩家胜利
+	if all_enemies_dead and not enemy_teams.is_empty():
+		print("所有敌人队伍全部死亡，玩家胜利")
+		return [true, true]  # 战斗结束，玩家胜利
+	
+	return [false, false]  # 战斗继续
+
+# 检查战斗结束条件（传统模式）：
+# 检查是否只剩一个队伍里有角色存活，如果是，说明战斗已经结束
+# 返回值: bool - 战斗是否结束
+func _check_battle_end_legacy() -> bool:
+	var battle = Game.g_combat
+	var alive_teams: Dictionary = {}  # 记录每个队伍的存活角色数量
+	
+	# 统计每个队伍的存活角色数量
+	for actor in battle.get_actors():
+		if actor.is_alive():
+			var team_id = actor.team_id
+			if alive_teams.has(team_id):
+				alive_teams[team_id] += 1
+			else:
+				alive_teams[team_id] = 1
+	
+	# 如果只有一个队伍有存活角色，或者没有存活角色，战斗结束
+	if alive_teams.size() <= 1:
+		if alive_teams.size() == 1:
+			var remaining_team = alive_teams.keys()[0]
+			print("只剩队伍 ", remaining_team, " 有存活角色，战斗结束")
+		else:
+			print("没有存活角色，战斗结束")
+		return true
+	
+	return false  # 还有多个队伍有存活角色，战斗继续

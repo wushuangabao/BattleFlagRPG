@@ -39,7 +39,7 @@ func _physics_process(delta: float) -> void:
 	for a in Game.g_combat.get_actors():
 		if a.is_alive():
 			live_actor_cnt += 1
-		elif texture_map.has(a):
+		elif texture_map[a] in get_children():
 			_on_actor_die(a)
 	# 执行行动条增长逻辑
 	if running and not btn_moving:
@@ -66,11 +66,12 @@ func clear_on_change_scene() -> void:
 	texture_map.clear()
 
 func _on_actor_die(a: ActorController) -> void:
+	a.clear_AP()
 	ready_queue.erase(a)
 	if gain_ap_map.has(a):
 		gain_ap_map.erase(a)
 	if texture_map.has(a):
-		texture_map.erase(a)
+		remove_child(texture_map[a])
 
 func start() -> void:
 	for a in Game.g_combat.get_actors():
@@ -229,7 +230,7 @@ func _sort_actor_by_ap_gain_speed(a1: ActorController, a2: ActorController) -> b
 
 # 设置UI，指示当前回合属于哪个角色
 func set_actor_actived_on_timeline(a: ActorController) -> void:
-	if texture_map.has(a):
+	if texture_map.has(a) and a.is_alive():
 		if select_box.get_parent():
 			select_box.get_parent().remove_child(select_box)
 		texture_map[a].add_child(select_box)
