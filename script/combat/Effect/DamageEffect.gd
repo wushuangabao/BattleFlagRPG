@@ -38,6 +38,8 @@ func execute(_context: Dictionary = {}) -> Dictionary:
 		"actual_damage": 0.0,
 		"is_critical": false,
 		"is_hit": false,
+		"is_parry": false,
+		"is_counter": false,
 		"hit_count": hit_count,
 		"damage_type": damage_type,
 		"splash_targets": []
@@ -51,6 +53,8 @@ func execute(_context: Dictionary = {}) -> Dictionary:
 	var damage_result = Resolver.calculate_damage(caster, target, damage_type, power_coefficient, skill_bonus)
 	
 	result["is_hit"] = damage_result["hit"]
+	result["is_parry"] = damage_result["parry"]
+	result["is_counter"] = damage_result["counter"]
 	result["is_critical"] = damage_result["critical"]
 	
 	if not damage_result["hit"]:
@@ -69,6 +73,8 @@ func execute(_context: Dictionary = {}) -> Dictionary:
 				result["splash_targets"].append({
 					"target": splash_target,
 					"damage": splash_result["damage"],
+					"is_parry": splash_result["parry"],
+					"is_counter": splash_result["counter"],
 					"is_critical": splash_result["critical"]
 				})
 	return result

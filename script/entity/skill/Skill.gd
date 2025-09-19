@@ -10,6 +10,7 @@ var id : int
 @export var name : String
 @export var icon : Texture2D
 @export var tags : Array[StringName] # “刀法”, “外攻”
+@export_multiline var desc : String
 
 @export var cost : Dictionary[StringName, int]
 @export var cool_down : float # 使用后隔几秒可以再次使用

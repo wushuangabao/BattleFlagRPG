@@ -167,7 +167,15 @@ func take_damage(amount: int, source: ActorController = null) -> void:
 	print(my_name, " 受到伤害", final, "，来自 ", source.my_name)
 	add_HP(-final)
 
-func animate_take_damage_after(seconds: float) -> void:
+func animate_take_damage_after(seconds: float, context: Dictionary) -> void:
 	await get_tree().create_timer(seconds).timeout
-	anim_player.play(&"take_damage")
+	if context.get("is_hit"):
+		if context.get("is_parry"):
+			print(my_name, " 招架了")
+			anim_player.play(&"defend")
+		else:
+			anim_player.play(&"take_damage")
+	else:
+		print(my_name, " 闪避了")
+		#anim_player.play(&"ShanBi")
 	anim_player.highlight_with_animation(UnitAnimatedSprite3D.HighLightType.ReceiveDamage, false)

@@ -17,7 +17,7 @@ enum EffectType {
 }
 
 ## 效果类型
-@export var my_type : EffectType
+var my_type : EffectType
 
 ## 目标角色（在执行时设置）
 var target : ActorController

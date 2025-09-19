@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=33 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -19,8 +19,11 @@
 [ext_resource type="Script" uid="uid://byxtnaoo2710d" path="res://script/combat/Action/ActionDefend.gd" id="14_dwjhn"]
 [ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="14_pomew"]
 [ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="15_662wh"]
+[ext_resource type="Script" uid="uid://camissxpceiep" path="res://script/combat/Effect/ConditionBase.gd" id="15_ga0e4"]
+[ext_resource type="Script" uid="uid://b0hmy44do600x" path="res://script/combat/Effect/DamageEffect.gd" id="16_ol0sb"]
 [ext_resource type="Script" uid="uid://5hvrwn0fjsgu" path="res://script/combat/Action/ActionSkipTurn.gd" id="17_5n8sn"]
 [ext_resource type="Script" uid="uid://bkdbyyw7vdvyv" path="res://script/combat/Action/ActionRecover.gd" id="18_rq0px"]
+[ext_resource type="Texture2D" uid="uid://cdi1wlm03n753" path="res://asset/png/ui/battle_actions.png" id="23_ol0sb"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wponv"]
 
@@ -47,9 +50,24 @@ custom_id = -1
 shape_type = 0
 d_inner = 0
 d_outer = 0
-target_range = 1
+target_range = 0
 is_blockable = false
 metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_yhjk3"]
+script = ExtResource("16_ol0sb")
+damage_type = 0
+hit_count = 1
+hit_interval = 0.3
+has_splash = false
+splash_range = 1.0
+splash_damage_ratio = 0.5
+power_coefficient = 1.0
+conditions = Array[ExtResource("15_ga0e4")]([])
+tags = Array[StringName]([])
+effect_name = ""
+description = ""
+metadata/_custom_type_script = "uid://b0hmy44do600x"
 
 [sub_resource type="Resource" id="Resource_c3jca"]
 script = ExtResource("15_662wh")
@@ -57,6 +75,7 @@ target_rule = 1
 name = "朴实无华的一拳"
 icon = ExtResource("9_te81e")
 tags = Array[StringName]([])
+desc = ""
 cost = Dictionary[StringName, int]({
 &"AP": 1,
 &"MP": 10
@@ -67,7 +86,7 @@ cast_time = 0.0
 area_range = SubResource("Resource_662wh")
 area_chose = SubResource("Resource_ga0e4")
 filters = Array[StringName]([])
-effects = Array[ExtResource("14_pomew")]([])
+effects = Array[ExtResource("14_pomew")]([SubResource("Resource_yhjk3")])
 caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 
@@ -172,6 +191,22 @@ layout_mode = 2
 text = "recover"
 script = ExtResource("14_4gioj")
 action = ExtResource("18_rq0px")
+
+[node name="TextureRect" type="TextureRect" parent="UI"]
+custom_minimum_size = Vector2(200, 400)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -800.0
+offset_right = 400.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("23_ol0sb")
+expand_mode = 2
+stretch_mode = 4
 
 [node name="Area2D" type="Area2D" parent="."]
 visible = false

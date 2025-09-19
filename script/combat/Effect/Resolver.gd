@@ -19,42 +19,36 @@ static func calculate_angle_bonus(attacker: ActorController, target: ActorContro
 		return 1.0
 	
 	# 获取攻击者和目标的位置
-	var attacker_pos = attacker.base3d.get_cur_cell()
-	var target_pos = target.base3d.get_cur_cell()
+	var attacker_pos := attacker.base3d.get_cur_cell()
+	var target_pos := target.base3d.get_cur_cell()
 	
 	# 计算攻击方向向量
-	var attack_dir = attacker_pos - target_pos
+	var attack_dir := attacker_pos - target_pos
 	if attack_dir == Vector2i.ZERO:
 		return 1.0  # 同一位置，无角度影响
 	
 	# 获取目标的背面法线方向
-	var target_facing = target.get_facing_vector()
-	var target_back_normal = -target_facing
+	var target_facing := target.get_facing_vector()
+	var target_back_normal := -target_facing
 	
 	# 计算攻击方向与目标背面法线的夹角
-	var dot_product = attack_dir.dot(target_back_normal)
-	var attack_magnitude = attack_dir.length()
-	var back_normal_magnitude = target_back_normal.length()
+	var angle := MathUtils.angle_between(attack_dir, target_back_normal)
 	
-	# 计算夹角的余弦值
-	var cos_angle = dot_product / (attack_magnitude * back_normal_magnitude)
-	cos_angle = clampf(cos_angle, -1.0, 1.0)
-	
-	# 计算夹角（弧度）
-	var angle = acos(cos_angle)
+	# 使用绝对角度值进行判断，因为angle_to返回的范围是[-PI, PI]
+	var abs_angle := absf(angle)
 	
 	# 根据角度和防御状态返回系数
-	if angle + 0.01 < Game.pi_4:         # 背袭（0°~45°）
-		print("背袭角度：", angle * 180 / PI)
+	if abs_angle + 0.01 < Game.pi_4:         # 背袭（0°~45°）
+		print("背袭角度：", abs_angle * 180 / PI)
 		return 0.5 if is_defend else 0.25
-	elif angle + 0.01 < Game.pi_2:       # 侧面攻击（45°~90°）
-		print("侧面攻击角度：", angle * 180 / PI)
+	elif abs_angle + 0.01 < Game.pi_2:       # 侧面攻击（45°~90°）
+		print("侧后方攻击角度：", abs_angle * 180 / PI)
 		return 0.75 if is_defend else 0.5
-	elif abs(angle - Game.pi_2) < 0.011:  # 正侧面（90°）
-		print("正侧面攻击角度：", angle * 180 / PI)
+	elif abs(abs_angle - Game.pi_2) < 0.011:  # 正侧面（90°）
+		print("侧面攻击角度：", abs_angle * 180 / PI)
 		return 1.0 if is_defend else 0.75
-	else:                                 # 正面，范围180°
-		print("正面攻击角度：", angle * 180 / PI)
+	else:                                 # 正面，范围90°~180°
+		print("正面攻击角度：", abs_angle * 180 / PI)
 		return 1.25 if is_defend else 1.0
 
 ## 检定命中
@@ -178,8 +172,7 @@ static func calculate_damage(attacker: ActorController, target: ActorController,
 		"critical": false,
 		"parry": false,
 		"counter": false,
-		"damage": 0.0,
-		"damage_type": damage_type
+		"damage": 0.0
 	}
 	
 	if not attacker or not target:

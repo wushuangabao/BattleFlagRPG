@@ -1,18 +1,64 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://dq6gitykay2t4"]
+[gd_resource type="Resource" script_class="Skill" load_steps=10 format=3 uid="uid://dq6gitykay2t4"]
 
-[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="1_fgay2"]
-[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="2_dql54"]
+[ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="1_nj6p4"]
+[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="2_u8iix"]
+[ext_resource type="Script" uid="uid://camissxpceiep" path="res://script/combat/Effect/ConditionBase.gd" id="3_lg27f"]
+[ext_resource type="Script" uid="uid://b0hmy44do600x" path="res://script/combat/Effect/DamageEffect.gd" id="4_hen26"]
+[ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="5_adi4l"]
+[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="6_hs8hr"]
+
+[sub_resource type="Resource" id="Resource_ga0e4"]
+script = ExtResource("1_nj6p4")
+custom_id = -1
+shape_type = 2
+d_inner = 1
+d_outer = 1
+target_range = 0
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_662wh"]
+script = ExtResource("1_nj6p4")
+custom_id = -1
+shape_type = 0
+d_inner = 0
+d_outer = 0
+target_range = 0
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_yhjk3"]
+script = ExtResource("4_hen26")
+damage_type = 0
+hit_count = 1
+hit_interval = 0.3
+has_splash = false
+splash_range = 1.0
+splash_damage_ratio = 0.5
+power_coefficient = 1.0
+conditions = Array[ExtResource("3_lg27f")]([])
+tags = Array[StringName]([])
+effect_name = ""
+description = ""
+metadata/_custom_type_script = "uid://b0hmy44do600x"
 
 [resource]
-script = ExtResource("2_dql54")
-target_rule = 0
-name = ""
+script = ExtResource("6_hs8hr")
+target_rule = 1
+name = "朴实一拳"
+icon = ExtResource("5_adi4l")
 tags = Array[StringName]([])
-cost = Dictionary[StringName, int]({})
+desc = "朴实无华的一拳，没有任何技巧可言。"
+cost = Dictionary[StringName, int]({
+&"AP": 1,
+&"MP": 10
+})
 cool_down = 0.0
 charges = 0
 cast_time = 0.0
+area_range = SubResource("Resource_662wh")
+area_chose = SubResource("Resource_ga0e4")
 filters = Array[StringName]([])
-effects = Array[ExtResource("1_fgay2")]([])
-caster_anim = &""
+effects = Array[ExtResource("2_u8iix")]([SubResource("Resource_yhjk3")])
+caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
