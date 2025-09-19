@@ -1,9 +1,11 @@
 class_name ActionAttack extends ActionBase
 
 var _skill : Skill
+var _result: Array[Dictionary]
 
 func _init(skill: Skill) -> void:
 	_skill = skill
+	_result = []
 	cost = skill.cost
 	target_type = TargetType.Unit
 	target_highlight_type = UnitAnimatedSprite3D.HighLightType.TargetRed
@@ -40,22 +42,28 @@ func check_target_units(chosed_targets: Array[ActorController], me: ActorControl
 
 func start(actor: ActorController) -> void:
 	print(actor.my_name, " 发动了攻击！消耗AP：", cost[&"AP"])
-	actor.anim_player.play(&"attack")
-	for tar in target:
-		tar.animate_take_damage_after(0.5)
+	actor.anim_player.play(_skill.caster_anim)
+	_result = _skill.execute_effects(actor, target)
+	for res in _result:
+		if not res.get("failed") and res.get("effect_name") == "伤害效果" and res.get("is_hit"):
+			var target_actor = res.get("target") as ActorController
+			target_actor.animate_take_damage_after(0.5)
+			# for splash_tar in res.get("splash_targets", []):
+			# 	var splash_tar_actor = splash_tar as ActorController
+			# 	splash_tar_actor.animate_take_damage_after(1.0)
 	_state = ActionState.Running
 
 # 在角色_process中执行
 func update(actor: ActorController, _delta: float) -> void:
-	if not actor.anim_player.is_playing() and actor.anim_player.animation == &"attack":
+	if not actor.anim_player.is_playing() and actor.anim_player.animation == _skill.caster_anim:
 		actor.anim_player.play(&"idle")
 		_state = ActionState.Terminated
-		for tar in target:
-			var target_actor = tar as ActorController
-			target_actor.anim_player.highlight_off()
-			if target_actor.get_state() == ActorController.ActorState.Defend:
-				target_actor.take_damage(20, actor)
-				target_actor.anim_player.play(&"defend")
-			else:
-				target_actor.take_damage(80, actor)
-				target_actor.anim_player.play(&"idle")
+		for res in _result:
+			if not res.get("failed") and res.get("effect_name") == "伤害效果" and res.get("is_hit"):
+				var target_actor = res.get("target") as ActorController
+				target_actor.take_damage(res.get("actual_damage"), actor)
+				target_actor.anim_player.highlight_off()
+				if target_actor.get_state() == ActorController.ActorState.Defend:
+					target_actor.anim_player.play(&"defend")
+				else:
+					target_actor.anim_player.play(&"idle")

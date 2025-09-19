@@ -23,7 +23,7 @@ layout_mode = 2
 [node name="Label_A" type="Label" parent="VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
-text = "A = 80.00"
+text = "A = 70.00"
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -55,16 +55,13 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "0.80"
+text = "0.7000"
 
 [node name="Canvas" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 script = ExtResource("1_i0ony")
-A_min = 70.0
-A_max = 110.0
-D_max = 90.0
-grid_x = 50
-grid_y = 50
+grid_x = 32
+grid_y = 32
 
 [connection signal="drag_ended" from="VBoxContainer/HBoxContainer/HSlider_A" to="VBoxContainer/Canvas" method="_on_slider_drag_ended"]
 [connection signal="drag_ended" from="VBoxContainer/HBoxContainer2/HSlider_D" to="VBoxContainer/Canvas" method="_on_slider_drag_ended"]

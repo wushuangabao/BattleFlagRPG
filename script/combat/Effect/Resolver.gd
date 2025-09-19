@@ -7,37 +7,95 @@ class_name Resolver
 enum DamageType {
 	Physical,    # 外功伤害
 	Magical,     # 内功伤害
-	True,        # 真实伤害（无视防御）
 }
+
+## 计算攻击角度对防御能力的影响系数
+## @param attacker: 攻击者
+## @param target: 目标
+## @param is_defend: 目标是否处于防御状态
+## @return: 防御能力系数
+static func calculate_angle_bonus(attacker: ActorController, target: ActorController, is_defend: bool) -> float:
+	if not attacker or not target or not attacker.base3d or not target.base3d:
+		return 1.0
+	
+	# 获取攻击者和目标的位置
+	var attacker_pos = attacker.base3d.get_cur_cell()
+	var target_pos = target.base3d.get_cur_cell()
+	
+	# 计算攻击方向向量
+	var attack_dir = attacker_pos - target_pos
+	if attack_dir == Vector2i.ZERO:
+		return 1.0  # 同一位置，无角度影响
+	
+	# 获取目标的背面法线方向
+	var target_facing = target.get_facing_vector()
+	var target_back_normal = -target_facing
+	
+	# 计算攻击方向与目标背面法线的夹角
+	var dot_product = attack_dir.dot(target_back_normal)
+	var attack_magnitude = attack_dir.length()
+	var back_normal_magnitude = target_back_normal.length()
+	
+	# 计算夹角的余弦值
+	var cos_angle = dot_product / (attack_magnitude * back_normal_magnitude)
+	cos_angle = clampf(cos_angle, -1.0, 1.0)
+	
+	# 计算夹角（弧度）
+	var angle = acos(cos_angle)
+	
+	# 根据角度和防御状态返回系数
+	if angle + 0.01 < Game.pi_4:         # 背袭（0°~45°）
+		print("背袭角度：", angle * 180 / PI)
+		return 0.5 if is_defend else 0.25
+	elif angle + 0.01 < Game.pi_2:       # 侧面攻击（45°~90°）
+		print("侧面攻击角度：", angle * 180 / PI)
+		return 0.75 if is_defend else 0.5
+	elif abs(angle - Game.pi_2) < 0.011:  # 正侧面（90°）
+		print("正侧面攻击角度：", angle * 180 / PI)
+		return 1.0 if is_defend else 0.75
+	else:                                 # 正面，范围180°
+		print("正面攻击角度：", angle * 180 / PI)
+		return 1.25 if is_defend else 1.0
 
 ## 检定命中
 ## @param attacker: 攻击者
 ## @param target: 目标
 ## @return: 是否命中
-static func check_hit(attacker: ActorController, target: ActorController) -> bool:
-	if not attacker or not target:
-		return false
+static func check_hit(attacker: ActorController, target: ActorController, state_bonus: float) -> bool:
 	var attacker_hit = attacker.my_stat.HIT.value
-	var target_eva = target.my_stat.EVA.value
+	var target_eva = target.my_stat.EVA.value * state_bonus
 	var hit_chance = clampf(calclulate_hit_chance(attacker_hit, target_eva), 0.05, 0.99)
 	return PseudoRandom.chance(hit_chance)
 
-## 使用软上限差值计算真实命中率
+## 计算真实命中率（可以使用 AttributeViewer 插件查看）
 static func calclulate_hit_chance(attacker_hit: float, target_eva: float) -> float:
 	# 归一化面板值到 [0,1]
 	var a = (attacker_hit - UnitStat.BASE_HIT) / (UnitStat.MAX_HIT - UnitStat.BASE_HIT)  # 命中：[70%, 110%] → [0, 1]
-	var d = target_eva / UnitStat.MAX_EVA  # 闪避：[0%, 90%] → [0, 1]
+	var d = target_eva / UnitStat.MAX_EVA  # 闪避：[0%, 180%] → [0, 2]
 	
 	return UnitStat.BASE_HIT + 0.4 * a - 0.63 * d
+
+## 检定招架（格挡）
+## @param attacker: 攻击者
+## @param target: 目标
+## @return: 是否招架成功
+static func check_parry(_attacker: ActorController, target: ActorController, state_bonus: float) -> bool:
+	var parry_rate = target.my_stat.PAR.value * state_bonus
+	return PseudoRandom.chance(parry_rate)
+
+## 检定反击
+## @param attacker: 攻击者
+## @param target: 目标
+## @return: 是否反击成功
+static func check_counter(_attacker: ActorController, target: ActorController, state_bonus: float) -> bool:
+	var counter_rate = target.my_stat.CTR.value * state_bonus
+	return PseudoRandom.chance(counter_rate)
 
 ## 检定暴击
 ## @param attacker: 攻击者
 ## @param target: 目标
 ## @return: 是否暴击
-static func check_critical(attacker: ActorController, target: ActorController) -> bool:
-	if not attacker or not target:
-		return false
-	
+static func check_critical(attacker: ActorController, _target: ActorController) -> bool:
 	var critical_rate = attacker.my_stat.CR.value
 	return PseudoRandom.chance(critical_rate)
 
@@ -49,9 +107,6 @@ static func check_critical(attacker: ActorController, target: ActorController) -
 ## @param is_critical: 是否暴击
 ## @return: 最终伤害值
 static func calculate_physical_damage(attacker: ActorController, target: ActorController, pow_coef: float, skill_bonus: float, is_critical: bool) -> float:
-	if not attacker or not target:
-		return 0.0
-	
 	# 原始伤害 RawP = ATKp × PowCoef × [1 + Skill%]
 	var raw_damage = attacker.my_stat.ATKp.value * pow_coef * (1.0 + skill_bonus)
 	
@@ -81,9 +136,6 @@ static func calculate_physical_damage(attacker: ActorController, target: ActorCo
 ## @param is_critical: 是否暴击
 ## @return: 最终伤害值
 static func calculate_magical_damage(attacker: ActorController, target: ActorController, pow_coef: float, skill_bonus: float, is_critical: bool) -> float:
-	if not attacker or not target:
-		return 0.0
-	
 	# 原始伤害 RawM = ATKm × PowCoef × [1 + Skill%]
 	var raw_damage = attacker.my_stat.ATKm.value * pow_coef * (1.0 + skill_bonus)
 	
@@ -124,6 +176,8 @@ static func calculate_damage(attacker: ActorController, target: ActorController,
 	var result = {
 		"hit": false,
 		"critical": false,
+		"parry": false,
+		"counter": false,
 		"damage": 0.0,
 		"damage_type": damage_type
 	}
@@ -131,29 +185,41 @@ static func calculate_damage(attacker: ActorController, target: ActorController,
 	if not attacker or not target:
 		return result
 	
+	# 计算攻击角度对防御能力的影响
+	var is_defend = target.get_state() == ActorController.ActorState.Defend
+	var state_bonus = calculate_angle_bonus(attacker, target, is_defend)
+	
 	# 1. 命中检定
-	var hit = check_hit(attacker, target)
+	var hit = check_hit(attacker, target, state_bonus)
 	result["hit"] = hit
+
+	# 2. 反击检定
+	var counter = check_counter(attacker, target, state_bonus)
+	result["counter"] = counter
 	
 	if not hit:
 		return result  # 未命中，直接返回
 	
-	# 2. 暴击检定
+	# 3. 招架检定
+	var parry = check_parry(attacker, target, state_bonus)
+	result["parry"] = parry
+	
+	# 4. 暴击检定
 	var critical = check_critical(attacker, target)
 	result["critical"] = critical
 	
-	# 3. 伤害计算
+	# 5. 伤害计算
 	var damage = 0.0
 	match damage_type:
 		DamageType.Physical:
 			damage = calculate_physical_damage(attacker, target, pow_coef, skill_bonus, critical)
 		DamageType.Magical:
 			damage = calculate_magical_damage(attacker, target, pow_coef, skill_bonus, critical)
-		DamageType.True:
-			# 真实伤害：基础伤害 × 威力系数 × 技能加成
-			damage = attacker.my_stat.ATKp.value * pow_coef * (1.0 + skill_bonus)
-			if critical:
-				damage *= attacker.my_stat.CD.value
+	
+	# 6. 应用减伤（如果招架成功）
+	if parry:
+		var parry_reduction = target.my_stat.PDR.value
+		damage *= (1.0 - parry_reduction)
 	
 	result["damage"] = damage
 	return result

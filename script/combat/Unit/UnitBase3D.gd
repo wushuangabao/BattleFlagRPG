@@ -76,6 +76,9 @@ func _process(_delta):
 			if idx != -1 and idx < _current_path.size() - 1:
 				var next_cell = _current_path[idx + 1]
 				_dir = next_cell - _cell
+				# 更新ActorController的面朝方向
+				if actor:
+					actor.update_facing_direction(_dir)
 				if next_cell.x < _cell.x and not anim.flip_h:
 					anim.flip_h = true
 				elif next_cell.x > _cell.x and anim.flip_h:

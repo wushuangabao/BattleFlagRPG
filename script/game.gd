@@ -2,6 +2,8 @@
 class_name Game
 
 const Debug = 1
+const pi_4 = PI / 4.0  # 45度
+const pi_2 = PI / 2.0  # 90度
 
 const MAX_LEVEL = 50
 const MAX_HP    = 3000

@@ -20,11 +20,44 @@ enum ActorState {
 	Idle, DoAction, Defend
 }
 
+enum FacingDirection {
+	Right = 0,  # 右 (1, 0)
+	Down = 1,   # 下 (0, 1)
+	Left = 2,   # 左 (-1, 0)
+	Up = 3      # 上 (0, -1)
+}
+
 var _state : ActorState = ActorState.Idle
 var _action: ActionBase = null
+var facing_direction : FacingDirection = FacingDirection.Right
 
 func get_state() -> ActorState:
 	return _state
+
+# 根据移动方向更新面朝方向
+func update_facing_direction(dir: Vector2i) -> void:
+	if dir.x > 0:
+		facing_direction = FacingDirection.Right
+	elif dir.x < 0:
+		facing_direction = FacingDirection.Left
+	elif dir.y > 0:
+		facing_direction = FacingDirection.Down
+	elif dir.y < 0:
+		facing_direction = FacingDirection.Up
+
+# 获取面朝方向的Vector2i表示
+func get_facing_vector() -> Vector2i:
+	match facing_direction:
+		FacingDirection.Right:
+			return Vector2i(1, 0)
+		FacingDirection.Down:
+			return Vector2i(0, 1)
+		FacingDirection.Left:
+			return Vector2i(-1, 0)
+		FacingDirection.Up:
+			return Vector2i(0, -1)
+		_:
+			return Vector2i(1, 0)
 
 func has_tag(_tags: Array[StringName]) -> bool:
 	for t in _tags:

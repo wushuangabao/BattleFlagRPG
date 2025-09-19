@@ -68,6 +68,7 @@ area_range = SubResource("Resource_662wh")
 area_chose = SubResource("Resource_ga0e4")
 filters = Array[StringName]([])
 effects = Array[ExtResource("14_pomew")]([])
+caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0eov1"]

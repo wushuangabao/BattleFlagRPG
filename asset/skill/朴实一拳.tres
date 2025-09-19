@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://dq6gitykay2t4"]
+
+[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="1_fgay2"]
+[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="2_dql54"]
+
+[resource]
+script = ExtResource("2_dql54")
+target_rule = 0
+name = ""
+tags = Array[StringName]([])
+cost = Dictionary[StringName, int]({})
+cool_down = 0.0
+charges = 0
+cast_time = 0.0
+filters = Array[StringName]([])
+effects = Array[ExtResource("1_fgay2")]([])
+caster_anim = &""
+metadata/_custom_type_script = "uid://dpyiyx506qhs6"

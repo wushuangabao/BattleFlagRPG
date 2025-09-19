@@ -1,10 +1,10 @@
 @tool
 extends Control
 
-@export_range(0.0, 100.0, 1.0) var A_min := 80.0
-@export_range(0.0, 200.0, 1.0) var A_max := 100.0
-@export_range(0.0, 100.0, 1.0) var D_min := 0.0
-@export_range(0.0, 200.0, 1.0) var D_max := 80.0
+@export_range(0.0, 100.0) var A_min := 70.0
+@export_range(0.0, 200.0) var A_max := 110.0
+@export_range(0.0, 100.0) var D_min := 0.0
+@export_range(0.0, 200.0, 0.5) var D_max := 112.5
 @export_range(8, 128, 1) var grid_x := 16
 @export_range(8, 128, 1) var grid_y := 16
 

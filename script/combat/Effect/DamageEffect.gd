@@ -57,11 +57,7 @@ func execute(_context: Dictionary = {}) -> Dictionary:
 		# 未命中，直接返回
 		return result
 	
-	var final_damage = damage_result["damage"]
-	
-	# 应用伤害到目标
-	var actual_damage = apply_damage_to_target(final_damage)
-	result["actual_damage"] = actual_damage
+	result["actual_damage"] = damage_result["damage"]
 	
 	# 处理溅射效果
 	if has_splash:
@@ -70,25 +66,12 @@ func execute(_context: Dictionary = {}) -> Dictionary:
 			# 溅射伤害也使用相同的计算逻辑，但伤害减少
 			var splash_result = Resolver.calculate_damage(caster, splash_target, damage_type, power_coefficient * splash_damage_ratio, skill_bonus)
 			if splash_result["hit"]:
-				var splash_actual = apply_damage_to_target(splash_result["damage"], splash_target)
-				result.splash_targets.append({
+				result["splash_targets"].append({
 					"target": splash_target,
-					"damage": splash_actual,
+					"damage": splash_result["damage"],
 					"is_critical": splash_result["critical"]
 				})
 	return result
-
-## 对目标应用伤害
-func apply_damage_to_target(damage: float, damage_target: ActorController = null) -> float:
-	var actual_target = damage_target if damage_target else target
-	
-	# 伤害计算已经在Resolver中完成，这里直接应用
-	var final_damage = max(1.0, damage)  # 确保至少造成1点伤害
-	
-	# 应用伤害到目标
-	actual_target.take_damage(final_damage, caster)
-	
-	return final_damage
 
 ## 获取溅射目标
 func get_splash_targets() -> Array[ActorController]:
