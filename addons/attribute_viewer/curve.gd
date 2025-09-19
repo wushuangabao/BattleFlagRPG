@@ -102,6 +102,6 @@ func _on_slider_drag_ended(_changed: bool) -> void:
 	label_A.text = "A = %.2f" % _A
 	lable_D.text = "D = %.2f" % _D
 	_P = calc_value(_A, _D)
-	label.text = "%.2f" % _P
+	label.text = "%.4f" % _P
 	if Engine.is_editor_hint():
 		queue_redraw()

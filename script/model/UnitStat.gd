@@ -45,8 +45,9 @@ var PENp     : BindableProperty  # 破甲
 var PENm     : BindableProperty  # 破气
 var RES      : BindableProperty  # 异常抗性
 
-const BASE_HIT = 0.8
-const MAX_EVA  = 0.8
+const BASE_HIT = 0.7
+const MAX_HIT  = 1.1
+const MAX_EVA  = 0.9
 
 func init_by_db(actor_name: StringName) -> void:
 	base_attr = ActorBaseAttr.new(_actor, actor_name)
@@ -159,15 +160,15 @@ func calculate_def_m() -> int:
 		return Game.MAX_DEF
 	return d
 
-# 命中率计算：HIT = 80% + min[f(基础属性)*0.2 + Gear.HIT, 20%]
+# 命中率计算：HIT = min[70% + f(基础属性)*0.4 + Gear.HIT, 110%]
 func calculate_hit() -> float:
-	var bonus_hit = trans_base_attr_to("HIT") * (1.0 - BASE_HIT) + gear["HIT"]  # 数值设计需要把 HIT 控制在 100 以内
-	return min(BASE_HIT + bonus_hit, 1.0)  # 上限100%（额外20%）
+	var bonus_hit = trans_base_attr_to("HIT") * (MAX_HIT - BASE_HIT) + gear["HIT"]  # 数值设计需要把 HIT 控制在 100 以内
+	return min(BASE_HIT + bonus_hit, MAX_HIT)  # 上限110%（额外40%）
 
-# 闪避率计算：EVA = min[f(基础属性)*0.8 + Gear.EVA, 80%]
+# 闪避率计算：EVA = min[f(基础属性)*0.9 + Gear.EVA, 90%]
 func calculate_eva() -> float:
 	var total_eva = trans_base_attr_to("EVA") * MAX_EVA + gear["EVA"]  # 数值设计需要把 EVA 控制在 100 以内
-	return min(total_eva, MAX_EVA)  # 上限80%
+	return min(total_eva, MAX_EVA)  # 上限90%
 
 # 暴击率计算：CR = min[20% + f(基础属性) + Gear.CR, 80%]
 func calculate_cr() -> float:

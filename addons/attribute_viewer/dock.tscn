@@ -60,6 +60,9 @@ text = "0.80"
 [node name="Canvas" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 script = ExtResource("1_i0ony")
+A_min = 70.0
+A_max = 110.0
+D_max = 90.0
 grid_x = 50
 grid_y = 50
 

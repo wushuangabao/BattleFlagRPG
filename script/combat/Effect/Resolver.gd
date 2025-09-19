@@ -19,24 +19,16 @@ static func check_hit(attacker: ActorController, target: ActorController) -> boo
 		return false
 	var attacker_hit = attacker.my_stat.HIT.value
 	var target_eva = target.my_stat.EVA.value
-	var hit_chance = calclulate_hit_chance(attacker_hit, target_eva)
+	var hit_chance = clampf(calclulate_hit_chance(attacker_hit, target_eva), 0.05, 0.99)
 	return PseudoRandom.chance(hit_chance)
 
 ## 使用软上限差值计算真实命中率
 static func calclulate_hit_chance(attacker_hit: float, target_eva: float) -> float:
-	# 1. 归一化面板值到 [0,1]
-	var a = (attacker_hit - UnitStat.BASE_HIT) / (1.0 - UnitStat.BASE_HIT)  # 命中：[80%, 100%] → [0, 1]
-	var d = target_eva / UnitStat.MAX_EVA  # 闪避：[0%, 80%] → [0, 1]
+	# 归一化面板值到 [0,1]
+	var a = (attacker_hit - UnitStat.BASE_HIT) / (UnitStat.MAX_HIT - UnitStat.BASE_HIT)  # 命中：[70%, 110%] → [0, 1]
+	var d = target_eva / UnitStat.MAX_EVA  # 闪避：[0%, 90%] → [0, 1]
 	
-	# 2. 用收益递减函数压缩
-	var kh = 4.20  # 命中收益递减参数
-	var ke = 0.68  # 闪避收益递减参数
-	var h = a / (a + kh)  # 命中软压缩
-	var e = d / (d + ke)  # 闪避软压缩
-	
-	# 3. 真实命中率计算
-	var hit_chance = UnitStat.BASE_HIT + h - e
-	return clampf(hit_chance, 0.05, 0.999)
+	return UnitStat.BASE_HIT + 0.4 * a - 0.63 * d
 
 ## 检定暴击
 ## @param attacker: 攻击者
