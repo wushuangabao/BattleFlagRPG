@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b1fwbaq1hxq6s"
-path="res://.godot/imported/02.png-6fd513363683352922660c4ffda589c6.ctex"
+uid="uid://dmsyogha2fiq8"
+path="res://.godot/imported/arrow-finger.png-31f379d16dc7b713ac9a48a0ee5ac730.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://asset/png/character/face120/02.png"
-dest_files=["res://.godot/imported/02.png-6fd513363683352922660c4ffda589c6.ctex"]
+source_file="res://asset/png/icon/arrow-finger.png"
+dest_files=["res://.godot/imported/arrow-finger.png-31f379d16dc7b713ac9a48a0ee5ac730.ctex"]
 
 [params]
 

@@ -13,3 +13,4 @@ modules/*/*.obj
 modules/*/*.obj.import
 modules/*/*/*.obj
 modules/*/*/*.obj.import
+asset/png/local

@@ -48,19 +48,21 @@ func change_cur_actor_to(actor: ActorController) -> void:
 func begin_to_chose_action_for(actor: ActorController) -> void:
 	scene.select_current_actor(actor)
 	_cur_state = BattleState.ActorIdle
+	info("%s : 选择动作" % [actor.my_name])
 
 # 选择动作目标
 func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	_cur_state = BattleState.ChoseActionTarget
 	cur_actor = actor
 	cur_action = action
+	info("%s : 选择 [%s] 目标" % [actor.my_name, action.get_action_name()])
 	scene.ground_layer.set_chose_area(action.get_area_chose_target(actor))
 	var target_cells = null
 	var ret = false
 	while true:
 		target_cells = await target_chosed
 		if target_cells == null:
-			print("取消动作")
+			info("%s : 取消动作" % [actor.my_name])
 			break
 		elif target_cells is Array[Vector2i] and target_cells.size() > 0:
 			if action.target_type != ActionBase.TargetType.None:
@@ -68,7 +70,7 @@ func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 					ret = true
 					break
 				else:
-					print("无效的选择目标！") #todo UI提示
+					info("无效的选择目标！", 2.0)
 			else:
 				push_error("目标类型为None的动作竟然在选择动作目标？！")
 				break
@@ -79,12 +81,13 @@ func chose_action_target(actor: ActorController, action: ActionBase) -> bool:
 	return ret
 
 # 开始动作
-func let_actor_do_action(actor, action) -> void:
+func let_actor_do_action(actor: ActorController, action: ActionBase) -> void:
 	actor.action = action
 	if actor.action != null: # 持续性动作
 		if actor.action is ActionDefend:
 			return
 		_cur_state = BattleState.ActorDoAction
+		info("%s : 开始动作 - %s" % [actor.my_name, action.get_action_name()])
 		await actor.end_doing_action
 		print("BattleSystem 收到信号 end_doing_action")
 
@@ -291,3 +294,13 @@ func on_battle_map_unload() -> void:
 	_turn_controller.timeline.clear_on_change_scene()
 
 #endregion
+
+#region UI相关
+
+func info(txt: String, play_seconds: float = -1.0) -> void:
+	if play_seconds > 0.01:
+		scene.bottom_panel.put_info_tmp(txt, play_seconds)
+	else:
+		scene.bottom_panel.put_info(txt)
+
+#regionend

@@ -16,7 +16,7 @@ var value:
 			_value = new_value
 			value_changed.emit(_value)
 
-func _init(v) -> void:
+func _init(v = null) -> void:
 	_value = v
 
 func set_value(new_value) -> void:

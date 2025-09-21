@@ -16,7 +16,7 @@ var attrs  : Array[AttributeBase]
 func _init(actor, name) -> void:
 	_actor = actor
 	for i in range(5):
-		var a = Game.g_luban.get_actor_attr(name, 0)
+		var a = Game.g_luban.get_actor_attr(name, i)
 		var attr = AttributeBase.new(actor, a, MAX_VALUE)
 		attrs.push_back(attr)
 

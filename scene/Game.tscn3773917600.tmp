@@ -15,8 +15,8 @@
 [ext_resource type="Texture2D" uid="uid://d4m142u02wuxe" path="res://asset/png/character/face64/3.png" id="6_r3aus"]
 [ext_resource type="Texture2D" uid="uid://diqul6ouvfb8u" path="res://asset/png/character/face64/5.png" id="8_6okl4"]
 [ext_resource type="Texture2D" uid="uid://br6rbubcmpua8" path="res://asset/png/character/face64/6.png" id="11_w73ac"]
+[ext_resource type="Texture2D" uid="uid://dmsyogha2fiq8" path="res://asset/png/icon/arrow-finger.png" id="16_7sjor"]
 [ext_resource type="Script" uid="uid://bqc6eh2635fpr" path="res://script/ui/mouse_sprite.gd" id="17_7ftmx"]
-[ext_resource type="Texture2D" uid="uid://kwvofq4rb22m" path="res://asset/png/icon/arrow-finger-border.png" id="17_7sjor"]
 
 [sub_resource type="Resource" id="Resource_f6bub"]
 script = ExtResource("4_4cigq")
@@ -75,15 +75,10 @@ layout_mode = 2
 text = "Big Map"
 script = ExtResource("3_t585p")
 
-[node name="mouse_layer" type="CanvasLayer" parent="."]
-
-[node name="mouse_sprite" type="Sprite2D" parent="mouse_layer"]
-top_level = true
+[node name="mouse_sprite" type="Sprite2D" parent="."]
 centered = false
 script = ExtResource("17_7ftmx")
-texture_normal = ExtResource("17_7sjor")
-offset_fix = Vector2(0, -1)
-particle_color = Color(1, 0.839216, 0.192157, 1)
+texture_normal = ExtResource("16_7sjor")
 
 [connection signal="pressed" from="CanvasLayer/debug/Btn_Battle" to="CanvasLayer/debug/Btn_Battle" method="_on_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Btn_BigMap" to="CanvasLayer/debug/Btn_BigMap" method="_on_pressed"]

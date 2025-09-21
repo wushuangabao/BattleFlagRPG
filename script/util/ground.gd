@@ -1,6 +1,8 @@
 extends TileMapLayer
 class_name Ground
 
+const BORDER_WIDTH := 10
+
 @export_group("highlight_area")
 # 移动边界线
 @export var color_range_border: Color = Color(0.1, 0.9, 0.1, 0.95)

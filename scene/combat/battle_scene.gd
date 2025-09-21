@@ -15,6 +15,7 @@ extends Node3D
 @onready var subvp := get_node(subviewport_path) as BattleMapContainer   # 战斗地图的容器
 @onready var timeline := get_node(timeline_path) as TimelineController
 @onready var turn_controller := get_node(turn_contr_path) as TurnController
+@onready var bottom_panel := $UI/Background/bottom_panel as BottomPanel
 
 var _cur_unit : UnitBase3D = null
 var _unit_list : Array[UnitBase3D]
@@ -51,6 +52,7 @@ func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> 
 func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
 	if unit_node != _cur_unit:
 		return
+	bottom_panel.set_actor(unit_node.actor)
 	camera.set_target_immediately(_cur_unit)
 
 # 选择预览角色（相机聚焦、高亮轮廓）
@@ -61,6 +63,7 @@ func select_preview_actor(actor: ActorController) -> void:
 				a.anim_player.highlight_off()
 			else:
 				a.anim_player.highlight_on()
+		bottom_panel.set_actor(actor)
 		camera.set_target_gradually(actor.base3d)
 
 # 取消预览角色（可能会回到当前角色）
@@ -68,6 +71,7 @@ func release_preview_actor(actor: ActorController) -> void:
 	if actor and actor is ActorController:
 		if _cur_unit and Game.g_combat.get_battle_state() == BattleSystem.BattleState.ActorIdle:
 			select_preview_actor(_cur_unit.actor)
+			bottom_panel.set_actor(_cur_unit.actor)
 			camera.set_target_gradually(_cur_unit)
 		else:
 			for a in my_system.get_actors():
@@ -106,7 +110,6 @@ func get_model(v):
 # 所有子节点都已经添加到场景树后，才会调用
 func _ready() -> void:
 	if my_system == null:
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		my_system = Game.g_combat
 		my_system.init_with_scene_node(self)
 	my_system.on_battle_start()
@@ -129,6 +132,7 @@ func load_battle_map(map_name: String) -> bool:
 	var dim = ground_layer.get_tilemap_dimensions()
 	map_cols = dim.x
 	map_rows = dim.y
+	camera.set_boundary(dim, ground_layer.position.y)
 	_configure_subviewport()
 	_configure_board_plane()
 	_hook_subviewport_texture_to_plane()

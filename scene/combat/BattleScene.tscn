@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=49 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -10,8 +10,13 @@
 [ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
 [ext_resource type="Texture2D" uid="uid://bvndynxhey5fa" path="res://asset/png/icon/timeline_under.png" id="7_7hkn4"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
+[ext_resource type="Texture2D" uid="uid://cots27xjnybp1" path="res://asset/png/ui/battle_panel.png" id="7_yhjk3"]
+[ext_resource type="Script" uid="uid://cv2o8s33g26w1" path="res://script/combat/Panel/bottom_panel.gd" id="8_4nkfg"]
 [ext_resource type="Texture2D" uid="uid://dyv4isl8flafu" path="res://asset/png/icon/timeline_progress.png" id="8_8xf8q"]
+[ext_resource type="Texture2D" uid="uid://c1nplcf8xymx6" path="res://asset/png/character/face85/05.png" id="8_d8im0"]
+[ext_resource type="Texture2D" uid="uid://bm5a4it77msxe" path="res://asset/png/ui/battle_panel_hp.png" id="9_0e1i0"]
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
+[ext_resource type="Texture2D" uid="uid://bdb84ei0lalcw" path="res://asset/png/ui/battle_panel_mp.png" id="10_4nkfg"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://script/ui/btn_attack.gd" id="10_c23fh"]
 [ext_resource type="PackedScene" uid="uid://vb2dibitntmx" path="res://scene/combat/green_box_timeline.tscn" id="11_8xf8q"]
 [ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="13_662wh"]
@@ -24,6 +29,8 @@
 [ext_resource type="Script" uid="uid://5hvrwn0fjsgu" path="res://script/combat/Action/ActionSkipTurn.gd" id="17_5n8sn"]
 [ext_resource type="Script" uid="uid://bkdbyyw7vdvyv" path="res://script/combat/Action/ActionRecover.gd" id="18_rq0px"]
 [ext_resource type="Texture2D" uid="uid://cdi1wlm03n753" path="res://asset/png/ui/battle_actions.png" id="23_ol0sb"]
+[ext_resource type="Texture2D" uid="uid://crxo3ml1k53xg" path="res://asset/png/icon/arrow-up.png" id="31_cowrm"]
+[ext_resource type="Texture2D" uid="uid://dtidltf1cren6" path="res://asset/png/icon/arrow-upleft.png" id="31_hexu1"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wponv"]
 
@@ -33,6 +40,34 @@ packed_scene = Dictionary[StringName, PackedScene]({
 &"test": ExtResource("3_ldyea")
 })
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+
+[sub_resource type="LabelSettings" id="LabelSettings_4nkfg"]
+font_size = 15
+font_color = Color(1, 0.718011, 0.64456, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_j1stj"]
+font_size = 15
+font_color = Color(1, 0.718011, 0.64456, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hexu1"]
+font_size = 15
+font_color = Color(1, 0.718011, 0.64456, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_cowrm"]
+font_size = 15
+font_color = Color(1, 0.718011, 0.64456, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ejo0j"]
+font_size = 15
+font_color = Color(1, 0.718011, 0.64456, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_0e1i0"]
+font_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_mc6gs"]
+font_size = 12
+outline_size = 2
+outline_color = Color(1, 0.121569, 0, 1)
 
 [sub_resource type="Resource" id="Resource_ga0e4"]
 script = ExtResource("13_662wh")
@@ -91,10 +126,16 @@ caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0eov1"]
-size = Vector2(365, 106)
+size = Vector2(15, 1080)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vpcar"]
-size = Vector2(270, 73)
+size = Vector2(15, 1080)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hexu1"]
+size = Vector2(1920, 15)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cowrm"]
+size = Vector2(1920, 15)
 
 [node name="BattleScene" type="Node3D"]
 script = ExtResource("1_1h8kx")
@@ -128,14 +169,117 @@ packed_scene = SubResource("Resource_dwjhn")
 [node name="UI" type="Node" parent="."]
 script = ExtResource("6_wwrlq")
 
+[node name="Background" type="TextureRect" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_yhjk3")
+
+[node name="bottom_panel" type="Node" parent="UI/Background"]
+script = ExtResource("8_4nkfg")
+
+[node name="TextureButton" type="TextureButton" parent="UI/Background/bottom_panel"]
+offset_left = 456.0
+offset_top = 927.0
+offset_right = 541.0
+offset_bottom = 1012.0
+texture_normal = ExtResource("8_d8im0")
+
+[node name="Label_LV" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 503.0
+offset_top = 903.0
+offset_right = 543.0
+offset_bottom = 926.0
+text = "99"
+
+[node name="Label_STR" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 548.0
+offset_top = 985.0
+offset_right = 588.0
+offset_bottom = 1008.0
+text = "100"
+label_settings = SubResource("LabelSettings_4nkfg")
+horizontal_alignment = 1
+
+[node name="Label_CON" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 588.0
+offset_top = 985.0
+offset_right = 628.0
+offset_bottom = 1008.0
+text = "100"
+label_settings = SubResource("LabelSettings_j1stj")
+horizontal_alignment = 1
+
+[node name="Label_AGI" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 631.0
+offset_top = 985.0
+offset_right = 671.0
+offset_bottom = 1008.0
+text = "100"
+label_settings = SubResource("LabelSettings_hexu1")
+horizontal_alignment = 1
+
+[node name="Label_WIL" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 675.0
+offset_top = 985.0
+offset_right = 715.0
+offset_bottom = 1008.0
+text = "100"
+label_settings = SubResource("LabelSettings_cowrm")
+horizontal_alignment = 1
+
+[node name="Label_INT" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 717.0
+offset_top = 985.0
+offset_right = 757.0
+offset_bottom = 1008.0
+text = "100"
+label_settings = SubResource("LabelSettings_ejo0j")
+horizontal_alignment = 1
+
+[node name="HP_Bar" type="TextureProgressBar" parent="UI/Background/bottom_panel"]
+offset_left = 768.0
+offset_top = 903.0
+offset_right = 1030.0
+offset_bottom = 943.0
+value = 6.0
+texture_progress = ExtResource("9_0e1i0")
+
+[node name="MP_Bar" type="TextureProgressBar" parent="UI/Background/bottom_panel"]
+offset_left = 768.0
+offset_top = 913.0
+offset_right = 1030.0
+offset_bottom = 953.0
+value = 4.0
+texture_progress = ExtResource("10_4nkfg")
+
+[node name="bottom_info" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 660.0
+offset_top = 1043.0
+offset_right = 1260.0
+offset_bottom = 1066.0
+text = "infomation"
+label_settings = SubResource("LabelSettings_0e1i0")
+horizontal_alignment = 1
+
+[node name="temp_info" type="Label" parent="UI/Background/bottom_panel"]
+offset_left = 760.0
+offset_top = 1043.0
+offset_right = 1160.0
+offset_bottom = 1066.0
+label_settings = SubResource("LabelSettings_mc6gs")
+horizontal_alignment = 1
+
 [node name="timeline" type="TextureProgressBar" parent="UI"]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 7.5
-offset_top = -300.0
-offset_right = 17.5
-offset_bottom = 305.0
+offset_left = 46.0
+offset_top = -406.0
+offset_right = 56.0
+offset_bottom = 199.0
 grow_vertical = 2
 fill_mode = 3
 texture_under = ExtResource("7_7hkn4")
@@ -144,85 +288,90 @@ script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")
 packed_greenbox = ExtResource("11_8xf8q")
 
-[node name="action_list" type="HBoxContainer" parent="UI"]
-anchors_preset = -1
-anchor_left = 0.99
-anchor_top = 0.985
-anchor_right = 0.99
-anchor_bottom = 0.985
-grow_horizontal = 0
-grow_vertical = 0
-alignment = 2
-
-[node name="attack" type="TextureButton" parent="UI/action_list"]
-layout_mode = 2
-script = ExtResource("10_c23fh")
-skill = SubResource("Resource_c3jca")
-
-[node name="skill_list" type="Control" parent="UI/action_list"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/action_list/skill_list"]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.9
-anchor_bottom = 0.9
-grow_vertical = 0
-alignment = 2
-
-[node name="skip" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
-custom_minimum_size = Vector2(60, 0)
-layout_mode = 2
-text = "skip"
-script = ExtResource("14_4gioj")
-action = ExtResource("17_5n8sn")
-
-[node name="defend" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
-custom_minimum_size = Vector2(60, 0)
-layout_mode = 2
-text = "defend"
-script = ExtResource("14_4gioj")
-action = ExtResource("14_dwjhn")
-
-[node name="recover" type="Button" parent="UI/action_list/skill_list/VBoxContainer"]
-custom_minimum_size = Vector2(60, 0)
-layout_mode = 2
-text = "recover"
-script = ExtResource("14_4gioj")
-action = ExtResource("18_rq0px")
-
-[node name="TextureRect" type="TextureRect" parent="UI"]
-custom_minimum_size = Vector2(200, 400)
+[node name="actions" type="TextureRect" parent="UI"]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -400.0
-offset_top = -800.0
-offset_right = 400.0
+offset_left = -807.0
+offset_top = -447.0
+offset_right = -169.0
+offset_bottom = -44.0
 grow_horizontal = 0
 grow_vertical = 0
 texture = ExtResource("23_ol0sb")
-expand_mode = 2
 stretch_mode = 4
 
+[node name="attack" type="TextureButton" parent="UI/actions"]
+layout_mode = 0
+offset_left = 117.0
+offset_top = 322.0
+offset_right = 117.0
+offset_bottom = 322.0
+stretch_mode = 3
+script = ExtResource("10_c23fh")
+skill = SubResource("Resource_c3jca")
+
+[node name="skip" type="Button" parent="UI/actions"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 0
+offset_left = 384.0
+offset_top = 374.0
+offset_right = 451.0
+offset_bottom = 405.0
+text = "skip"
+script = ExtResource("14_4gioj")
+action = ExtResource("17_5n8sn")
+
+[node name="defend" type="Button" parent="UI/actions"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 0
+offset_left = 469.0
+offset_top = 267.0
+offset_right = 536.0
+offset_bottom = 298.0
+text = "defend"
+script = ExtResource("14_4gioj")
+action = ExtResource("14_dwjhn")
+
+[node name="recover" type="Button" parent="UI/actions"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 0
+offset_left = 385.0
+offset_top = 241.0
+offset_right = 452.0
+offset_bottom = 272.0
+text = "recover"
+script = ExtResource("14_4gioj")
+action = ExtResource("18_rq0px")
+
 [node name="Area2D" type="Area2D" parent="."]
-visible = false
 disable_mode = 1
 script = ExtResource("7_vpcar")
+cursor_texture_up = ExtResource("31_cowrm")
+cursor_texture_upleft = ExtResource("31_hexu1")
 
-[node name="Collision1" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(1133.5, 702)
+[node name="Collision_left" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(7.5, 540)
 shape = SubResource("RectangleShape2D_0eov1")
 debug_color = Color(0.917647, 0.235294, 0.411765, 0.917647)
 
-[node name="Collision2" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(1176, -3.5)
+[node name="Collision_right" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(1912.5, 540)
 shape = SubResource("RectangleShape2D_vpcar")
 
-[connection signal="pressed" from="UI/action_list/attack" to="UI/action_list/attack" method="_on_pressed"]
-[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/skip" to="UI/action_list/skill_list/VBoxContainer/skip" method="_on_pressed"]
-[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/defend" to="UI/action_list/skill_list/VBoxContainer/defend" method="_on_pressed"]
-[connection signal="pressed" from="UI/action_list/skill_list/VBoxContainer/recover" to="UI/action_list/skill_list/VBoxContainer/recover" method="_on_pressed"]
+[node name="Collision_up" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(960, 7.5)
+shape = SubResource("RectangleShape2D_hexu1")
+debug_color = Color(0.10563, 0.488892, 0.0730698, 0.419608)
+
+[node name="Collision_down" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(960, 1072.5)
+shape = SubResource("RectangleShape2D_cowrm")
+debug_color = Color(0.210093, 0.64005, 0, 0.42)
+
+[connection signal="pressed" from="UI/actions/attack" to="UI/actions/attack" method="_on_pressed"]
+[connection signal="pressed" from="UI/actions/skip" to="UI/actions/skip" method="_on_pressed"]
+[connection signal="pressed" from="UI/actions/defend" to="UI/actions/defend" method="_on_pressed"]
+[connection signal="pressed" from="UI/actions/recover" to="UI/actions/recover" method="_on_pressed"]

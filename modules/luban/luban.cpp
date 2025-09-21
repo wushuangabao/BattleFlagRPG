@@ -2,7 +2,7 @@
 
 int Luban::get_actor_attr(String actor_name, int attr_index)
 {
-	auto attrs = tables.TbActorBaseAttr.get("test_actor");
+	auto attrs = tables.TbActorBaseAttr.get(actor_name.utf8().get_data());
 	if (attrs)
 	{
 		switch (attr_index)

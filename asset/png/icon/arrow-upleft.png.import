@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgo170g668o5o"
-path="res://.godot/imported/01.png-bc14b163223ecaf35bfe42f4f0be270a.ctex"
+uid="uid://dtidltf1cren6"
+path="res://.godot/imported/arrow-upleft.png-6c564202dcc9fe6f2ebbcca243ed5f66.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://asset/png/character/face120/01.png"
-dest_files=["res://.godot/imported/01.png-bc14b163223ecaf35bfe42f4f0be270a.ctex"]
+source_file="res://asset/png/icon/arrow-upleft.png"
+dest_files=["res://.godot/imported/arrow-upleft.png-6c564202dcc9fe6f2ebbcca243ed5f66.ctex"]
 
 [params]
 
