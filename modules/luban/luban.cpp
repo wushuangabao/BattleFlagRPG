@@ -68,7 +68,10 @@ Luban::Luban()
 {
 	if (tables.load(
 		[](::luban::ByteBuf& buf, const std::string& s) {
-			return buf.loadFromFile("modules/luban/Table/" + s + ".bytes");
+			// 首先尝试使用Godot的虚拟路径加载
+			return buf.loadFromGodotFile("res://modules/luban/Table/" + s + ".bytes");
+			// 使用真实路径加载
+			//return buf.loadFromFile("modules/luban/Table/" + s + ".bytes");
 		})
 	)
 		print_line("== luban data load succ ==");

@@ -1,6 +1,8 @@
 # 游戏中的常量和常用静态函数
 class_name Game
 
+const CONFIG_PATH := "user://settings.cfg"
+
 const Debug = 1
 const pi_4 = PI / 4.0  # 45度
 const pi_2 = PI / 2.0  # 90度

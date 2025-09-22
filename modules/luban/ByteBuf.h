@@ -9,6 +9,8 @@
 #include <fstream>
 
 #include "CommonMacros.h"
+#include "core/io/file_access.h"
+#include "core/string/ustring.h"
 
 namespace luban
 {
@@ -841,6 +843,32 @@ namespace luban
 			std::istreambuf_iterator<char> beginIt(infile);
 			std::vector<char> arr(beginIt, std::istreambuf_iterator<char>());
 			appendBuffer(arr.data(), int(arr.size()));
+			return true;
+		}
+		
+		bool loadFromGodotFile(const std::string& file)
+		{
+			clear();
+			
+			// 使用Godot的FileAccess类读取虚拟路径下的文件
+			auto godot_file = FileAccess::open(file.c_str(), FileAccess::READ);
+			if (godot_file.is_null()) {
+				return false;
+			}
+			
+			// 获取文件大小
+			uint64_t size_f = godot_file->get_length();
+			if (size_f == 0) {
+				return false;
+			}
+			
+			// 读取文件内容
+			std::vector<char> buffer;
+			buffer.resize(size_f);
+			godot_file->get_buffer((uint8_t*)buffer.data(), size_f);
+			
+			// 添加到ByteBuf
+			appendBuffer(buffer.data(), int(buffer.size()));
 			return true;
 		}
 	private:

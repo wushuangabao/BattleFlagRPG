@@ -1,64 +1,85 @@
 extends Node
 
-const CONFIG_PATH := "user://settings.cfg"
 const CONFIG_SECTION := "display"
 
-# 内存中的当前设置
-var is_fullscreen: bool = true
-var window_size: Vector2i = Vector2i(1920, 1080)
-var window_position: Vector2i = Vector2i(0, 0) # -1 表示不强制
-var keep_aspect: String = "keep"  # "keep", "expand", "ignore"
-var vsync_enabled: bool = true
+const keep_aspect := "keep"
+const vsync_enabled := true
 
+# 内存中的当前设置
+var is_fullscreen: bool = false
+var window_size_index: int = 0
+var window_size := [
+	Vector2i(860, 540),
+	Vector2i(1024, 576),
+	Vector2i(1152, 648),
+	Vector2i(1280, 720),
+	Vector2i(1536, 864),
+	Vector2i(1920, 1080)
+]
+var window_position: Vector2i = Vector2i(0, 31) # -1 表示不强制
+
+# 上一次记录的窗口位置
+var _last_window_position := Vector2i(0, 0)
+# 检查窗口位置变化的计时器
+var _position_check_timer := 0.0
+# 检查窗口位置的时间间隔（秒）
+const POSITION_CHECK_INTERVAL := 2.0
 
 func _ready() -> void:
 	_load_settings()
 	_apply_settings()
-	_connect_window_signals()
+	var win := _get_window()
+	if not win.is_connected("size_changed", Callable(self, "_on_window_size_changed")):
+		win.connect("size_changed", Callable(self, "_on_window_size_changed"))
+	_last_window_position = win.position
 	
 func _input(event: InputEvent) -> void:
-	# 检测是否按下ESC键，并且当前处于全屏模式
+	# 检测是否按下F11键
 	if event is InputEventKey:
 		var key_event := event as InputEventKey
-		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_ESCAPE:
-			if is_fullscreen:
-				# 退出全屏，切换到窗口模式
-				set_fullscreen(false)
-				# 标记事件为已处理，防止其他节点也处理此事件
-				get_viewport().set_input_as_handled()
+		if key_event.pressed and not key_event.echo:
+			if key_event.keycode == KEY_F10:
+				toggle_fullscreen()
+				get_viewport().set_input_as_handled() # 标记事件为已处理，防止其他节点也处理此事件
 
 func _get_window() -> Window:
 	return get_tree().root
 
-func _connect_window_signals() -> void:
-	var win := _get_window()
-	if not win.is_connected("size_changed", Callable(self, "_on_window_size_changed")):
-		win.connect("size_changed", Callable(self, "_on_window_size_changed"))
-	if not win.is_connected("window_state_changed", Callable(self, "_on_window_state_changed")):
-		win.connect("window_state_changed", Callable(self, "_on_window_state_changed"))
-	if not win.is_connected("dpi_changed", Callable(self, "_on_dpi_changed")):
-		win.connect("dpi_changed", Callable(self, "_on_dpi_changed"))
-
+# 在窗口化时记录玩家调整的大小
 func _on_window_size_changed() -> void:
+	if is_fullscreen:
+		return
 	var win := _get_window()
-	# 仅在窗口化时记录玩家调整的大小
-	if not is_fullscreen:
-		window_size = win.size
-		_save_settings()
-
-func _on_window_state_changed() -> void:
-	# 当用户通过系统快捷键切换全屏、最大化等状态时触发
-	var win := _get_window()
-	# 这里根据当前 Window 的状态回填（示例里我们主要使用 exclusive_fullscreen/borderless）
-	# 如果你允许 Alt+Enter 切换，可以在 Input 里调用 toggle_fullscreen()
-	# 这里简单保存一下尺寸变化（窗口化时）
-	if not is_fullscreen:
-		window_size = win.size
+	_set_window_size_index(win.size)
 	_save_settings()
+	
+# 设置窗口大小索引为与给定大小最接近的预设大小
+func _set_window_size_index(size: Vector2i) -> void:
+	var closest_index := 0
+	var min_distance := INF
+	for i in range(window_size.size()):
+		var preset_size = window_size[i] as Vector2i
+		var dx = size.x - preset_size.x
+		var dy = size.y - preset_size.y
+		var distance = dx * dx + dy * dy
+		if distance < min_distance:
+			min_distance = distance
+			closest_index = i
+	window_size_index = closest_index
 
-func _on_dpi_changed() -> void:
-	# DPI 改变时通常无需保存，但如需自适应 UI，可在此处理
-	pass
+# 在_process中定期检查窗口位置变化
+func _process(delta: float) -> void:
+	if is_fullscreen:
+		return
+	_position_check_timer += delta
+	if _position_check_timer >= POSITION_CHECK_INTERVAL:
+		_position_check_timer = 0.0
+		var win := _get_window()
+		var current_position := win.position
+		if current_position != _last_window_position and current_position.x >= 0 and current_position.y >= 0:
+			_last_window_position = current_position
+			window_position = current_position
+			_save_settings()
 
 # 对外 API：切换全屏（独占全屏）
 func set_fullscreen(enable: bool) -> void:
@@ -66,99 +87,59 @@ func set_fullscreen(enable: bool) -> void:
 	_apply_fullscreen_mode()
 	_save_settings()
 
+# 对外 API：在独占全屏与窗口化之间切换
 func toggle_fullscreen() -> void:
-	# 在独占全屏与窗口化之间切换
-	set_fullscreen(!is_fullscreen)
+	var enable := false if is_fullscreen else true
+	set_fullscreen(enable)
 
 # 对外 API：在窗口化模式下设置分辨率
-func set_windowed_resolution(size: Vector2i) -> void:
-	window_size = size.clamp(Vector2i(640, 360), Vector2i(16384, 16384))
-	if not is_fullscreen:
+func set_windowed_resolution(size_id: int) -> void:
+	if size_id >= 0 and size_id < window_size.size() and not is_fullscreen:
 		var win := _get_window()
-		win.size = window_size
-	_save_settings()
-
-# 对外 API：设置是否启用 VSync
-func set_vsync(enable: bool) -> void:
-	vsync_enabled = enable
-	DisplayServer.window_set_vsync_mode(
-		DisplayServer.VSYNC_ENABLED if enable else DisplayServer.VSYNC_DISABLED
-	)
-	_save_settings()
-
-# 对外 API：设置保持纵横比
-func set_keep_aspect(mode: String) -> void:
-	# mode: "keep", "expand", "ignore"
-	keep_aspect = mode
-	var win := get_window()
-	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
-	win.content_scale_aspect = (
-		Window.CONTENT_SCALE_ASPECT_KEEP if mode == "keep"
-		else Window.CONTENT_SCALE_ASPECT_EXPAND if mode == "expand"
-		else Window.CONTENT_SCALE_ASPECT_IGNORE
-	)
+		win.size = window_size[size_id]
+		window_size_index = size_id
 	_save_settings()
 
 # 应用当前设置到窗口
 func _apply_settings() -> void:
-	var win := _get_window()
-
-	# VSync
-	DisplayServer.window_set_vsync_mode(
-		DisplayServer.VSYNC_ENABLED if vsync_enabled else DisplayServer.VSYNC_DISABLED
-	)
-
-	# 纵横比策略
-	set_keep_aspect(keep_aspect)
-
-	# 全屏/窗口化
 	_apply_fullscreen_mode()
-
 	# 位置与尺寸（仅窗口化时）
 	if not is_fullscreen:
-		win.size = window_size
+		var win := _get_window()
 		if window_position.x >= 0 and window_position.y >= 0:
 			win.position = window_position
 
 func _apply_fullscreen_mode() -> void:
 	var win := _get_window()
-	# 先复位窗口属性，避免状态残留
-	win.borderless = false
-	win.mode = Window.MODE_WINDOWED
-	win.unresizable = false
-
 	if is_fullscreen:
-		# 独占全屏（切换显示器分辨率；最稳定的“真全屏”）
 		win.mode = Window.MODE_EXCLUSIVE_FULLSCREEN
 	else:
-		# 恢复窗口化
 		win.mode = Window.MODE_WINDOWED
-		win.size = window_size
+		if window_size_index < 0 or window_size_index >= window_size.size():
+			window_size_index = 3
+		win.size = window_size[window_size_index]
+		win.borderless = false
+		win.unresizable = false
 
 # 读取/写入配置
 func _load_settings() -> void:
 	var cfg := ConfigFile.new()
-	var err := cfg.load(CONFIG_PATH)
+	var err := cfg.load(Game.CONFIG_PATH)
 	if err != OK:
 		return
 
 	is_fullscreen = cfg.get_value(CONFIG_SECTION, "is_fullscreen", false)
-	var w: int = cfg.get_value(CONFIG_SECTION, "width", 1280)
-	var h: int = cfg.get_value(CONFIG_SECTION, "height", 720)
-	window_size = Vector2i(w, h)
+	window_size_index = cfg.get_value(CONFIG_SECTION, "window_size_index", 0)
 	var px: int = cfg.get_value(CONFIG_SECTION, "pos_x", -1)
 	var py: int = cfg.get_value(CONFIG_SECTION, "pos_y", -1)
 	window_position = Vector2i(px, py)
-	keep_aspect = str(cfg.get_value(CONFIG_SECTION, "keep_aspect", "keep"))
-	vsync_enabled = cfg.get_value(CONFIG_SECTION, "vsync", true)
 
 func _save_settings() -> void:
 	var cfg := ConfigFile.new()
-	cfg.load(CONFIG_PATH) # 如果不存在也没关系
+	cfg.load(Game.CONFIG_PATH)
 
 	cfg.set_value(CONFIG_SECTION, "is_fullscreen", is_fullscreen)
-	cfg.set_value(CONFIG_SECTION, "width", window_size.x)
-	cfg.set_value(CONFIG_SECTION, "height", window_size.y)
+	cfg.set_value(CONFIG_SECTION, "window_size_index", window_size_index)
 
 	# 仅在窗口化时记录当前位置（部分 WM 不允许读位置，忽略错误）
 	var win := _get_window()
@@ -167,9 +148,6 @@ func _save_settings() -> void:
 		cfg.set_value(CONFIG_SECTION, "pos_x", pos.x)
 		cfg.set_value(CONFIG_SECTION, "pos_y", pos.y)
 
-	cfg.set_value(CONFIG_SECTION, "keep_aspect", keep_aspect)
-	cfg.set_value(CONFIG_SECTION, "vsync", vsync_enabled)
-
-	var err := cfg.save(CONFIG_PATH)
+	var err := cfg.save(Game.CONFIG_PATH)
 	if err != OK:
-		push_warning("Failed to save settings to %s (error %d)" % [CONFIG_PATH, err])
+		push_warning("Failed to save settings to %s (error %d)" % [Game.CONFIG_PATH, err])
