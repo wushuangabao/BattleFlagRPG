@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://cawqxl3cvi2nl"]
+
+[ext_resource type="Script" uid="uid://cftnpfjca6dqb" path="res://addons/story_editor/graph_dock.gd" id="1"]
+
+[node name="StoryGraph" type="VBoxContainer" node_paths=PackedStringArray("graph_edit", "btn_new", "btn_load", "btn_save", "btn_add_dlg", "btn_add_choice", "btn_add_end", "btn_play")]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1")
+graph_edit = NodePath("GraphEdit")
+btn_new = NodePath("Toolbar/NewBtn")
+btn_load = NodePath("Toolbar/LoadBtn")
+btn_save = NodePath("Toolbar/SaveBtn")
+btn_add_dlg = NodePath("Toolbar/AddDialogue")
+btn_add_choice = NodePath("Toolbar/AddChoice")
+btn_add_end = NodePath("Toolbar/AddEnding")
+btn_play = NodePath("Toolbar/PlayBtn")
+
+[node name="Toolbar" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="NewBtn" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "新建图"
+
+[node name="LoadBtn" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "加载"
+
+[node name="SaveBtn" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "保存"
+
+[node name="AddDialogue" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "+对话"
+
+[node name="AddChoice" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "+选项"
+
+[node name="AddEnding" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "+结局"
+
+[node name="PlayBtn" type="Button" parent="Toolbar"]
+layout_mode = 2
+text = "预览"
+
+[node name="GraphEdit" type="GraphEdit" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+right_disconnects = true

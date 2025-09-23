@@ -10,7 +10,7 @@
 },
 &"default_portrait": "New portrait",
 &"description": "desc_test",
-&"display_name": "character_test",
+&"display_name": "少侠",
 &"mirror": false,
 &"nicknames": ["nickname_test"],
 &"offset": Vector2(0, 0),

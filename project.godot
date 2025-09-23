@@ -23,14 +23,18 @@ SettingManager="*res://script/SettingManager.gd"
 [dialogic]
 
 directories/dch_directory={
+"character_fangzhang": "res://asset/Dialogic/character/character_fangzhang.dch",
+"character_shengnv": "res://asset/Dialogic/character/character_shengnv.dch",
 "character_test": "res://asset/Dialogic/character/character_test.dch"
 }
 directories/dtl_directory={
-"timeline/timeline_test": "res://asset/Dialogic/timeline/timeline_test.dtl"
+"timeline/timeline_test": "res://asset/Dialogic/timeline/timeline_test.dtl",
+"timeline_test_1": "res://asset/Dialogic/timeline/timeline_test_1.dtl",
+"timeline_test_2": "res://asset/Dialogic/timeline/timeline_test_2.dtl"
 }
 variables={
 "Folder": {
-"Var_test": 0.0
+"Var_test": ""
 }
 }
 extensions_folder="res://addons/dialogic_additions"
@@ -56,6 +60,7 @@ text/autopauses={}
 layout/style_list=["res://asset/Dialogic/style/New_File.tres"]
 layout/default_style="res://asset/Dialogic/style/New_File.tres"
 choices/hotkey_behaviour=1
+glossary/default_case_sensitive=true
 
 [display]
 
@@ -65,7 +70,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/qframework_godot/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/qframework_godot/plugin.cfg", "res://addons/story_editor/plugin.cfg")
 
 [input]
 

@@ -1,15 +1,6 @@
-111
-join character_test left
-character_test: 222
-- 1
-	- 1111111
-	- 22222222222
-	- 33333333333333333
-- 2
-	- 21
-		character_test: 211
-		set {Folder.Var_test} = range(0,100).pick_random()
-		[signal arg="dia_event_123"]
-- 3
-- 4
-- 5
+join character_test center
+character_test: 此去江湖路远，你可有何打算？
+- 投身少林修心问道
+	set {Folder.Var_test} = "A"
+- 入魔教求速成之力
+	set {Folder.Var_test} = "B"

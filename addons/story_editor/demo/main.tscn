@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://ne6wvxnl2x4x"]
+
+[ext_resource type="Script" uid="uid://074cf84qqrua" path="res://addons/story_editor/demo/main.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bqil6rmkdfb2u" path="res://addons/story_editor/demo/story_ui.tscn" id="3"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1")
+
+[node name="StoryUI" parent="." instance=ExtResource("3")]
+unique_name_in_owner = true
