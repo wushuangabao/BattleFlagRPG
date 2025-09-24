@@ -38,9 +38,6 @@ metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
 [node name="Game" type="Node"]
 
-[node name="StoryRunner" type="Node" parent="."]
-script = ExtResource("1_7ftmx")
-
 [node name="ActorManager" type="Node" parent="."]
 script = ExtResource("1_vg7sv")
 actors = SubResource("Resource_f6bub")
@@ -55,6 +52,9 @@ timeline_icons = Dictionary[StringName, Texture2D]({
 [node name="SceneManager" type="Node" parent="."]
 script = ExtResource("2_e7hha")
 packed_scene = SubResource("Resource_4cigq")
+
+[node name="StoryRunner" type="Node" parent="."]
+script = ExtResource("1_7ftmx")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

@@ -1,5 +1,5 @@
 extends TileMapLayer
-class_name Ground
+class_name GroundLayer
 
 const BORDER_WIDTH := 10
 

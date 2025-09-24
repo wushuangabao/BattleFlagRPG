@@ -1,10 +1,11 @@
-class_name CombatArchitecture extends Architecture
+class_name GameArchitecture extends Architecture
 
 var actor_stat : Dictionary[ActorController, UnitStat] = {}
 
 func _init() -> void:
-	self.register_system(Game.g_combat)
 	self.register_system(Game.g_actors)
+	self.register_system(Game.g_scenes)
+	self.register_system(Game.g_runner)
 	make_sure_architecture()
 
 func register_actor(actor: ActorController) -> void:

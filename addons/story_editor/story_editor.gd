@@ -5,11 +5,8 @@ var editor_window
 var graph_editor
 
 func _enter_tree():
-	# 加载插件面板
-	graph_editor = preload("res://addons/story_editor/graph_dock.tscn").instantiate()
-	
 	# 创建独立窗口
-	editor_window = Window.new()
+	editor_window = preload("res://addons/story_editor/graph_dock.tscn").instantiate()
 	editor_window.title = "故事线编辑器"
 	editor_window.size = Vector2(800, 600)  # 设置窗口大小
 	editor_window.min_size = Vector2(400, 300)  # 设置最小窗口大小
@@ -18,9 +15,6 @@ func _enter_tree():
 	editor_window.unresizable = false  # 允许调整大小
 	editor_window.close_requested.connect(_on_window_close_requested)
 	
-	# 将面板添加到窗口中
-	editor_window.add_child(graph_editor)
-	
 	# 将窗口添加到编辑器界面
 	get_editor_interface().get_base_control().add_child(editor_window)
 	
@@ -28,14 +22,11 @@ func _enter_tree():
 	add_tool_menu_item("打开故事线编辑器", _on_open_editor_menu_item_pressed)
 
 	# 注册自定义资源图标
-	var icon = Texture2D.new()
+	var icon = load("res://addons/story_editor/icon.svg") # 或者使用您的图标路径
 	add_custom_type("StoryGraph", "Resource", preload("res://addons/story_editor/runtime/StoryGraph.gd"), icon)
-	add_custom_type("DialogueNode", "Resource", preload("res://addons/story_editor/runtime/DialogueNode.gd"), icon)
-	add_custom_type("ChoiceNode", "Resource", preload("res://addons/story_editor/runtime/ChoiceNode.gd"), icon)
-	add_custom_type("EndingNode", "Resource", preload("res://addons/story_editor/runtime/EndingNode.gd"), icon)
-	
-	# 默认隐藏窗口，通过菜单打开
-	editor_window.hide()
+	add_custom_type("DialogueNode", "Resource", preload("res://addons/story_editor/node/DialogueNode.gd"), icon)
+	add_custom_type("ChoiceNode", "Resource", preload("res://addons/story_editor/node/ChoiceNode.gd"), icon)
+	add_custom_type("EndingNode", "Resource", preload("res://addons/story_editor/node/EndingNode.gd"), icon)
 	
 	# 输出日志，表示插件已加载
 	print("故事线编辑器插件已加载")

@@ -1,11 +1,14 @@
-class_name SceneManager extends Node
+class_name SceneManager extends AbstractSystem
 @export var packed_scene: PackedSceneDictionary # todo 改成读表，而不是手动配置
 
 # 缓存常用的场景，避免反复释放加载
 var _scene_cache: Dictionary = {}
 
+# 切换到战斗场景前的场景
+var _origin_scene: Node
+
 # 当前场景名称
-var _current_scene: String
+var _current_scene: StringName
 
 func _ready() -> void:
 	Game.g_scenes = self
@@ -14,8 +17,19 @@ func _ready() -> void:
 
 # 开始战斗
 func start_battle(battle_name: StringName) -> void:
+	_origin_scene = get_child(0)
+	remove_child(_origin_scene)
 	Game.g_combat.init_with_battle_name(battle_name)
-	goto_scene("BattleScene")
+	goto_scene(&"BattleScene")
+
+# 回到战斗前的场景
+func back_to_origin_scene() -> void:
+	if _origin_scene:
+		var old_scene = get_child(0)
+		remove_child(old_scene)
+		old_scene.call_deferred(&"release_on_change_scene")
+		add_child(_origin_scene)
+		_origin_scene = null
 
 # 切换场景
 func goto_scene(scene_name: StringName) -> void:
@@ -24,10 +38,9 @@ func goto_scene(scene_name: StringName) -> void:
 	if get_child_count() > 0:
 		var old_scene = get_child(0)
 		if _scene_cache.has(_current_scene):
-			remove_child(get_child(0)) # 删除当前场景，但不释放内存
-			old_scene.call_deferred(&"release_on_change_scene")
-		else:
-			get_child(0).queue_free() # 释放当前场景
+			remove_child(old_scene) # 删除当前场景，但不释放内存
+		elif old_scene != _origin_scene:
+			old_scene.queue_free() # 释放当前场景
 	# 尝试用三种方式加载场景：
 	# 1 从缓存中取场景
 	var scene = _scene_cache.get(scene_name)

@@ -1,8 +1,8 @@
 class_name StoryRunner extends AbstractSystem
 
-signal node_entered(node: Resource)
-signal choice_requested(node: Resource, options: PackedStringArray)
-signal ended(ending_id: String)
+signal node_entered(node: StoryNode)
+signal choice_requested(node: ChoiceNode, options: PackedStringArray)
+signal game_ended(ending_id: String)
 
 var graph: StoryGraph
 var current: StoryNode
@@ -11,9 +11,27 @@ var state := {
 	"visited": {}
 }
 
+func on_init() -> void:
+	register_event("battle_end", _on_battle_end)
+
+func _on_battle_end(player_victory: bool) -> void:
+	if not current or not current is BattleNode:
+		return
+	Game.g_scenes.back_to_origin_scene()
+	var node = current as BattleNode
+	if player_victory:
+		_goto(node.get_next_for(node.success))
+	else:
+		_goto(node.get_next_for(node.fail))
+
 func _init() -> void:
 	Dialogic.timeline_started.connect(_on_timeline_started)
 	Dialogic.timeline_ended.connect(_on_timeline_ended)
+
+func _ready() -> void:
+	Game.g_runner = self
+	set_architecture(GameArchitecture.new())
+	print("游戏架构初始化完毕")
 
 func _on_timeline_started():
 	pass
@@ -23,9 +41,9 @@ func _on_timeline_ended():
 		return
 	var node = current as DialogueNode
 	var port_name = Dialogic.VAR.get_variable(node.var_name) if not node.var_name.is_empty() else null
-	print("port_name = ", port_name if port_name is String else "null")
+	if port_name != null:
+		print("StoryRunner: chose port_name = ", port_name)
 	var next_id = node.get_next_for(port_name) if port_name != null else node.get_next_for("out")
-	print("next_id = ", next_id)
 	if next_id != "":
 		_goto(next_id)
 
@@ -34,7 +52,7 @@ func _goto(node_id: String) -> void:
 	if node == null:
 		push_error("StoryRunner: node not found: %s" % node_id)
 		return
-	print("StoryRunner: goto node = ", node_id)
+	print("StoryRunner: goto %s(%s)" % [node.name, node_id])
 	current = node
 	# 标记访问
 	state.visited[node.id] = true
@@ -44,24 +62,28 @@ func _goto(node_id: String) -> void:
 	var scr = node.get_script().get_global_name() as StringName
 	match scr:
 		&"DialogueNode":                             # 对话（调用Dialogic插件）
-			if Dialogic.current_timeline == null:
-				Dialogic.start(node.timeline)
-				return
-			else:
+			if Dialogic.current_timeline != null:
 				await Dialogic.timeline_ended
+			Dialogic.start(node.timeline)
+		&"BattleNode":                               # 战斗
+			if Game.g_scenes == null:
+				print("预览模式，直接胜利。")
+				_goto(node.get_next_for(node.success))
+			else:
+				Game.g_scenes.start_battle(node.battle_name)
 		&"ChoiceNode":                               # 选项（场景中卡片，非对话）
 			var options := PackedStringArray()
 			for c_dict in node.choices:
 				var enabled := true
 				if c_dict.has("condition") and c_dict["condition"] != null:
-					enabled = c_dict["condition"].evaluate(state)
+					enabled = (c_dict["condition"] as Evaluator).evaluate(state)
 				if enabled:
 					options.append(String(c_dict.get("text", "")))
 				else:
 					options.append(String(c_dict.get("text_disabled", "Locked Yet")))
-			emit_signal("choice_requested", node, options)
+			emit_signal("choice_requested", node as ChoiceNode, options)
 		&"EndingNode":                               # 结局（游戏结束）
-			emit_signal("ended", node.ending_id)
+			emit_signal("game_ended", node.ending_id)
 		_:                                           # 走默认出口
 			var nxt = node.get_next_for("out")
 			if nxt != "":

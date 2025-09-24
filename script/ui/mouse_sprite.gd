@@ -12,7 +12,8 @@ extends Sprite2D
 
 func _ready() -> void:
 	if Game.Debug == 1:
-		Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		# Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
 	

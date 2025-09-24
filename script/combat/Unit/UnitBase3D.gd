@@ -8,7 +8,7 @@ class_name UnitBase3D extends Marker3D
 
 signal initialized
 
-var map: Ground = null
+var map: GroundLayer = null
 var actor: ActorController = null
 
 var _cell: Vector2i # 当前所在格子

@@ -222,9 +222,8 @@ func init_with_scene_node(node: BattleScene) -> void:
 	scene = node
 	_turn_controller = scene.turn_controller
 	_turn_controller.set_timeline(scene.timeline)
-	if get_architecture() == null:
-		set_architecture(CombatArchitecture.new())
-		print("战斗架构 CombatArchitecture 创建完毕")
+	Game.g_runner.m_architecture.register_system(self)
+	print("战斗系统已经初始化")
 
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
@@ -249,6 +248,9 @@ func on_battle_start() -> void:
 	else:
 		print("加载地图失败：", _cur_battle_name)
 		_cur_battle_name = ""
+
+func on_battle_end(player_victory: bool) -> void:
+	send_event("battle_end", player_victory)
 
 func create_initial_units_on_battle_map() -> void:
 	print("开始生成战斗单位...")

@@ -24,7 +24,7 @@ var _cell_mouse_on  # 鼠标指向的单元格
 var _target_units : Array[ActorController] # 动作选择 - 目标单位组
 
 var my_system : BattleSystem = null
-var ground_layer : Ground
+var ground_layer : GroundLayer
 var flag_layer   : FlagLayer
 
 # 地图行列数（用于计算SubViewport size与Plane尺寸）
@@ -123,12 +123,11 @@ func _enter_tree() -> void:
 	my_system.on_battle_start()
 
 func load_battle_map(map_name: String) -> bool:
-	var new_node = await subvp.loadScene_battleMap(map_name)
+	var new_node := await subvp.loadScene_battleMap(map_name)
 	if new_node == null:
 		return false
-	var map_root = subvp.get_child(0).get_child(1)
-	ground_layer = map_root.get_child(0)           # CanvasLayer/TilemapRoot2D/Ground
-	flag_layer   = map_root.get_child(1)           # CanvasLayer/TilemapRoot2D/Flag
+	ground_layer = new_node.ground
+	flag_layer   = new_node.flag
 	var dim = ground_layer.get_tilemap_dimensions()
 	map_cols = dim.x
 	map_rows = dim.y

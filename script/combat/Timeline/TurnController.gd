@@ -71,10 +71,7 @@ func do_turn(actor: ActorController) -> void:
 	var player_victory = battle_result[1]
 	
 	if is_battle_end:
-		if player_victory:
-			print("战斗结束！玩家胜利！")
-		else:
-			print("战斗结束！玩家失败！")
+		battle.on_battle_end(player_victory)
 		return
 	timeline.resume_timeline()
 	_actor = null

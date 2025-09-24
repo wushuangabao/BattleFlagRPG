@@ -107,13 +107,13 @@ func _get_my_pos_by(p: Vector3) ->Vector3:
 	return p + v
 
 func set_boundary(dim: Vector2i, ground_y: float) -> void:
-	var min_pos = Vector3(Ground.BORDER_WIDTH * 1.5 * Game.cell_world_size.x,
+	var min_pos = Vector3(GroundLayer.BORDER_WIDTH * 1.5 * Game.cell_world_size.x,
 	ground_y,
-	Ground.BORDER_WIDTH * Game.cell_world_size.y)
+	GroundLayer.BORDER_WIDTH * Game.cell_world_size.y)
 
-	var max_pos = Vector3((dim.x - Ground.BORDER_WIDTH * 1.5) * Game.cell_world_size.x,
+	var max_pos = Vector3((dim.x - GroundLayer.BORDER_WIDTH * 1.5) * Game.cell_world_size.x,
 	ground_y,
-	(dim.y - Ground.BORDER_WIDTH) * Game.cell_world_size.y)
+	(dim.y - GroundLayer.BORDER_WIDTH) * Game.cell_world_size.y)
 
 	boundary_min = _get_my_pos_by(min_pos)
 	boundary_max = _get_my_pos_by(max_pos)

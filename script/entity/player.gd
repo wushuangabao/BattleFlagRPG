@@ -2,7 +2,7 @@ extends AnimatedSprite2D
 
 @export var MAX_STEPS: int = 6 # 每次能移动的最大步数，-1表示无限制
 @export var move_time: float = 0.5
-@export var map: Ground = null
+@export var map: GroundLayer = null
 
 var _cell: Vector2i # 当前所在格子
 var _dir: Vector2i # 当前朝向

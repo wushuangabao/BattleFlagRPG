@@ -8,14 +8,17 @@ func _ready():
 	runner = StoryRunner.new()
 
 	# 连接信号
-	runner.choice_requested.connect(func(node:Resource, opts:PackedStringArray):
-		ui.show_choices(opts, func(i:int):
+	runner.choice_requested.connect(func(node: ChoiceNode, opts: PackedStringArray):
+		ui.show_choices(opts, func(i: int):
 			runner.choose(i)
 		)
 	)
-	runner.ended.connect(func(eid:String):
+	runner.game_ended.connect(func(eid: String):
 		ui.show_line("结局", "结束：%s" % eid)
+		print("StoryRunner: 游戏结束 - %s" % eid)
+		get_tree().create_timer(2.0).timeout.connect(func():
+			get_tree().quit()
+		)
 	)
-	# 构建一个最小剧情图（也可以从资源加载 .tres）
-	var graph := load("res://addons/story_editor/demo/story_test.tres")
-	runner.start(graph)
+
+	runner.start(load("res://addons/story_editor/demo/story_test.tres"))
