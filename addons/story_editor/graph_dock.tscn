@@ -81,3 +81,40 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 right_disconnects = true
+connections = Array[Dictionary]([{
+"from_node": &"n1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_d57315e1",
+"to_port": 0
+}, {
+"from_node": &"n1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_mojiao",
+"to_port": 0
+}, {
+"from_node": &"n_mojiao",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_92b06edd",
+"to_port": 0
+}, {
+"from_node": &"n_d57315e1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"end_good",
+"to_port": 0
+}, {
+"from_node": &"n_92b06edd",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"end_dark",
+"to_port": 0
+}, {
+"from_node": &"n_92b06edd",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_c411c04d",
+"to_port": 0
+}])

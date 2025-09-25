@@ -106,12 +106,12 @@ func choose(index: int) -> void:
 	var node := current as ChoiceNode
 	if index < 0 or index >= node.choices.size():
 		return
-	var chosen = node.choices[index]
+	var chosen := node.choices[index]
 	# 选项效果
 	if chosen.has("effects"):
 		_apply_effects(chosen["effects"])
 	# 跳转
-	var port_name := String(chosen.get("port", "out"))
+	var port_name := chosen.port
 	var target := node.get_next_for(port_name)
 	if target == "":
 		target = node.get_next_for("out")
