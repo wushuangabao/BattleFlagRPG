@@ -27,15 +27,6 @@ static var g_actors : ActorManager = null
 static var g_scenes : SceneManager = null
 static var g_runner : StoryRunner  = null
 
-# 预加载常用场景，避免频繁加载
-# 这些场景在 goto_scene 中第一次实例化之后会被缓存
-const scene_cached: Dictionary = {
-	"BigMap" = preload("res://scene/ui/BigMap.tscn"),
-	"BattleScene" = preload("res://scene/combat/BattleScene.tscn")
-}
-
-# 从脚本加载全局常量
-
 static var _base_attrs
 static func get_base_attrs() -> Array:
 	if _base_attrs:

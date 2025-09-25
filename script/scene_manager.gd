@@ -1,5 +1,10 @@
 class_name SceneManager extends AbstractSystem
+
 @export var packed_scene: PackedSceneDictionary # todo 改成读表，而不是手动配置
+
+# 预加载常用场景，避免频繁加载
+# 这些场景在 goto_scene 中第一次实例化之后会被缓存
+@export var scene_cached: PackedSceneDictionary
 
 # 缓存常用的场景，避免反复释放加载
 var _scene_cache: Dictionary = {}
@@ -44,14 +49,13 @@ func goto_scene(scene_name: StringName) -> void:
 	# 尝试用三种方式加载场景：
 	# 1 从缓存中取场景
 	var scene = _scene_cache.get(scene_name)
-	# 2 用预加载的 PackedScene 实例化场景
-	if not scene and Game.scene_cached.has(scene_name):
-		var packed = Game.scene_cached[scene_name]
-		if packed:
-			scene = packed.instantiate()
-			_scene_cache[scene_name] = scene # 加入缓存
-	# 3 动态加载场景
-	if not scene and packed_scene.exists(scene_name):
+	# 2 加载场景，加入缓存
+	if not scene and scene_cached.exists(scene_name):
+		var packed = scene_cached.get_scene(scene_name)
+		scene = packed.instantiate()
+		_scene_cache[scene_name] = scene # 加入缓存
+	# 3 加载场景，不缓存
+	elif not scene and packed_scene.exists(scene_name):
 		var packed = packed_scene.get_scene(scene_name)
 		scene = packed.instantiate()
 	if scene:

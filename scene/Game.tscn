@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://b2wub0ms8es6m"]
+[gd_scene load_steps=24 format=3 uid="uid://b2wub0ms8es6m"]
 
 [ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
 [ext_resource type="Script" uid="uid://dmnygjeo673qb" path="res://addons/story_editor/runtime/StoryRunner.gd" id="1_7ftmx"]
@@ -16,6 +16,8 @@
 [ext_resource type="Texture2D" uid="uid://d4m142u02wuxe" path="res://asset/png/character/face64/3.png" id="6_r3aus"]
 [ext_resource type="Texture2D" uid="uid://diqul6ouvfb8u" path="res://asset/png/character/face64/5.png" id="8_6okl4"]
 [ext_resource type="Texture2D" uid="uid://br6rbubcmpua8" path="res://asset/png/character/face64/6.png" id="11_w73ac"]
+[ext_resource type="PackedScene" uid="uid://skvo00upkv2p" path="res://scene/combat/BattleScene.tscn" id="14_cg8ds"]
+[ext_resource type="PackedScene" uid="uid://datpgnyw8dvwa" path="res://scene/ui/BigMap.tscn" id="15_hr58s"]
 [ext_resource type="Script" uid="uid://bqc6eh2635fpr" path="res://script/ui/mouse_sprite.gd" id="17_7ftmx"]
 [ext_resource type="Texture2D" uid="uid://kwvofq4rb22m" path="res://asset/png/icon/arrow-finger-border.png" id="17_7sjor"]
 
@@ -36,6 +38,14 @@ packed_scene = Dictionary[StringName, PackedScene]({
 })
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
+[sub_resource type="Resource" id="Resource_0ybkd"]
+script = ExtResource("4_4cigq")
+packed_scene = Dictionary[StringName, PackedScene]({
+&"BattleScene": ExtResource("14_cg8ds"),
+&"BigMap": ExtResource("15_hr58s")
+})
+metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+
 [node name="Game" type="Node"]
 
 [node name="ActorManager" type="Node" parent="."]
@@ -52,6 +62,7 @@ timeline_icons = Dictionary[StringName, Texture2D]({
 [node name="SceneManager" type="Node" parent="."]
 script = ExtResource("2_e7hha")
 packed_scene = SubResource("Resource_4cigq")
+scene_cached = SubResource("Resource_0ybkd")
 
 [node name="StoryRunner" type="Node" parent="."]
 script = ExtResource("1_7ftmx")
