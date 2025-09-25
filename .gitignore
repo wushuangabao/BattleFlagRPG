@@ -13,3 +13,6 @@ modules/*/*.obj.import
 modules/*/*/*.obj
 modules/*/*/*.obj.import
 asset/png/local
+asset/png/*/*.png.import
+asset/png/*/*/*.png.import
+*.tmp

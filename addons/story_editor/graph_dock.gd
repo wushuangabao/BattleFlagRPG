@@ -50,6 +50,28 @@ func _ready():
 	
 	# 确保窗口可以接收输入事件
 	set_process_input(true)
+	
+	# 启用拖放功能
+	get_viewport().gui_embed_subwindows = false
+	set_process_unhandled_input(true)
+	self.get_viewport().files_dropped.connect(_on_files_dropped)
+
+func _on_files_dropped(files):
+	if files.size() > 0:
+		var file_path = files[0]
+		if file_path.get_extension() in ["tres", "res"]:
+			# 检查资源类型是否为StoryGraph
+			var file = FileAccess.open(file_path, FileAccess.READ)
+			if file:
+				var first_line = file.get_line()
+				file.close()
+				if "script_class=\"StoryGraph\"" in first_line:
+					print("加载拖入的 StoryGraph：", file_path)
+					_load_story_graph(file_path)
+				else:
+					push_warning("拖放的文件不是StoryGraph类型：" + file_path)
+			else:
+				push_warning("无法打开文件：" + file_path)
 
 func _on_new():
 	graph_res = StoryGraph.new()
@@ -69,12 +91,15 @@ func _on_load():
 	dlg.add_filter("*.tres,*.res ; StoryGraph")
 	add_child(dlg)
 	dlg.file_selected.connect(func(path):
-		graph_res = load(path)
-		_rebuild_from_resource()
+		_load_story_graph(path)
 		dlg.queue_free()
 	)
 	dlg.canceled.connect(dlg.queue_free)
 	dlg.popup_centered()
+	
+func _load_story_graph(path: String):
+	graph_res = load(path)
+	_rebuild_from_resource()
 
 func _on_save():
 	if graph_res == null:
@@ -152,9 +177,16 @@ func _rebuild_from_resource():
 	for c in graph_edit.get_children():
 		if c is GraphNode:
 			c.queue_free()
+	# 等待所有节点完全移除
+	var tree = get_tree()
+	if tree != null:
+		await tree.process_frame
 	# 构建
 	for n in graph_res.nodes:
 		var gn := _create_graph_node(n)
+	# 等待所有节点完全创建
+	if tree != null:
+		await tree.process_frame
 	# 连接
 	for n in graph_res.nodes:
 		for k in n.outputs.keys():
@@ -232,9 +264,15 @@ func _set_battle_node(gn: GraphNode, n: BattleNode, is_new: bool = false):
 	gn.set_slot(0, true, 0, Color.YELLOW, true, 0, Color.YELLOW)
 
 func _set_choice_node(gn: GraphNode, n: ChoiceNode, is_new: bool = false):
-	gn.set_slot(0, true, 0, Color.BLUE, false, 0, Color.BLUE)
-	for i in range(1, 4):
-		gn.set_slot(i, false, 0, Color.BLUE, true, 0, Color.BLUE)
+	gn.set_slot(0, true, 0, Color.BLUE, true, 0, Color.BLUE)
+	# 在Inspector中编辑按钮
+	var btn_inspect := Button.new()
+	btn_inspect.text = "在Inspector中编辑"
+	btn_inspect.pressed.connect(func():
+		_sync_to_resource()
+		EditorInterface.edit_resource(n)
+	)
+	gn.add_child(btn_inspect)
 
 func _set_ending_node(gn: GraphNode, n: EndingNode, is_new: bool = false):
 	var ending_id = LineEdit.new()
@@ -287,7 +325,36 @@ func _on_preview():
 
 func _input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_DELETE:
+		_show_delete_confirmation()
+
+func _show_delete_confirmation():
+	# 检查是否有选中的节点
+	var has_selected = false
+	for child in graph_edit.get_children():
+		if child is GraphNode and child.selected:
+			has_selected = true
+			break
+	if not has_selected:
+		return
+	# 创建确认对话框
+	var dialog = ConfirmationDialog.new()
+	dialog.title = "确认删除"
+	dialog.dialog_text = "确定要删除选中的节点吗？"
+	dialog.get_ok_button().text = "确定"
+	dialog.get_cancel_button().text = "取消"
+	dialog.min_size = Vector2(300, 100)
+	add_child(dialog)
+	# 连接确认信号
+	dialog.confirmed.connect(func():
 		_delete_selected_nodes()
+		dialog.queue_free()
+	)
+	# 连接取消/关闭信号
+	dialog.canceled.connect(func():
+		dialog.queue_free()
+	)
+	# 显示对话框
+	dialog.popup_centered()
 		
 func _delete_selected_nodes():
 	if graph_res == null:
@@ -370,7 +437,7 @@ func _delete_selected_nodes():
 	undo_stack.append(undo_record)
 	
 func _on_delete_pressed():
-	_delete_selected_nodes()
+	_show_delete_confirmation()
 	
 func _on_undo_pressed():
 	if undo_stack.size() == 0:

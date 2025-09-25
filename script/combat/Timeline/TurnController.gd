@@ -110,6 +110,16 @@ func has_affordable_actions(actor: ActorController) -> bool:
 # 返回值: [战斗是否结束, 玩家是否胜利] - [bool, bool]
 func _check_battle_end() -> Array:
 	var battle = Game.g_combat
+
+	# 先执行 BattleMap 的自定义检查器
+	var map = battle.scene.subvp.get_child(0)
+	if map and map is BattleMap:
+		if map.win_checker:
+			if map.win_checker.evaluate({}):
+				return [true, true]
+		if map.lose_checker:
+			if map.lose_checker.evaluate({}):
+				return [true, false]
 	
 	# 如果没有指定队伍，使用默认判断逻辑
 	if player_teams.is_empty() and enemy_teams.is_empty():

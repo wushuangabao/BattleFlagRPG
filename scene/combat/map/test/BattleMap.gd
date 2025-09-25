@@ -3,6 +3,9 @@ extends CanvasLayer
 
 signal battle_map_ready
 
+@export var win_checker  : Evaluator = null
+@export var lose_checker : Evaluator = null
+
 @onready var ground : GroundLayer = $TilemapRoot2D/Ground
 @onready var flag   : FlagLayer   = $TilemapRoot2D/Flag
 

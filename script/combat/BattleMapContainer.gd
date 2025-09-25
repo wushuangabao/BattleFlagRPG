@@ -12,8 +12,7 @@ func loadScene_battleMap(scene_name: StringName) -> BattleMap:
 		return get_child(0)
 	# 动态加载场景
 	if packed_scene.exists(scene_name):
-		var packed = packed_scene.get_scene(scene_name)
-		var scene = packed.instantiate()
+		var scene = packed_scene.get_scene(scene_name).instantiate()
 		if scene:
 			_current_scene = scene_name
 			add_child(scene)

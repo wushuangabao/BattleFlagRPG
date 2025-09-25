@@ -256,7 +256,8 @@ func create_initial_units_on_battle_map() -> void:
 	print("开始生成战斗单位...")
 	# 根据 TileMap 上设置的标记，生成初始单位
 	var actor_manager = Game.g_actors
-	var map = scene.flag_layer as FlagLayer
+	var team_ids_not_player : Array[Game.TeamID] = []
+	var map := scene.flag_layer
 	var flag_units = map.get_flag_units()
 	for unit_name in flag_units.keys():
 		if actor_manager.actors.exists(unit_name) == false:
@@ -271,7 +272,8 @@ func create_initial_units_on_battle_map() -> void:
 				cells.remove_at(i)
 		for cell in cells:
 			var look := true if _actors.is_empty() else false
-			print("开始添加单位 ", _actors.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
+			if Game.Debug == 1:
+				print("开始添加单位 ", _actors.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
 			var unit := scene.add_unit_to(template, cell, look)
 			if not actor_manager.get_actor_by_name(unit_name):
 				actor = unit.get_child(1) # 获取子节点 ActorDefault
@@ -284,6 +286,9 @@ func create_initial_units_on_battle_map() -> void:
 			actor.team_id = map.get_team_by_cell(cell)
 			_actors.push_back(actor)
 			_cell_map[cell] = actor
+			if not map.is_player_team(actor.team_id):
+				team_ids_not_player.append(actor.team_id)
+	_turn_controller.set_battle_teams(map.get_player_team_id(), team_ids_not_player)
 	print("战斗单位已加载完毕")
 	
 
@@ -294,6 +299,7 @@ func on_battle_map_unload() -> void:
 			a.base3d.remove_child(a)
 	init_with_battle_name("")
 	_turn_controller.timeline.clear_on_change_scene()
+	_turn_controller.set_battle_teams([], [])
 
 #endregion
 

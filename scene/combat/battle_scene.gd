@@ -15,7 +15,7 @@ extends Node3D
 @onready var subvp := get_node(subviewport_path) as BattleMapContainer   # 战斗地图的容器
 @onready var timeline := get_node(timeline_path) as TimelineController
 @onready var turn_controller := get_node(turn_contr_path) as TurnController
-@onready var bottom_panel := $UI/Background/bottom_panel as BottomPanel
+@onready var bottom_panel := $TurnController/Background/bottom_panel as BottomPanel
 
 var _cur_unit : UnitBase3D = null
 var _unit_list : Array[UnitBase3D]

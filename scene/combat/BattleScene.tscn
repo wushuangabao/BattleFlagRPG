@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
-[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/test_battle_map.tscn" id="3_ldyea"]
+[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/test/test_battle_map.tscn" id="3_ldyea"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/Timeline/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/Timeline/TurnController.gd" id="6_wwrlq"]
@@ -141,9 +141,9 @@ size = Vector2(1920, 15)
 script = ExtResource("1_1h8kx")
 board_plane_path = NodePath("plane")
 camera_path = NodePath("Camera3D")
-subviewport_path = NodePath("SubViewport_MapContainer")
-timeline_path = NodePath("UI/timeline")
-turn_contr_path = NodePath("UI")
+subviewport_path = NodePath("MapContainer")
+timeline_path = NodePath("TurnController/timeline")
+turn_contr_path = NodePath("TurnController")
 
 [node name="Camera3D" type="Camera3D" parent="." node_paths=PackedStringArray("ui_area_detector")]
 transform = Transform3D(1, 0, 0, 0, 0.695236, 0.718782, 0, -0.718782, 0.695236, 0, 1.80018, 1.01038)
@@ -160,16 +160,16 @@ light_energy = 1.1
 [node name="plane" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_wponv")
 
-[node name="SubViewport_MapContainer" type="SubViewport" parent="."]
+[node name="MapContainer" type="SubViewport" parent="."]
 size = Vector2i(1280, 720)
 render_target_update_mode = 4
 script = ExtResource("3_4gioj")
 packed_scene = SubResource("Resource_dwjhn")
 
-[node name="UI" type="Node" parent="."]
+[node name="TurnController" type="Node" parent="."]
 script = ExtResource("6_wwrlq")
 
-[node name="Background" type="TextureRect" parent="UI"]
+[node name="Background" type="TextureRect" parent="TurnController"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -177,24 +177,24 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("7_yhjk3")
 
-[node name="bottom_panel" type="Node" parent="UI/Background"]
+[node name="bottom_panel" type="Node" parent="TurnController/Background"]
 script = ExtResource("8_4nkfg")
 
-[node name="TextureButton" type="TextureButton" parent="UI/Background/bottom_panel"]
+[node name="TextureButton" type="TextureButton" parent="TurnController/Background/bottom_panel"]
 offset_left = 456.0
 offset_top = 927.0
 offset_right = 541.0
 offset_bottom = 1012.0
 texture_normal = ExtResource("8_d8im0")
 
-[node name="Label_LV" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_LV" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 503.0
 offset_top = 903.0
 offset_right = 543.0
 offset_bottom = 926.0
 text = "99"
 
-[node name="Label_STR" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_STR" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 548.0
 offset_top = 985.0
 offset_right = 588.0
@@ -203,7 +203,7 @@ text = "100"
 label_settings = SubResource("LabelSettings_4nkfg")
 horizontal_alignment = 1
 
-[node name="Label_CON" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_CON" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 588.0
 offset_top = 985.0
 offset_right = 628.0
@@ -212,7 +212,7 @@ text = "100"
 label_settings = SubResource("LabelSettings_j1stj")
 horizontal_alignment = 1
 
-[node name="Label_AGI" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_AGI" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 631.0
 offset_top = 985.0
 offset_right = 671.0
@@ -221,7 +221,7 @@ text = "100"
 label_settings = SubResource("LabelSettings_hexu1")
 horizontal_alignment = 1
 
-[node name="Label_WIL" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_WIL" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 675.0
 offset_top = 985.0
 offset_right = 715.0
@@ -230,7 +230,7 @@ text = "100"
 label_settings = SubResource("LabelSettings_cowrm")
 horizontal_alignment = 1
 
-[node name="Label_INT" type="Label" parent="UI/Background/bottom_panel"]
+[node name="Label_INT" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 717.0
 offset_top = 985.0
 offset_right = 757.0
@@ -239,7 +239,7 @@ text = "100"
 label_settings = SubResource("LabelSettings_ejo0j")
 horizontal_alignment = 1
 
-[node name="HP_Bar" type="TextureProgressBar" parent="UI/Background/bottom_panel"]
+[node name="HP_Bar" type="TextureProgressBar" parent="TurnController/Background/bottom_panel"]
 offset_left = 768.0
 offset_top = 903.0
 offset_right = 1030.0
@@ -247,7 +247,7 @@ offset_bottom = 943.0
 value = 6.0
 texture_progress = ExtResource("9_0e1i0")
 
-[node name="MP_Bar" type="TextureProgressBar" parent="UI/Background/bottom_panel"]
+[node name="MP_Bar" type="TextureProgressBar" parent="TurnController/Background/bottom_panel"]
 offset_left = 768.0
 offset_top = 913.0
 offset_right = 1030.0
@@ -255,7 +255,7 @@ offset_bottom = 953.0
 value = 4.0
 texture_progress = ExtResource("10_4nkfg")
 
-[node name="bottom_info" type="Label" parent="UI/Background/bottom_panel"]
+[node name="bottom_info" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 660.0
 offset_top = 1043.0
 offset_right = 1260.0
@@ -264,7 +264,7 @@ text = "infomation"
 label_settings = SubResource("LabelSettings_0e1i0")
 horizontal_alignment = 1
 
-[node name="temp_info" type="Label" parent="UI/Background/bottom_panel"]
+[node name="temp_info" type="Label" parent="TurnController/Background/bottom_panel"]
 offset_left = 760.0
 offset_top = 1043.0
 offset_right = 1160.0
@@ -272,7 +272,7 @@ offset_bottom = 1066.0
 label_settings = SubResource("LabelSettings_mc6gs")
 horizontal_alignment = 1
 
-[node name="timeline" type="TextureProgressBar" parent="UI"]
+[node name="timeline" type="TextureProgressBar" parent="TurnController"]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
@@ -288,7 +288,7 @@ script = ExtResource("6_vpcar")
 packed_sprite = ExtResource("7_1h76q")
 packed_greenbox = ExtResource("11_8xf8q")
 
-[node name="actions" type="TextureRect" parent="UI"]
+[node name="actions" type="TextureRect" parent="TurnController"]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -303,7 +303,7 @@ grow_vertical = 0
 texture = ExtResource("23_ol0sb")
 stretch_mode = 4
 
-[node name="attack" type="TextureButton" parent="UI/actions"]
+[node name="attack" type="TextureButton" parent="TurnController/actions"]
 layout_mode = 0
 offset_left = 117.0
 offset_top = 322.0
@@ -313,7 +313,7 @@ stretch_mode = 3
 script = ExtResource("10_c23fh")
 skill = SubResource("Resource_c3jca")
 
-[node name="skip" type="Button" parent="UI/actions"]
+[node name="skip" type="Button" parent="TurnController/actions"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 0
 offset_left = 384.0
@@ -324,7 +324,7 @@ text = "skip"
 script = ExtResource("14_4gioj")
 action = ExtResource("17_5n8sn")
 
-[node name="defend" type="Button" parent="UI/actions"]
+[node name="defend" type="Button" parent="TurnController/actions"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 0
 offset_left = 469.0
@@ -335,7 +335,7 @@ text = "defend"
 script = ExtResource("14_4gioj")
 action = ExtResource("14_dwjhn")
 
-[node name="recover" type="Button" parent="UI/actions"]
+[node name="recover" type="Button" parent="TurnController/actions"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 0
 offset_left = 385.0
@@ -371,7 +371,7 @@ position = Vector2(960, 1072.5)
 shape = SubResource("RectangleShape2D_cowrm")
 debug_color = Color(0.210093, 0.64005, 0, 0.42)
 
-[connection signal="pressed" from="UI/actions/attack" to="UI/actions/attack" method="_on_pressed"]
-[connection signal="pressed" from="UI/actions/skip" to="UI/actions/skip" method="_on_pressed"]
-[connection signal="pressed" from="UI/actions/defend" to="UI/actions/defend" method="_on_pressed"]
-[connection signal="pressed" from="UI/actions/recover" to="UI/actions/recover" method="_on_pressed"]
+[connection signal="pressed" from="TurnController/actions/attack" to="TurnController/actions/attack" method="_on_pressed"]
+[connection signal="pressed" from="TurnController/actions/skip" to="TurnController/actions/skip" method="_on_pressed"]
+[connection signal="pressed" from="TurnController/actions/defend" to="TurnController/actions/defend" method="_on_pressed"]
+[connection signal="pressed" from="TurnController/actions/recover" to="TurnController/actions/recover" method="_on_pressed"]

@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cn42efyewbr8i" path="res://asset/png/map/world.png" id="1_hxm1c"]
 [ext_resource type="Script" uid="uid://durpyhsxpppj3" path="res://scene/ui/big_map.gd" id="1_wlwro"]
 [ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="2_g43hy"]
-[ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/ground.gd" id="3_eiqjw"]
+[ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/layer/ground.gd" id="3_eiqjw"]
 [ext_resource type="Texture2D" uid="uid://c17gk8jxbpogq" path="res://asset/png/character/animation/test_run_3.png" id="5_wlwro"]
 [ext_resource type="Script" uid="uid://k6fkpi6blm72" path="res://script/entity/player.gd" id="12_1s3vn"]
 

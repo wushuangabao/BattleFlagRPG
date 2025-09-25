@@ -1,11 +1,11 @@
-class_name Evaluator extends Resource
+class_name CompareEvaluator extends Evaluator
 
 @export var key: String = ""
 @export var cmp: String = "exists" # exists, =, !=, >, >=, <, <=
 @export var value: int
 
 func evaluate(state: Dictionary) -> bool:
-	var vars := state.get("variables", {})
+	var vars = state.get("variables", {})
 	match cmp:
 		"exists":
 			return vars.has(key)

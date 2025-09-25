@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StoryGraph" load_steps=14 format=3 uid="uid://blwr216gupj3a"]
+[gd_resource type="Resource" script_class="StoryGraph" load_steps=16 format=3 uid="uid://blwr216gupj3a"]
 
 [ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="1_1faki"]
 [ext_resource type="Script" uid="uid://bljb6dkpa3oam" path="res://addons/story_editor/runtime/StoryNode.gd" id="1_6uq8v"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://df2l5y3nftsnu" path="res://addons/story_editor/node/DialogueNode.gd" id="3_fw4x2"]
 [ext_resource type="Script" uid="uid://kveh2dwxglja" path="res://addons/story_editor/node/BattleNode.gd" id="4_bb037"]
 [ext_resource type="Script" uid="uid://ce2qotkg2fraf" path="res://addons/story_editor/node/EndingNode.gd" id="5_3tm8g"]
+[ext_resource type="Script" uid="uid://bt5f6py66e084" path="res://addons/story_editor/node/ChoiceNode.gd" id="6_bb037"]
 
 [sub_resource type="Resource" id="Resource_5fg8h"]
 script = ExtResource("3_fw4x2")
@@ -27,9 +28,9 @@ timeline = "timeline_test_2"
 var_name = ""
 id = "n_mojiao"
 name = "B"
-position = Vector2(40, 180)
+position = Vector2(-80, 180)
 outputs = Dictionary[String, String]({
-"out": "n_92b06edd"
+"out": "n_c317683c"
 })
 effects = Array[ExtResource("1_1faki")]([])
 metadata/_custom_type_script = "uid://df2l5y3nftsnu"
@@ -82,10 +83,21 @@ success = "m"
 fail = "s"
 id = "n_92b06edd"
 name = ""
-position = Vector2(280, 180)
+position = Vector2(300, 180)
 outputs = Dictionary[String, String]({
 "m": "end_dark",
 "s": "n_c411c04d"
+})
+effects = Array[ExtResource("1_1faki")]([])
+
+[sub_resource type="Resource" id="Resource_pvgde"]
+script = ExtResource("6_bb037")
+choices = Array[Dictionary]([{}])
+id = "n_c317683c"
+name = ""
+position = Vector2(120, 220)
+outputs = Dictionary[String, String]({
+"out": "n_92b06edd"
 })
 effects = Array[ExtResource("1_1faki")]([])
 
@@ -94,5 +106,5 @@ script = ExtResource("1_l50ia")
 id = "demo"
 title = "DEMO"
 entry_node = "n1"
-nodes = Array[ExtResource("1_6uq8v")]([SubResource("Resource_5fg8h"), SubResource("Resource_r116x"), SubResource("Resource_6uq8v"), SubResource("Resource_fw4x2"), SubResource("Resource_bb037"), SubResource("Resource_3tm8g"), SubResource("Resource_m2vor")])
+nodes = Array[ExtResource("1_6uq8v")]([SubResource("Resource_5fg8h"), SubResource("Resource_r116x"), SubResource("Resource_6uq8v"), SubResource("Resource_fw4x2"), SubResource("Resource_bb037"), SubResource("Resource_3tm8g"), SubResource("Resource_m2vor"), SubResource("Resource_pvgde")])
 metadata/_custom_type_script = "uid://bot004yitd8b0"
