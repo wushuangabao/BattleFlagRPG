@@ -1,7 +1,7 @@
 class_name BattleMapContainer
 extends SubViewport
 
-@export var packed_scene: PackedSceneDictionary # 每添加一个战斗地图，都要在这个字典里加上（todo 改成读表加载）
+@export var packed_scene: PackedSceneDictionary # 每添加一个战斗地图，都要在这个字典里加上（todo 改成在StoryGraph里的BattleNode中配置）
 
 # 当前地图名称
 var _current_scene: String

@@ -18,12 +18,15 @@ var inspector : EditorInspector
 var graph_res: StoryGraph = null
 var node_map : Dictionary[String, GraphNode] = {} # id -> GraphNode
 var undo_stack = [] # 撤销栈，用于存储删除的节点信息
+var aux: GraphDockAux = null
 
 func _ready():
 	if not Engine.is_editor_hint():
 		return
 	inspector = null
 	_try_set_inspector()
+	if aux == null or not aux is GraphDockAux:
+		aux = GraphDockAux.new(self, graph_edit)
 
 	btn_new.pressed.connect(_on_new)
 	btn_load.pressed.connect(_on_load)
@@ -34,9 +37,9 @@ func _ready():
 	var popup := btn_add_menu.get_popup()
 	popup.index_pressed.connect(_on_add_menu_index_pressed)
 	
-	btn_delete.pressed.connect(_on_delete_pressed)
-	btn_undo.pressed.connect(_on_undo_pressed)
-	btn_play.pressed.connect(_on_preview)
+	btn_delete.pressed.connect(aux._on_delete_pressed)
+	btn_undo.pressed.connect(aux._on_undo_pressed)
+	btn_play.pressed.connect(aux._on_preview)
 	
 	graph_edit.connection_request.connect(_on_connect_request)
 	graph_edit.disconnection_request.connect(_on_disconnect_request)
@@ -45,17 +48,12 @@ func _ready():
 	graph_res = load("res://addons/story_editor/demo/story_test.tres")
 	_rebuild_from_resource()
 
-	# 设置窗口为可聚焦，以便接收键盘输入
 	self.gui_embed_subwindows = false
 	self.exclusive = true
-	
-	# 确保窗口可以接收输入事件
 	set_process_input(true)
-	
-	# 启用拖放功能
 	get_viewport().gui_embed_subwindows = false
 	set_process_unhandled_input(true)
-	self.get_viewport().files_dropped.connect(_on_files_dropped)
+	self.get_viewport().files_dropped.connect(aux._on_files_dropped)
 
 func _try_set_inspector():
 	if inspector != null:
@@ -330,56 +328,12 @@ func _update_references_on_name_change(node_id: String, new_name: String):
 			source_node.outputs.erase(old_key)
 			source_node.outputs[new_name] = node_id
 
-func _on_preview():
-	if graph_res == null:
-		return
-	_sync_to_resource()
-	if DialogicUtil and DialogicUtil.get_dialogic_plugin():
-		hide()
-		ResourceSaver.save(graph_res, "res://addons/story_editor/demo/story_test.tres")
-		EditorInterface.play_custom_scene("res://addons/story_editor/demo/main.tscn")
-		var timer = Timer.new()
-		timer.wait_time = 2.0
-		timer.autostart = true
-		add_child(timer)
-		timer.timeout.connect(func():
-			if not EditorInterface.is_playing_scene():
-				show()
-				timer.queue_free()
-		)
-
 func _input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_DELETE:
 		_show_delete_confirmation()
 
 func _show_delete_confirmation():
-	# 检查是否有选中的节点
-	var has_selected = false
-	for child in graph_edit.get_children():
-		if child is GraphNode and child.selected:
-			has_selected = true
-			break
-	if not has_selected:
-		return
-	# 创建确认对话框
-	var dialog = ConfirmationDialog.new()
-	dialog.title = "确认删除"
-	dialog.dialog_text = "确定要删除选中的节点吗？"
-	dialog.get_ok_button().text = "确定"
-	dialog.get_cancel_button().text = "取消"
-	dialog.min_size = Vector2(300, 100)
-	add_child(dialog)
-	# 连接确认信号
-	dialog.confirmed.connect(func():
-		_delete_selected_nodes()
-		dialog.queue_free()
-	)
-	# 连接取消/关闭信号
-	dialog.canceled.connect(func():
-		dialog.queue_free()
-	)
-	# 显示对话框
-	dialog.popup_centered()
+	aux._show_delete_confirmation()
 	
 func _on_node_selected(node: GraphNode):
 	var node_res = _find_res_node(node.name)
@@ -390,118 +344,6 @@ func _on_node_selected(node: GraphNode):
 		else:
 			_try_set_inspector()
 		EditorInterface.get_inspector().edit(node_res)
-	
-func _delete_selected_nodes():
-	if graph_res == null:
-		return
-	
-	# 收集所有选中的节点
-	var selected_nodes = []
-	for child in graph_edit.get_children():
-		if child is GraphNode and child.selected:
-			selected_nodes.append(child)
-	if selected_nodes.size() == 0:
-		return
-		
-	# 创建撤销记录
-	var undo_record = {
-		"nodes": [],
-		"connections": []
-	}
-	
-	# 删除选中的节点
-	for node in selected_nodes:
-		# 不能删除入口节点
-		if graph_res.entry_node == _find_res_node(node.name).id:
-			push_warning("不能删除入口节点！")
-			continue
-		
-		var node_record = {
-			"node_id": node.name,
-			"position": node.position_offset,
-			"resource": null,
-			"connections": []
-		}
-		
-		# 记录连接信息
-		var connections = graph_edit.get_connection_list()
-		for connection in connections:
-			if connection.from_node == node.name or connection.to_node == node.name:
-				node_record.connections.append({
-					"from": connection.from_node,
-					"from_port": connection.from_port,
-					"to": connection.to_node,
-					"to_port": connection.to_port
-				})
-				graph_edit.disconnect_node(connection.from_node, connection.from_port, connection.to_node, connection.to_port)
-		
-		# 从资源中删除节点并记录
-		var res_node = _find_res_node(node.name)
-		if res_node != null:
-			# 深度复制资源节点以便撤销
-			node_record.resource = res_node.duplicate(true)
-			graph_res.nodes.erase(res_node)
-			
-			# 删除其他节点对该节点的引用
-			for n in graph_res.nodes:
-				var keys_to_erase = []
-				for k in n.outputs.keys():
-					if n.outputs[k] == node.name:
-						keys_to_erase.append(k)
-						# 记录引用关系
-						node_record.connections.append({
-							"ref_node": n.id,
-							"ref_key": k,
-							"ref_value": node.name
-						})
-				for k in keys_to_erase:
-					n.outputs.erase(k)
-		
-		# 从节点映射中删除
-		node_map.erase(node.name)
-		
-		# 从场景中删除节点
-		node.queue_free()
-		
-		# 添加到撤销记录
-		undo_record.nodes.append(node_record)
-	
-	# 将撤销记录添加到撤销栈
-	undo_stack.append(undo_record)
-	
-func _on_delete_pressed():
-	_show_delete_confirmation()
-	
-func _on_undo_pressed():
-	if undo_stack.size() == 0:
-		return
-		
-	var undo_record = undo_stack.pop_back()
-	
-	# 恢复节点
-	for node_record in undo_record.nodes:
-		if node_record.resource != null:
-			# 恢复资源节点
-			graph_res.nodes.append(node_record.resource)
-
-			# 创建UI节点
-			var gn = _create_graph_node(node_record.resource)
-			
-			# 恢复连接
-			for conn in node_record.connections:
-				if conn.has("from"):
-					# 恢复图形连接
-					if node_map.has(conn.from) and node_map.has(conn.to):
-						graph_edit.connect_node(conn.from, conn.from_port, conn.to, conn.to_port)
-						# 恢复资源节点的输出连接
-						var from_res = _find_res_node(conn.from)
-						if from_res != null:
-							from_res.outputs["out"] = conn.to
-				elif conn.has("ref_node"):
-					# 恢复引用关系
-					var ref_node = _find_res_node(conn.ref_node)
-					if ref_node != null:
-						ref_node.outputs[conn.ref_key] = conn.ref_value
 
 func _on_set_entry_pressed():
 	if graph_res == null:
