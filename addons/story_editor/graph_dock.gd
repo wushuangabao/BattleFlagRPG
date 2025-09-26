@@ -6,17 +6,14 @@ extends Window
 @export var btn_new: Button
 @export var btn_load: Button
 @export var btn_save: Button
+@export var btn_save_as: Button
 @export var btn_set_entry: Button
-
-@export var btn_add_dlg: Button
-@export var btn_add_battle: Button
-@export var btn_add_choice: Button
-@export var btn_add_end: Button
-
-@export var btn_edit: Button
+@export var btn_add_menu: MenuButton
 @export var btn_delete: Button
 @export var btn_undo: Button
 @export var btn_play: Button
+
+var inspector : EditorInspector
 
 var graph_res: StoryGraph = null
 var node_map : Dictionary[String, GraphNode] = {} # id -> GraphNode
@@ -25,23 +22,25 @@ var undo_stack = [] # 撤销栈，用于存储删除的节点信息
 func _ready():
 	if not Engine.is_editor_hint():
 		return
+	inspector = null
+	_try_set_inspector()
+
 	btn_new.pressed.connect(_on_new)
 	btn_load.pressed.connect(_on_load)
 	btn_save.pressed.connect(_on_save)
+	btn_save_as.pressed.connect(_on_save_as)
 	btn_set_entry.pressed.connect(_on_set_entry_pressed)
 
-	btn_add_dlg.pressed.connect(func(): _add_node_ui(DialogueNode))
-	btn_add_battle.pressed.connect(func(): _add_node_ui(BattleNode))
-	btn_add_choice.pressed.connect(func(): _add_node_ui(ChoiceNode))
-	btn_add_end.pressed.connect(func(): _add_node_ui(EndingNode))
+	var popup := btn_add_menu.get_popup()
+	popup.index_pressed.connect(_on_add_menu_index_pressed)
 	
-	btn_edit.pressed.connect(_on_edit_pressed)
 	btn_delete.pressed.connect(_on_delete_pressed)
 	btn_undo.pressed.connect(_on_undo_pressed)
 	btn_play.pressed.connect(_on_preview)
 	
 	graph_edit.connection_request.connect(_on_connect_request)
 	graph_edit.disconnection_request.connect(_on_disconnect_request)
+	graph_edit.node_selected.connect(_on_node_selected)
 
 	graph_res = load("res://addons/story_editor/demo/story_test.tres")
 	_rebuild_from_resource()
@@ -57,6 +56,14 @@ func _ready():
 	get_viewport().gui_embed_subwindows = false
 	set_process_unhandled_input(true)
 	self.get_viewport().files_dropped.connect(_on_files_dropped)
+
+func _try_set_inspector():
+	if inspector != null:
+		return
+	var inspector_parent = get_node("VBoxContainer/HSplitContainer/Inspector")
+	if inspector_parent and inspector_parent.get_child_count() > 0:
+		inspector = inspector_parent.get_child(0)
+		inspector.property_edited.connect(_on_node_changed)
 
 func _on_files_dropped(files):
 	if files.size() > 0:
@@ -101,9 +108,24 @@ func _on_load():
 	
 func _load_story_graph(path: String):
 	graph_res = load(path)
+	for n in graph_res.nodes:
+		n.outputs = n.outputs.duplicate()
 	_rebuild_from_resource()
 
 func _on_save():
+	if graph_res == null:
+		return
+	# 同步 GraphNode 到资源
+	_sync_to_resource()
+	# 直接覆盖保存到原路径；若资源尚未有路径，则转为另存为
+	var path := graph_res.resource_path
+	if path.is_empty():
+		_on_save_as()
+		return
+	ResourceSaver.save(graph_res, path)
+	print("已保存到：", path)
+
+func _on_save_as():
 	if graph_res == null:
 		return
 	# 同步 GraphNode 到资源
@@ -115,6 +137,7 @@ func _on_save():
 	add_child(dlg)
 	dlg.file_selected.connect(func(path):
 		ResourceSaver.save(graph_res, path)
+		print("已另存为：", path)
 		dlg.queue_free()
 	)
 	dlg.canceled.connect(dlg.queue_free)
@@ -143,15 +166,20 @@ func _on_connect_request(from_node, from_port, to_node, to_port):
 	var from_res := _find_res_node(from_node)
 	var to_res := _find_res_node(to_node)
 	if from_res == null or to_res == null:
-		push_error("连接失败：节点不存在")
+		push_warning("连接失败：节点不存在")
 		return
-	# 出口名：默认 "out"
-	var port_name := "out"
-	if from_res is DialogueNode and not from_res.var_name.is_empty():
-		port_name = to_res.name
-	elif from_res is BattleNode:
-		port_name = to_res.name
-	from_res.outputs[port_name] = to_res.id
+	if from_res is EndingNode:
+		push_warning("连接失败：EndingNode不能连接到其他节点")
+		return
+	var port_name = to_res.name
+	if port_name == null or port_name.is_empty():
+		push_warning("连接失败：目标节点名称为空")
+		return
+	if from_res is DialogueNode and (from_res.var_name == null or from_res.var_name.is_empty()):
+		if from_res.outputs.size() > 0:
+			push_warning("连接失败：DialogueNode未设置var_name，因此out端口最多连接1个节点")
+			return
+	from_res.outputs[port_name as String] = to_res.id
 	graph_edit.connect_node(from_node, from_port, to_node, to_port)
 
 func _on_disconnect_request(from_node, from_port, to_node, to_port):
@@ -164,9 +192,15 @@ func _on_disconnect_request(from_node, from_port, to_node, to_port):
 			from_res.outputs.erase(k)
 	graph_edit.disconnect_node(from_node, from_port, to_node, to_port)
 
-func _find_res_node(name: String) -> Resource:
+func _find_res_node(p_id: String) -> Resource:
 	for n in graph_res.nodes:
-		if n.id == name:
+		if n.id == p_id:
+			return n
+	return null
+
+func _find_res_node_by_name(p_name: String) -> Resource:
+	for n in graph_res.nodes:
+		if n.name == p_name:
 			return n
 	return null
 
@@ -193,7 +227,7 @@ func _rebuild_from_resource():
 	for n in graph_res.nodes:
 		for k in n.outputs.keys():
 			var target_id: String = n.outputs[k]
-			if node_map.has(n.id) and node_map.has(target_id):
+			if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
 				graph_edit.connect_node(n.id, 0, target_id, 0)
 
 func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
@@ -201,7 +235,10 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 	gn.title = n.get_script().get_global_name()
 	gn.name = n.id
 	gn.size.x = 150
-	gn.position_offset = n.position
+	if is_new:
+		gn.position_offset = graph_edit.scroll_offset / graph_edit.zoom + Vector2(100, 100)
+	else:
+		gn.position_offset = n.position
 	gn.resizable = true
 	gn.draggable = true
 	var lbl = LineEdit.new()
@@ -209,9 +246,8 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 	if not is_new:
 		lbl.text = n.name
 	lbl.text_changed.connect(func(t): 
-		var old_name = n.name
 		n.name = t
-		_update_references_on_name_change(n.id, old_name, t)
+		_update_references_on_name_change(n.id, t)
 	)
 	gn.add_child(lbl)
 	match gn.title:
@@ -230,18 +266,13 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 	return gn
 
 func _set_dialogue_node(gn: GraphNode, n: DialogueNode, is_new: bool = false):
-	var timeline = LineEdit.new()
-	timeline.placeholder_text = "timeline"
-	if not is_new:
-		timeline.text = n.timeline
-	timeline.text_changed.connect(func(t): n.timeline = t)
-	var var_name = LineEdit.new()
-	var_name.placeholder_text = "var_name"
-	if not is_new:
-		var_name.text = n.var_name
-	var_name.text_changed.connect(func(t): n.var_name = t)
-	gn.add_child(timeline)
-	gn.add_child(var_name)
+	if is_new == false:
+		if n.var_name and not n.var_name.is_empty():
+			# 检查变量是否存在 project.godot / ProjectSettings 中
+			if not _project_variable_exists(n.var_name):
+				push_warning("变量不存在于 ProjectSettings: %s" % n.var_name)
+	else:
+		n.var_name = ""
 	gn.set_slot(0, true, 0, Color.WHITE, true, 0, Color.WHITE)
 
 func _set_battle_node(gn: GraphNode, n: BattleNode, is_new: bool = false):
@@ -266,15 +297,7 @@ func _set_battle_node(gn: GraphNode, n: BattleNode, is_new: bool = false):
 	gn.set_slot(0, true, 0, Color.YELLOW, true, 0, Color.YELLOW)
 
 func _set_choice_node(gn: GraphNode, n: ChoiceNode, is_new: bool = false):
-	gn.set_slot(0, true, 0, Color.BLUE, true, 0, Color.BLUE)
-	# 在Inspector中编辑按钮
-	var btn_inspect := Button.new()
-	btn_inspect.text = "在Inspector中编辑"
-	btn_inspect.pressed.connect(func():
-		_sync_to_resource()
-		EditorInterface.edit_resource(n)
-	)
-	gn.add_child(btn_inspect)
+	gn.set_slot(0, true, 0, Color.GREEN, true, 0, Color.GREEN)
 
 func _set_ending_node(gn: GraphNode, n: EndingNode, is_new: bool = false):
 	var ending_id = LineEdit.new()
@@ -293,14 +316,14 @@ func _sync_to_resource():
 			n.position = gn.position_offset
 
 # 查找所有指向该节点的前置节点，并更新它们的outputs字典
-func _update_references_on_name_change(node_id: String, old_name: String, new_name: String):
+func _update_references_on_name_change(node_id: String, new_name: String):
 	if graph_res == null:
 		return		
 	for source_node in graph_res.nodes:
 		var keys_to_update = []
 		for port_name in source_node.outputs.keys():
-			# 如果输出指向目标节点，并且端口名称与旧名称匹配
-			if source_node.outputs[port_name] == node_id and port_name == old_name:
+			# 如果输出指向目标节点
+			if source_node.outputs[port_name] == node_id:
 				keys_to_update.append(port_name)
 		# 更新找到的键
 		for old_key in keys_to_update:
@@ -358,19 +381,15 @@ func _show_delete_confirmation():
 	# 显示对话框
 	dialog.popup_centered()
 	
-func _on_edit_pressed():
-	var selected_nodes = []
-	for child in graph_edit.get_children():
-		if child is GraphNode and child.selected:
-			selected_nodes.append(child)
-			if selected_nodes.size() > 1:
-				return
-	if selected_nodes.size() == 0:
-		return
-	var node_res = _find_res_node(selected_nodes[0].name)
+func _on_node_selected(node: GraphNode):
+	var node_res = _find_res_node(node.name)
 	if node_res:
 		_sync_to_resource()
-		EditorInterface.edit_resource(node_res)
+		if inspector:
+			inspector.edit(node_res)
+		else:
+			_try_set_inspector()
+		EditorInterface.get_inspector().edit(node_res)
 	
 func _delete_selected_nodes():
 	if graph_res == null:
@@ -509,3 +528,105 @@ func _on_set_entry_pressed():
 			graph_res.entry_node = node.id
 			selected_nodes[0].set_slot_color_right(0, Color.RED)
 			print("设置入口节点为：%s(%s)" % [node.name, node.id])
+
+func _on_node_changed(property: String) -> void:
+	if graph_res == null:
+		return
+	if inspector == null:
+		return
+	var edited = inspector.get_edited_object()
+	if edited is StoryNode:
+		_update_graph_node_for_resource(edited, property)
+
+# 仅更新发生改变的 StoryNode 对应的 GraphNode
+func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
+	var gn: GraphNode = node_map.get(n.id, null)
+	if gn == null:
+		push_error("update_graph_node: 找不到对应的 GraphNode 节点！")
+		return
+	# 更新文本字段
+	for child in gn.get_children():
+		if child is LineEdit:  # 如果后续新增字段，请确保对应 LineEdit 的 placeholder_text 与资源属性保持一致
+			match child.placeholder_text:
+				"name":
+					if child.text != n.name:
+						child.text = n.name
+				"battle_name":
+					if n is BattleNode:
+						child.text = (n as BattleNode).battle_name
+				"success":
+					if n is BattleNode:
+						child.text = (n as BattleNode).success
+				"fail":
+					if n is BattleNode:
+						child.text = (n as BattleNode).fail
+				"ending_id":
+					if n is EndingNode:
+						child.text = (n as EndingNode).ending_id
+	# 如果是名称变更，更新其他节点对该节点的引用键名
+	if property == "name":
+		_update_references_on_name_change(n.id, n.name)
+	# 重新整理与该节点相关的连线
+	var conns = graph_edit.get_connection_list()
+	for c in conns.duplicate():
+		if c.from_node == n.id or c.to_node == n.id:
+			graph_edit.disconnect_node(c.from_node, c.from_port, c.to_node, c.to_port)
+	# 重新连接该节点的所有输出
+	for k in n.outputs.keys():
+		var target_id: String = n.outputs[k]
+		if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
+			graph_edit.connect_node(n.id, 0, target_id, 0)
+	# 重新连接指向该节点的输入
+	for src in graph_res.nodes:
+		for k in src.outputs.keys():
+			if src.outputs[k] == n.id:
+				if node_map.has(src.id) and node_map.has(n.id):
+					graph_edit.connect_node(src.id, 0, n.id, 0)
+
+# 检查 ProjectSettings 中是否存在给定的变量路径（如 "Folder.Var_test" 或更深层级如 "Folder.Sub.Var"）
+func _project_variable_exists(var_path: String) -> bool:
+	if var_path == null:
+		return false
+	var_path = var_path.strip_edges()
+	if var_path.is_empty():
+		return false
+	var settings_key := "dialogic/variables"
+	if not ProjectSettings.has_setting(settings_key):
+		return false
+	var vars_root := ProjectSettings.get_setting(settings_key)
+	if vars_root == null:
+		return false
+	# 仅支持字典结构
+	if vars_root is Dictionary:
+		var dict: Dictionary = vars_root
+		var parts := var_path.split(".")
+		if parts.size() == 1:
+			var key := parts[0]
+			if dict.has(key):
+				return true
+			return false
+		# 多层路径：逐层深入，最后检查叶子键是否存在
+		var current: Variant = dict
+		for i in range(parts.size() - 1):
+			var seg := parts[i]
+			if current is Dictionary and (current as Dictionary).has(seg):
+				current = (current as Dictionary)[seg]
+			else:
+				return false
+		# 检查叶子键
+		if current is Dictionary:
+			return (current as Dictionary).has(parts[parts.size() - 1])
+	return false
+
+func _on_add_menu_index_pressed(index: int) -> void:
+	match index:
+		0:
+			_add_node_ui(DialogueNode)
+		1:
+			_add_node_ui(BattleNode)
+		2:
+			_add_node_ui(ChoiceNode)
+		3:
+			_add_node_ui(EndingNode)
+		_:
+			pass

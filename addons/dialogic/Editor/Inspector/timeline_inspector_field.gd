@@ -53,7 +53,12 @@ func _update_property() -> void:
 	button.icon = get_theme_icon("ExternalLink", "EditorIcons")
 
 	# Read the current value from the property.
-	var new_value = get_edited_object()[get_edited_property()]
+	var edited_obj = get_edited_object()
+	if edited_obj == null:
+		return
+	var new_value = edited_obj[get_edited_property()]
+	if new_value == null or not new_value is DialogicTimeline:
+		return
 	if (new_value == current_value):
 		return
 

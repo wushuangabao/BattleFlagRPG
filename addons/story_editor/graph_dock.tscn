@@ -2,22 +2,19 @@
 
 [ext_resource type="Script" uid="uid://cftnpfjca6dqb" path="res://addons/story_editor/graph_dock.gd" id="1"]
 
-[node name="StoryGraph" type="Window" node_paths=PackedStringArray("graph_edit", "btn_new", "btn_load", "btn_save", "btn_set_entry", "btn_add_dlg", "btn_add_battle", "btn_add_choice", "btn_add_end", "btn_edit", "btn_delete", "btn_undo", "btn_play")]
+[node name="StoryGraph" type="Window" node_paths=PackedStringArray("graph_edit", "btn_new", "btn_load", "btn_save", "btn_save_as", "btn_set_entry", "btn_add_menu", "btn_delete", "btn_undo", "btn_play")]
 position = Vector2i(0, 36)
 size = Vector2i(600, 300)
 exclusive = true
 min_size = Vector2i(500, 300)
 script = ExtResource("1")
-graph_edit = NodePath("VBoxContainer/GraphEdit")
+graph_edit = NodePath("VBoxContainer/HSplitContainer/GraphEdit")
 btn_new = NodePath("VBoxContainer/Toolbar/NewBtn")
 btn_load = NodePath("VBoxContainer/Toolbar/LoadBtn")
 btn_save = NodePath("VBoxContainer/Toolbar/SaveBtn")
+btn_save_as = NodePath("VBoxContainer/Toolbar/SaveAsBtn")
 btn_set_entry = NodePath("VBoxContainer/Toolbar/SetEntryBtn")
-btn_add_dlg = NodePath("VBoxContainer/Toolbar/AddDialogue")
-btn_add_battle = NodePath("VBoxContainer/Toolbar/AddBattleBtn")
-btn_add_choice = NodePath("VBoxContainer/Toolbar/AddChoice")
-btn_add_end = NodePath("VBoxContainer/Toolbar/AddEnding")
-btn_edit = NodePath("VBoxContainer/Toolbar/EditBtn")
+btn_add_menu = NodePath("VBoxContainer/Toolbar/AddBtn")
 btn_delete = NodePath("VBoxContainer/Toolbar/DelBtn")
 btn_undo = NodePath("VBoxContainer/Toolbar/UndoBtn")
 btn_play = NodePath("VBoxContainer/Toolbar/PlayBtn")
@@ -44,30 +41,26 @@ text = "加载"
 layout_mode = 2
 text = "保存"
 
+[node name="SaveAsBtn" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+text = "另存为"
+
 [node name="SetEntryBtn" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 text = "设为入口"
 
-[node name="AddDialogue" type="Button" parent="VBoxContainer/Toolbar"]
+[node name="AddBtn" type="MenuButton" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
-text = "+对话"
-
-[node name="AddBattleBtn" type="Button" parent="VBoxContainer/Toolbar"]
-layout_mode = 2
-text = "+战斗"
-
-[node name="AddChoice" type="Button" parent="VBoxContainer/Toolbar"]
-layout_mode = 2
-text = "+分支"
-
-[node name="AddEnding" type="Button" parent="VBoxContainer/Toolbar"]
-layout_mode = 2
-text = "+结局"
-
-[node name="EditBtn" type="Button" parent="VBoxContainer/Toolbar"]
-layout_mode = 2
-tooltip_text = "在Inspector面板中编辑"
-text = "编辑"
+text = "+节点"
+item_count = 4
+popup/item_0/text = "对话"
+popup/item_0/id = 0
+popup/item_1/text = "战斗"
+popup/item_1/id = 1
+popup/item_2/text = "分支"
+popup/item_2/id = 2
+popup/item_3/text = "结局"
+popup/item_3/id = 3
 
 [node name="DelBtn" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
@@ -78,55 +71,32 @@ layout_mode = 2
 text = "撤销删除
 "
 
+[node name="Control" type="Control" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="PlayBtn" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 text = "预览"
 
-[node name="GraphEdit" type="GraphEdit" parent="VBoxContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GraphEdit" type="GraphEdit" parent="VBoxContainer/HSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+scroll_offset = Vector2(-24, 0)
 right_disconnects = true
 connections = Array[Dictionary]([{
 "from_node": &"n1",
 "from_port": 0,
 "keep_alive": false,
-"to_node": &"n_d57315e1",
-"to_port": 0
-}, {
-"from_node": &"n1",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"n_mojiao",
-"to_port": 0
-}, {
-"from_node": &"n_mojiao",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"n_c317683c",
-"to_port": 0
-}, {
-"from_node": &"n_d57315e1",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"end_good",
-"to_port": 0
-}, {
-"from_node": &"n_92b06edd",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"end_dark",
-"to_port": 0
-}, {
-"from_node": &"n_92b06edd",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"n_c411c04d",
-"to_port": 0
-}, {
-"from_node": &"n_c317683c",
-"from_port": 0,
-"keep_alive": false,
-"to_node": &"n_92b06edd",
+"to_node": &"n_b895a015",
 "to_port": 0
 }])
+
+[node name="Inspector" type="Control" parent="VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2

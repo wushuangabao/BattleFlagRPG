@@ -40,12 +40,24 @@ func _on_timeline_ended():
 	if not current or not current is DialogueNode:
 		return
 	var node = current as DialogueNode
-	var port_name = Dialogic.VAR.get_variable(node.var_name) if not node.var_name.is_empty() else null
+	var port_name = null
+	if node.var_name == null or node.var_name.is_empty():
+		if node.outputs and node.outputs.keys().size() > 0:
+			port_name = node.outputs.keys()[0]
+	else:
+		var dialog_var = Dialogic.VAR.get_variable(node.var_name)
+		if dialog_var is String:
+			port_name = dialog_var
 	if port_name != null:
 		print("StoryRunner: chose port_name = ", port_name)
-	var next_id = node.get_next_for(port_name) if port_name != null else node.get_next_for("out")
+	else:
+		push_error("StoryRunner: DialogueNode %s has no port" % node.name)
+		return
+	var next_id = node.get_next_for(port_name)
 	if next_id != "":
 		_goto(next_id)
+	else:
+		push_error("StoryRunner: DialogueNode %s not find port %s" % [node.name, port_name])
 
 func _goto(node_id: String) -> void:
 	var node = graph.get_node_by_id(node_id)
@@ -86,10 +98,6 @@ func _goto(node_id: String) -> void:
 			emit_signal("choice_requested", node as ChoiceNode, options)
 		&"EndingNode":                               # 结局（游戏结束）
 			emit_signal("game_ended", node.ending_id)
-		_:                                           # 走默认出口
-			var nxt = node.get_next_for("out")
-			if nxt != "":
-				_goto(nxt)
 
 func _apply_effects(effects: Array) -> void:
 	for e in effects:

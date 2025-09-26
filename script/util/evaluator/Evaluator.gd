@@ -1,4 +1,4 @@
 class_name Evaluator extends Resource
 
-func evaluate(state: Dictionary) -> bool:
+func evaluate(_state: Dictionary) -> bool:
 	return false

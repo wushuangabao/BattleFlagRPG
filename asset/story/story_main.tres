@@ -12,12 +12,12 @@ script = ExtResource("3_r116x")
 timeline = "timeline/timeline_test"
 var_name = "Folder.Var_test"
 id = "n1"
-name = ""
 position = Vector2(-180, -20)
 outputs = Dictionary[String, String]({
 "A": "n_d57315e1",
 "B": "n_mojiao"
 })
+name = ""
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://df2l5y3nftsnu"
 
@@ -26,11 +26,11 @@ script = ExtResource("3_r116x")
 timeline = "timeline_test_2"
 var_name = ""
 id = "n_mojiao"
-name = "B"
 position = Vector2(40, 180)
 outputs = Dictionary[String, String]({
 "out": "n_92b06edd"
 })
+name = "B"
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://df2l5y3nftsnu"
 
@@ -39,20 +39,20 @@ script = ExtResource("3_r116x")
 timeline = "timeline_test_1"
 var_name = ""
 id = "n_d57315e1"
-name = "A"
 position = Vector2(20, -40)
 outputs = Dictionary[String, String]({
 "out": "end_good"
 })
+name = "A"
 effects = Array[ExtResource("2_c2ac0")]([])
 
 [sub_resource type="Resource" id="Resource_fw4x2"]
 script = ExtResource("4_l7vwl")
 ending_id = "魔途启程"
 id = "end_dark"
-name = "m"
 position = Vector2(500, 80)
 outputs = Dictionary[String, String]({})
+name = "m"
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://ce2qotkg2fraf"
 
@@ -60,9 +60,9 @@ metadata/_custom_type_script = "uid://ce2qotkg2fraf"
 script = ExtResource("4_l7vwl")
 ending_id = "清修之路"
 id = "end_good"
-name = ""
 position = Vector2(300, -20)
 outputs = Dictionary[String, String]({})
+name = ""
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://ce2qotkg2fraf"
 
@@ -70,9 +70,9 @@ metadata/_custom_type_script = "uid://ce2qotkg2fraf"
 script = ExtResource("4_l7vwl")
 ending_id = "身死道消"
 id = "n_c411c04d"
-name = "s"
 position = Vector2(500, 240)
 outputs = Dictionary[String, String]({})
+name = "s"
 effects = Array[ExtResource("2_c2ac0")]([])
 
 [sub_resource type="Resource" id="Resource_m2vor"]
@@ -81,12 +81,12 @@ battle_name = "test"
 success = "m"
 fail = "s"
 id = "n_92b06edd"
-name = ""
 position = Vector2(280, 180)
 outputs = Dictionary[String, String]({
 "m": "end_dark",
 "s": "n_c411c04d"
 })
+name = ""
 effects = Array[ExtResource("2_c2ac0")]([])
 
 [resource]

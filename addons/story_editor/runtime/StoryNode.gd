@@ -1,17 +1,23 @@
 class_name StoryNode extends Resource
 
-@export var id: String = ""
-@export var name: String = ""
-@export var position: Vector2 = Vector2.ZERO # 编辑器中的位置
+@export_storage var id: String
+@export_storage var position: Vector2
+@export_storage var outputs: Dictionary[String, String]
 
-# 出口连线：出口名 -> 目标节点 id（最小实现）
-@export var outputs: Dictionary[String, String] = {} # { "out": "node_id", "A": "n2" }
+@export var name: String
 
 # 进入节点时执行的效果
-@export var effects: Array[ChoiceEffect] = [] # Array[Effect]
+@export var effects: Array[ChoiceEffect]
+
+# 确保每个实例拥有独立的容器，避免共享引用
+func _init() -> void:
+	outputs = {}
+	effects = []
 
 func get_output_port_names() -> Array:
-	return outputs.keys()
+	return outputs.keys() if outputs != null else []
 
 func get_next_for(port_name: String) -> String:
+	if outputs == null:
+		return ""
 	return outputs.get(port_name, "")
