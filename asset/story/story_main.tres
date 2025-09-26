@@ -1,92 +1,84 @@
-[gd_resource type="Resource" script_class="StoryGraph" load_steps=14 format=3 uid="uid://ddfd06ssdylco"]
+[gd_resource type="Resource" script_class="StoryGraph" load_steps=17 format=3 uid="uid://ddfd06ssdylco"]
 
 [ext_resource type="Script" uid="uid://bljb6dkpa3oam" path="res://addons/story_editor/runtime/StoryNode.gd" id="1_1faki"]
 [ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="2_c2ac0"]
 [ext_resource type="Script" uid="uid://df2l5y3nftsnu" path="res://addons/story_editor/node/DialogueNode.gd" id="3_r116x"]
+[ext_resource type="Resource" uid="uid://chei5pen0wq7w" path="res://asset/Dialogic/timeline/timeline_test.dtl" id="4_00is4"]
+[ext_resource type="Resource" uid="uid://cxvlyqqyh6c6g" path="res://asset/Dialogic/timeline/timeline_test_2.dtl" id="4_5iqrb"]
 [ext_resource type="Script" uid="uid://ce2qotkg2fraf" path="res://addons/story_editor/node/EndingNode.gd" id="4_l7vwl"]
 [ext_resource type="Script" uid="uid://kveh2dwxglja" path="res://addons/story_editor/node/BattleNode.gd" id="5_kaq4p"]
+[ext_resource type="Resource" uid="uid://dy4a8cd7eo6la" path="res://asset/Dialogic/timeline/timeline_test_1.dtl" id="5_mj656"]
 [ext_resource type="Script" uid="uid://bot004yitd8b0" path="res://addons/story_editor/runtime/StoryGraph.gd" id="6_8im30"]
+[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://asset/battle/map/test_battle_map.tscn" id="7_2f12m"]
 
 [sub_resource type="Resource" id="Resource_5fg8h"]
 script = ExtResource("3_r116x")
-timeline = "timeline/timeline_test"
+timeline = ExtResource("4_00is4")
 var_name = "Folder.Var_test"
 id = "n1"
-position = Vector2(-180, -20)
+position = Vector2(-220, -20)
 outputs = Dictionary[String, String]({
-"A": "n_d57315e1",
-"B": "n_mojiao"
+"A": "n_bfffdd83",
+"B": "n_a499480b"
 })
 name = ""
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://df2l5y3nftsnu"
 
-[sub_resource type="Resource" id="Resource_r116x"]
+[sub_resource type="Resource" id="Resource_l1061"]
 script = ExtResource("3_r116x")
-timeline = "timeline_test_2"
+timeline = ExtResource("5_mj656")
 var_name = ""
-id = "n_mojiao"
-position = Vector2(40, 180)
+id = "n_bfffdd83"
+position = Vector2(60, -60)
 outputs = Dictionary[String, String]({
-"out": "n_92b06edd"
-})
-name = "B"
-effects = Array[ExtResource("2_c2ac0")]([])
-metadata/_custom_type_script = "uid://df2l5y3nftsnu"
-
-[sub_resource type="Resource" id="Resource_6uq8v"]
-script = ExtResource("3_r116x")
-timeline = "timeline_test_1"
-var_name = ""
-id = "n_d57315e1"
-position = Vector2(20, -40)
-outputs = Dictionary[String, String]({
-"out": "end_good"
+"e1": "n_43dc4cdd"
 })
 name = "A"
 effects = Array[ExtResource("2_c2ac0")]([])
 
-[sub_resource type="Resource" id="Resource_fw4x2"]
-script = ExtResource("4_l7vwl")
-ending_id = "魔途启程"
-id = "end_dark"
-position = Vector2(500, 80)
-outputs = Dictionary[String, String]({})
-name = "m"
-effects = Array[ExtResource("2_c2ac0")]([])
-metadata/_custom_type_script = "uid://ce2qotkg2fraf"
-
-[sub_resource type="Resource" id="Resource_bb037"]
-script = ExtResource("4_l7vwl")
-ending_id = "清修之路"
-id = "end_good"
-position = Vector2(300, -20)
-outputs = Dictionary[String, String]({})
-name = ""
-effects = Array[ExtResource("2_c2ac0")]([])
-metadata/_custom_type_script = "uid://ce2qotkg2fraf"
-
-[sub_resource type="Resource" id="Resource_3tm8g"]
-script = ExtResource("4_l7vwl")
-ending_id = "身死道消"
-id = "n_c411c04d"
-position = Vector2(500, 240)
-outputs = Dictionary[String, String]({})
-name = "s"
-effects = Array[ExtResource("2_c2ac0")]([])
-
-[sub_resource type="Resource" id="Resource_m2vor"]
-script = ExtResource("5_kaq4p")
-battle_name = "test"
-success = "m"
-fail = "s"
-id = "n_92b06edd"
-position = Vector2(280, 180)
+[sub_resource type="Resource" id="Resource_5iqrb"]
+script = ExtResource("3_r116x")
+timeline = ExtResource("4_5iqrb")
+var_name = ""
+id = "n_a499480b"
+position = Vector2(40, 120)
 outputs = Dictionary[String, String]({
-"m": "end_dark",
-"s": "n_c411c04d"
+"b": "n_3f65641e"
 })
-name = ""
+name = "B"
+effects = Array[ExtResource("2_c2ac0")]([])
+
+[sub_resource type="Resource" id="Resource_mj656"]
+script = ExtResource("5_kaq4p")
+battle = ExtResource("7_2f12m")
+success = "e1"
+fail = "e2"
+id = "n_3f65641e"
+position = Vector2(260, 100)
+outputs = Dictionary[String, String]({
+"e1": "n_43dc4cdd",
+"e2": "n_6c6293fa"
+})
+name = "b"
+effects = Array[ExtResource("2_c2ac0")]([])
+
+[sub_resource type="Resource" id="Resource_pvgde"]
+script = ExtResource("4_l7vwl")
+ending_id = "eee"
+id = "n_43dc4cdd"
+position = Vector2(480, -100)
+outputs = Dictionary[String, String]({})
+name = "e1"
+effects = Array[ExtResource("2_c2ac0")]([])
+
+[sub_resource type="Resource" id="Resource_q7nag"]
+script = ExtResource("4_l7vwl")
+ending_id = "qqq"
+id = "n_6c6293fa"
+position = Vector2(540, 40)
+outputs = Dictionary[String, String]({})
+name = "e2"
 effects = Array[ExtResource("2_c2ac0")]([])
 
 [resource]
@@ -94,5 +86,5 @@ script = ExtResource("6_8im30")
 id = "main"
 title = "MAIN"
 entry_node = "n1"
-nodes = Array[ExtResource("1_1faki")]([SubResource("Resource_5fg8h"), SubResource("Resource_r116x"), SubResource("Resource_6uq8v"), SubResource("Resource_fw4x2"), SubResource("Resource_bb037"), SubResource("Resource_3tm8g"), SubResource("Resource_m2vor")])
+nodes = Array[ExtResource("1_1faki")]([SubResource("Resource_5fg8h"), SubResource("Resource_l1061"), SubResource("Resource_5iqrb"), SubResource("Resource_mj656"), SubResource("Resource_pvgde"), SubResource("Resource_q7nag")])
 metadata/_custom_type_script = "uid://bot004yitd8b0"

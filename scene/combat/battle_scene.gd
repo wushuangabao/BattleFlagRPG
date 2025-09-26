@@ -122,8 +122,8 @@ func _enter_tree() -> void:
 	# Game.g_event.register_event(destination, on_event)
 	my_system.on_battle_start()
 
-func load_battle_map(map_name: String) -> bool:
-	var new_node := await subvp.loadScene_battleMap(map_name)
+func load_battle_map(map: PackedScene) -> bool:
+	var new_node := await subvp.loadScene_battleMap(map)
 	if new_node == null:
 		return false
 	ground_layer = new_node.ground

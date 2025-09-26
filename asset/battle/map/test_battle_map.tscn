@@ -1,21 +1,21 @@
 [gd_scene load_steps=9 format=4 uid="uid://dp0j1m0xqlrck"]
 
-[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://scene/combat/map/test/BattleMap.gd" id="1_o8354"]
-[ext_resource type="Script" uid="uid://bsvowqsb6lmf0" path="res://scene/combat/map/test/test_winChecker.gd" id="2_bxxp4"]
+[ext_resource type="Script" uid="uid://dfhryo2ttkqg8" path="res://script/combat/Map/BattleMap.gd" id="1_o8354"]
+[ext_resource type="Script" uid="uid://bsvowqsb6lmf0" path="res://script/combat/Map/test_winChecker.gd" id="2_bxxp4"]
 [ext_resource type="Script" uid="uid://dpsqnsulag2qx" path="res://script/util/evaluator/ScriptEvaluator.gd" id="3_soc4e"]
 [ext_resource type="Texture2D" uid="uid://cv118puq1dpgq" path="res://asset/png/map/grass_background.png" id="4_gqv0a"]
-[ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/tres/battle.tres" id="5_2f7ip"]
+[ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/battle/battle.tres" id="5_2f7ip"]
 [ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/layer/ground.gd" id="6_1pl78"]
 [ext_resource type="Script" uid="uid://bbtjguud5g6kt" path="res://script/util/layer/flaglayer.gd" id="7_85oxp"]
 
-[sub_resource type="Resource" id="Resource_8vyxb"]
+[sub_resource type="Resource" id="Resource_yp0ia"]
 script = ExtResource("3_soc4e")
 my_script = ExtResource("2_bxxp4")
 metadata/_custom_type_script = "uid://dpsqnsulag2qx"
 
 [node name="CanvasLayer" type="CanvasLayer"]
 script = ExtResource("1_o8354")
-win_checker = SubResource("Resource_8vyxb")
+lose_checker = SubResource("Resource_yp0ia")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(633, 405)

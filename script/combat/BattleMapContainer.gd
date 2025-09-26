@@ -1,28 +1,29 @@
 class_name BattleMapContainer
 extends SubViewport
 
-@export var packed_scene: PackedSceneDictionary # 每添加一个战斗地图，都要在这个字典里加上（todo 改成在StoryGraph里的BattleNode中配置）
-
-# 当前地图名称
-var _current_scene: String
+# 当前地图场景资源
+var _current_scene: PackedScene
 
 # 开始战斗（切换地图）
-func loadScene_battleMap(scene_name: StringName) -> BattleMap:
-	if _current_scene and _current_scene == scene_name:
+func loadScene_battleMap(scene_map: PackedScene) -> BattleMap:
+	if _current_scene and _current_scene == scene_map:
 		return get_child(0)
 	# 动态加载场景
-	if packed_scene.exists(scene_name):
-		var scene = packed_scene.get_scene(scene_name).instantiate()
-		if scene:
-			_current_scene = scene_name
-			add_child(scene)
-			await scene.battle_map_ready
-			return scene
-	else:
-		push_error("loadScene_battleMap, not find ", scene_name)
+	var scene = scene_map.instantiate()
+	if scene:
+		if not scene is BattleMap:
+			push_error("加载失败，这个场景不是BattleMap：", scene_map.get_path())
+			return null
+		_current_scene = scene_map
+		if get_child_count() > 0:
+			get_child(0).queue_free() # 释放当前场景
+		add_child(scene)
+		await scene.battle_map_ready
+		return scene
+	push_error("无法实例化场景：", scene_map.get_path())
 	return null
 
 func release_battleMap() -> void:
 	if get_child_count() > 0:
-		_current_scene = ""
+		_current_scene = null
 		get_child(0).queue_free() # 释放当前场景

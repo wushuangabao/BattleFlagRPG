@@ -82,7 +82,7 @@ func _goto(node_id: String) -> void:
 				print("预览模式，直接胜利。")
 				_goto(node.get_next_for(node.success))
 			else:
-				Game.g_scenes.start_battle(node.battle_name)
+				Game.g_scenes.start_battle(node.battle)
 		&"ChoiceNode":                               # 选项（场景中卡片，非对话）
 			var options := PackedStringArray()
 			node = node as ChoiceNode

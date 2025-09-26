@@ -4,9 +4,11 @@ enum BattleState {
 	Uninit, Init, Prepare, Wait, ActorIdle, ChoseActionTarget, ActorDoAction, AtEnd
 }
 
+var _cur_state := BattleState.Uninit
+
 var scene : BattleScene = null
-var _cur_battle_name := ""
-var _cur_state       := BattleState.Uninit
+var _cur_battle_path  := ""
+var _cur_battle_scene : PackedScene = null
 
 var _turn_controller : TurnController
 var _buff_system : BuffSystem
@@ -208,12 +210,16 @@ func on_actor_mp_changed(actor, new_mp, old_mp):
 #region 装载相关
 
 # 开始战斗时，由 SceneManager 调用
-func init_with_battle_name(battle_name: StringName) -> void:
-	if _cur_battle_name != battle_name:
+func init_with_battle_scene(battle_scene: PackedScene) -> void:
+	if _cur_battle_scene != battle_scene:
 		_cur_state = BattleState.Init
 		_actors.clear()
 		_cell_map.clear()
-		_cur_battle_name = battle_name
+		_cur_battle_scene = battle_scene
+		if battle_scene:
+			_cur_battle_path = battle_scene.get_path()
+		else:
+			_cur_battle_path = ""
 
 # 节点首次加载到场景树完毕时，由 BattleScene 调用
 func init_with_scene_node(node: BattleScene) -> void:
@@ -226,8 +232,8 @@ func init_with_scene_node(node: BattleScene) -> void:
 	print("战斗系统已经初始化")
 
 func on_battle_start() -> void:
-	print("战斗场景已添加，开始加载地图：", _cur_battle_name)
-	if _cur_battle_name.is_empty():
+	print("战斗场景已添加，开始加载地图：", _cur_battle_path)
+	if _cur_battle_path.is_empty() or _cur_battle_scene == null:
 		push_error("on_battle_start but battle_name is empty")
 		return
 	if scene == null:
@@ -240,14 +246,15 @@ func on_battle_start() -> void:
 	set_battle_seed(_battle_seed)
 	clear_replay_data()
 	
-	var ok = await scene.load_battle_map(_cur_battle_name)
+	var ok = await scene.load_battle_map(_cur_battle_scene)
 	if ok:
 		create_initial_units_on_battle_map()
 		scene.timeline.start()
 		_cur_state = BattleState.Wait
 	else:
-		print("加载地图失败：", _cur_battle_name)
-		_cur_battle_name = ""
+		print("加载地图失败：", _cur_battle_path)
+		_cur_battle_path = ""
+		_cur_battle_scene = null
 
 func on_battle_end(player_victory: bool) -> void:
 	send_event("battle_end", player_victory)
@@ -261,13 +268,13 @@ func create_initial_units_on_battle_map() -> void:
 	var flag_units = map.get_flag_units()
 	for unit_name in flag_units.keys():
 		if actor_manager.actors.exists(unit_name) == false:
-			push_warning("地图 ", _cur_battle_name, " 中的 unit: ", unit_name, " 是不存在的角色！")
+			push_warning("地图 ", _cur_battle_path, " 中的 unit: ", unit_name, " 是不存在的角色！")
 			continue
 		var actor : ActorController = actor_manager.get_actor_by_name(unit_name)
 		var template : PackedScene = actor_manager.actors.get_scene(unit_name)
 		var cells = flag_units[unit_name] as Array
 		if actor and cells.size() > 1:
-			push_error("地图 ", _cur_battle_name, " 中的 unit: ", unit_name, " 不能放置超过1个！自动删除到只剩1个")
+			push_error("地图 ", _cur_battle_path, " 中的 unit: ", unit_name, " 不能放置超过1个！自动删除到只剩1个")
 			for i in range(cells.size() - 1, 0, -1):
 				cells.remove_at(i)
 		for cell in cells:
@@ -297,7 +304,7 @@ func on_battle_map_unload() -> void:
 	for a in _actors:
 		if Game.g_actors.is_character(a.base3d):
 			a.base3d.remove_child(a)
-	init_with_battle_name("")
+	init_with_battle_scene(null)
 	_turn_controller.timeline.clear_on_change_scene()
 	_turn_controller.set_battle_teams([], [])
 

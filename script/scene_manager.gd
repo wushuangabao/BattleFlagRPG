@@ -21,10 +21,13 @@ func _ready() -> void:
 	print("场景管理器初始化完毕")
 
 # 开始战斗
-func start_battle(battle_name: StringName) -> void:
-	_origin_scene = get_child(0)
-	remove_child(_origin_scene)
-	Game.g_combat.init_with_battle_name(battle_name)
+func start_battle(battle_scene: PackedScene) -> void:
+	if get_child_count() > 0:
+		_origin_scene = get_child(0)
+		remove_child(_origin_scene)
+	else:
+		push_warning("start_battle but origin scene is null. It should not happen.")
+	Game.g_combat.init_with_battle_scene(battle_scene)
 	goto_scene(&"BattleScene")
 
 # 回到战斗前的场景
@@ -35,6 +38,8 @@ func back_to_origin_scene() -> void:
 		old_scene.call_deferred(&"release_on_change_scene")
 		add_child(_origin_scene)
 		_origin_scene = null
+	else:
+		push_warning("back_to_origin_scene but origin scene is null. It should not happen.")
 
 # 切换场景
 func goto_scene(scene_name: StringName) -> void:

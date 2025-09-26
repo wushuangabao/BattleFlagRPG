@@ -274,12 +274,6 @@ func _set_dialogue_node(gn: GraphNode, n: DialogueNode, is_new: bool = false):
 	gn.set_slot(0, true, 0, Color.WHITE, true, 0, Color.WHITE)
 
 func _set_battle_node(gn: GraphNode, n: BattleNode, is_new: bool = false):
-	var battle_name = LineEdit.new()
-	battle_name.placeholder_text = "battle_name"
-	if not is_new:
-		battle_name.text = n.battle_name
-	battle_name.text_changed.connect(func(t): n.battle_name = t)
-	gn.add_child(battle_name)
 	var success = LineEdit.new()
 	success.placeholder_text = "success"
 	if not is_new:
@@ -393,9 +387,6 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 				"name":
 					if child.text != n.name:
 						child.text = n.name
-				"battle_name":
-					if n is BattleNode:
-						child.text = (n as BattleNode).battle_name
 				"success":
 					if n is BattleNode:
 						child.text = (n as BattleNode).success

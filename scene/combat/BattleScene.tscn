@@ -1,13 +1,11 @@
-[gd_scene load_steps=49 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=46 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
-[ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://scene/combat/map/test/test_battle_map.tscn" id="3_ldyea"]
-[ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_hqoxg"]
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/Timeline/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/Timeline/TurnController.gd" id="6_wwrlq"]
-[ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://scene/combat/sprite_timeline.tscn" id="7_1h76q"]
+[ext_resource type="PackedScene" uid="uid://bu2b3qlmtaw2p" path="res://asset/battle/sprite_timeline.tscn" id="7_1h76q"]
 [ext_resource type="Texture2D" uid="uid://bvndynxhey5fa" path="res://asset/png/icon/timeline_under.png" id="7_7hkn4"]
 [ext_resource type="Script" uid="uid://dg2vdfjs5rfq6" path="res://script/combat/UI_Area_Detector.gd" id="7_vpcar"]
 [ext_resource type="Texture2D" uid="uid://cots27xjnybp1" path="res://asset/png/ui/battle_panel.png" id="7_yhjk3"]
@@ -18,7 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="9_te81e"]
 [ext_resource type="Texture2D" uid="uid://bdb84ei0lalcw" path="res://asset/png/ui/battle_panel_mp.png" id="10_4nkfg"]
 [ext_resource type="Script" uid="uid://n7wcdg7p08l2" path="res://script/ui/btn_attack.gd" id="10_c23fh"]
-[ext_resource type="PackedScene" uid="uid://vb2dibitntmx" path="res://scene/combat/green_box_timeline.tscn" id="11_8xf8q"]
+[ext_resource type="PackedScene" uid="uid://vb2dibitntmx" path="res://asset/battle/green_box_timeline.tscn" id="11_8xf8q"]
 [ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="13_662wh"]
 [ext_resource type="Script" uid="uid://ba0gvnqsvcpa" path="res://script/ui/btn_action.gd" id="14_4gioj"]
 [ext_resource type="Script" uid="uid://byxtnaoo2710d" path="res://script/combat/Action/ActionDefend.gd" id="14_dwjhn"]
@@ -33,13 +31,6 @@
 [ext_resource type="Texture2D" uid="uid://dtidltf1cren6" path="res://asset/png/icon/arrow-upleft.png" id="31_hexu1"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wponv"]
-
-[sub_resource type="Resource" id="Resource_dwjhn"]
-script = ExtResource("4_hqoxg")
-packed_scene = Dictionary[StringName, PackedScene]({
-&"test": ExtResource("3_ldyea")
-})
-metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
 [sub_resource type="LabelSettings" id="LabelSettings_4nkfg"]
 font_size = 15
@@ -164,7 +155,6 @@ mesh = SubResource("PlaneMesh_wponv")
 size = Vector2i(1280, 720)
 render_target_update_mode = 4
 script = ExtResource("3_4gioj")
-packed_scene = SubResource("Resource_dwjhn")
 
 [node name="TurnController" type="Node" parent="."]
 script = ExtResource("6_wwrlq")

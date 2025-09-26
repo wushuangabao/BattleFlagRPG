@@ -87,13 +87,42 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-scroll_offset = Vector2(-24, 0)
 right_disconnects = true
 connections = Array[Dictionary]([{
 "from_node": &"n1",
 "from_port": 0,
 "keep_alive": false,
 "to_node": &"n_b895a015",
+"to_port": 0
+}, {
+"from_node": &"n1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_14febab4",
+"to_port": 0
+}, {
+"from_node": &"n_b895a015",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_8b4978e2",
+"to_port": 0
+}, {
+"from_node": &"n_14febab4",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_5be80736",
+"to_port": 0
+}, {
+"from_node": &"n_5be80736",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_8b4978e2",
+"to_port": 0
+}, {
+"from_node": &"n_5be80736",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_5fc6e349",
 "to_port": 0
 }])
 
