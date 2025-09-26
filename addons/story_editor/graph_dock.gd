@@ -13,6 +13,7 @@ extends Window
 @export var btn_add_choice: Button
 @export var btn_add_end: Button
 
+@export var btn_edit: Button
 @export var btn_delete: Button
 @export var btn_undo: Button
 @export var btn_play: Button
@@ -34,6 +35,7 @@ func _ready():
 	btn_add_choice.pressed.connect(func(): _add_node_ui(ChoiceNode))
 	btn_add_end.pressed.connect(func(): _add_node_ui(EndingNode))
 	
+	btn_edit.pressed.connect(_on_edit_pressed)
 	btn_delete.pressed.connect(_on_delete_pressed)
 	btn_undo.pressed.connect(_on_undo_pressed)
 	btn_play.pressed.connect(_on_preview)
@@ -355,18 +357,30 @@ func _show_delete_confirmation():
 	)
 	# 显示对话框
 	dialog.popup_centered()
-		
-func _delete_selected_nodes():
-	if graph_res == null:
-		return
-		
-	var selected_nodes = []
 	
-	# 收集所有选中的节点
+func _on_edit_pressed():
+	var selected_nodes = []
 	for child in graph_edit.get_children():
 		if child is GraphNode and child.selected:
 			selected_nodes.append(child)
+			if selected_nodes.size() > 1:
+				return
+	if selected_nodes.size() == 0:
+		return
+	var node_res = _find_res_node(selected_nodes[0].name)
+	if node_res:
+		_sync_to_resource()
+		EditorInterface.edit_resource(node_res)
 	
+func _delete_selected_nodes():
+	if graph_res == null:
+		return
+	
+	# 收集所有选中的节点
+	var selected_nodes = []
+	for child in graph_edit.get_children():
+		if child is GraphNode and child.selected:
+			selected_nodes.append(child)
 	if selected_nodes.size() == 0:
 		return
 		

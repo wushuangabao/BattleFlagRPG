@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StoryGraph" load_steps=16 format=3 uid="uid://blwr216gupj3a"]
+[gd_resource type="Resource" script_class="StoryGraph" load_steps=19 format=3 uid="uid://blwr216gupj3a"]
 
 [ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="1_1faki"]
 [ext_resource type="Script" uid="uid://bljb6dkpa3oam" path="res://addons/story_editor/runtime/StoryNode.gd" id="1_6uq8v"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://df2l5y3nftsnu" path="res://addons/story_editor/node/DialogueNode.gd" id="3_fw4x2"]
 [ext_resource type="Script" uid="uid://kveh2dwxglja" path="res://addons/story_editor/node/BattleNode.gd" id="4_bb037"]
 [ext_resource type="Script" uid="uid://ce2qotkg2fraf" path="res://addons/story_editor/node/EndingNode.gd" id="5_3tm8g"]
+[ext_resource type="Script" uid="uid://6cwwq3vlqmom" path="res://addons/story_editor/runtime/Choice.gd" id="6_3tm8g"]
 [ext_resource type="Script" uid="uid://bt5f6py66e084" path="res://addons/story_editor/node/ChoiceNode.gd" id="6_bb037"]
 
 [sub_resource type="Resource" id="Resource_5fg8h"]
@@ -14,7 +15,7 @@ timeline = "timeline/timeline_test"
 var_name = "Folder.Var_test"
 id = "n1"
 name = ""
-position = Vector2(-180, -20)
+position = Vector2(-280, 40)
 outputs = Dictionary[String, String]({
 "A": "n_d57315e1",
 "B": "n_mojiao"
@@ -90,13 +91,30 @@ outputs = Dictionary[String, String]({
 })
 effects = Array[ExtResource("1_1faki")]([])
 
+[sub_resource type="Resource" id="Resource_q7nag"]
+script = ExtResource("6_3tm8g")
+text = "战斗！"
+text_disabled = ""
+effects = Array[ExtResource("1_1faki")]([])
+port = "out"
+metadata/_custom_type_script = "uid://6cwwq3vlqmom"
+
+[sub_resource type="Resource" id="Resource_2qh0w"]
+script = ExtResource("6_3tm8g")
+text = "屈服"
+text_disabled = ""
+effects = Array[ExtResource("1_1faki")]([])
+port = "m"
+metadata/_custom_type_script = "uid://6cwwq3vlqmom"
+
 [sub_resource type="Resource" id="Resource_pvgde"]
 script = ExtResource("6_bb037")
-choices = Array[Dictionary]([{}])
+choices = Array[ExtResource("6_3tm8g")]([SubResource("Resource_q7nag"), SubResource("Resource_2qh0w")])
 id = "n_c317683c"
 name = ""
-position = Vector2(120, 220)
+position = Vector2(100, 180)
 outputs = Dictionary[String, String]({
+"m": "end_dark",
 "out": "n_92b06edd"
 })
 effects = Array[ExtResource("1_1faki")]([])

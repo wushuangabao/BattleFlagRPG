@@ -73,14 +73,16 @@ func _goto(node_id: String) -> void:
 				Game.g_scenes.start_battle(node.battle_name)
 		&"ChoiceNode":                               # 选项（场景中卡片，非对话）
 			var options := PackedStringArray()
-			for c_dict in node.choices:
+			node = node as ChoiceNode
+			for chosen in node.choices:
 				var enabled := true
-				if c_dict.has("condition") and c_dict["condition"] != null:
-					enabled = (c_dict["condition"] as Evaluator).evaluate(state)
+				if chosen.condition != null:
+					enabled = chosen.condition.evaluate(state)
 				if enabled:
-					options.append(String(c_dict.get("text", "")))
+					options.append(chosen.text)
 				else:
-					options.append(String(c_dict.get("text_disabled", "Locked Yet")))
+					var txt = chosen.text_diabled if not chosen.text_disabled.is_empty else "Locked Yet"
+					options.append(txt)
 			emit_signal("choice_requested", node as ChoiceNode, options)
 		&"EndingNode":                               # 结局（游戏结束）
 			emit_signal("game_ended", node.ending_id)
@@ -108,8 +110,8 @@ func choose(index: int) -> void:
 		return
 	var chosen := node.choices[index]
 	# 选项效果
-	if chosen.has("effects"):
-		_apply_effects(chosen["effects"])
+	if chosen.effects != null:
+		_apply_effects(chosen.effects)
 	# 跳转
 	var port_name := chosen.port
 	var target := node.get_next_for(port_name)

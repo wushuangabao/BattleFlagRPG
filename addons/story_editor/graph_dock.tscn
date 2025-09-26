@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cftnpfjca6dqb" path="res://addons/story_editor/graph_dock.gd" id="1"]
 
-[node name="StoryGraph" type="Window" node_paths=PackedStringArray("graph_edit", "btn_new", "btn_load", "btn_save", "btn_set_entry", "btn_add_dlg", "btn_add_battle", "btn_add_choice", "btn_add_end", "btn_delete", "btn_undo", "btn_play")]
+[node name="StoryGraph" type="Window" node_paths=PackedStringArray("graph_edit", "btn_new", "btn_load", "btn_save", "btn_set_entry", "btn_add_dlg", "btn_add_battle", "btn_add_choice", "btn_add_end", "btn_edit", "btn_delete", "btn_undo", "btn_play")]
 position = Vector2i(0, 36)
 size = Vector2i(600, 300)
 exclusive = true
@@ -17,6 +17,7 @@ btn_add_dlg = NodePath("VBoxContainer/Toolbar/AddDialogue")
 btn_add_battle = NodePath("VBoxContainer/Toolbar/AddBattleBtn")
 btn_add_choice = NodePath("VBoxContainer/Toolbar/AddChoice")
 btn_add_end = NodePath("VBoxContainer/Toolbar/AddEnding")
+btn_edit = NodePath("VBoxContainer/Toolbar/EditBtn")
 btn_delete = NodePath("VBoxContainer/Toolbar/DelBtn")
 btn_undo = NodePath("VBoxContainer/Toolbar/UndoBtn")
 btn_play = NodePath("VBoxContainer/Toolbar/PlayBtn")
@@ -57,11 +58,16 @@ text = "+战斗"
 
 [node name="AddChoice" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
-text = "+选项"
+text = "+分支"
 
 [node name="AddEnding" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 text = "+结局"
+
+[node name="EditBtn" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+tooltip_text = "在Inspector面板中编辑"
+text = "编辑"
 
 [node name="DelBtn" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
@@ -97,7 +103,7 @@ connections = Array[Dictionary]([{
 "from_node": &"n_mojiao",
 "from_port": 0,
 "keep_alive": false,
-"to_node": &"n_92b06edd",
+"to_node": &"n_c317683c",
 "to_port": 0
 }, {
 "from_node": &"n_d57315e1",
@@ -116,5 +122,11 @@ connections = Array[Dictionary]([{
 "from_port": 0,
 "keep_alive": false,
 "to_node": &"n_c411c04d",
+"to_port": 0
+}, {
+"from_node": &"n_c317683c",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_92b06edd",
 "to_port": 0
 }])
