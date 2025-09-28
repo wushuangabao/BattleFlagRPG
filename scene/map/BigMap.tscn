@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=4 uid="uid://datpgnyw8dvwa"]
 
 [ext_resource type="Texture2D" uid="uid://cn42efyewbr8i" path="res://asset/png/map/world.png" id="1_hxm1c"]
-[ext_resource type="Script" uid="uid://durpyhsxpppj3" path="res://scene/ui/big_map.gd" id="1_wlwro"]
+[ext_resource type="Script" uid="uid://durpyhsxpppj3" path="res://scene/map/big_map.gd" id="1_wlwro"]
 [ext_resource type="TileSet" uid="uid://dycc0vdai3viu" path="res://asset/battle/battle.tres" id="2_g43hy"]
 [ext_resource type="Script" uid="uid://clpytwmgjbf4h" path="res://script/util/layer/ground.gd" id="3_eiqjw"]
 [ext_resource type="Texture2D" uid="uid://c17gk8jxbpogq" path="res://asset/png/character/animation/test_run_3.png" id="5_wlwro"]
@@ -92,9 +92,5 @@ speed_scale = 3.0
 script = ExtResource("12_1s3vn")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
-limit_left = 0
-limit_top = 0
-limit_right = 1536
-limit_bottom = 1024
 limit_smoothed = true
 position_smoothing_enabled = true

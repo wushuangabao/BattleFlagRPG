@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SceneData" load_steps=7 format=3 uid="uid://c18djaegv756j"]
+
+[ext_resource type="Texture2D" uid="uid://yg5haa1ohvo6" path="res://icon.svg" id="1_4sw7n"]
+[ext_resource type="Script" uid="uid://ba5pocl2biuj" path="res://script/scene/SceneBtnData.gd" id="1_lgkvs"]
+[ext_resource type="Texture2D" uid="uid://bu6hl0rfdc6pb" path="res://asset/png/full_screen/outputs_20250922_17585380573885200_result_00632__c2fbdaf51a.png" id="2_8hh7j"]
+[ext_resource type="Script" uid="uid://bjolqxvxn6r0d" path="res://script/scene/SceneData.gd" id="2_nbnhv"]
+[ext_resource type="Texture2D" uid="uid://cgjd1d5b3rlli" path="res://asset/png/ui/main_menu_btn_new.png" id="4_8hh7j"]
+
+[sub_resource type="Resource" id="Resource_4advk"]
+script = ExtResource("1_lgkvs")
+name = &"1111"
+texture = ExtResource("4_8hh7j")
+position = Vector2(0, 0)
+size = Vector2(120, 48)
+tooltip = ""
+enabled = true
+visible = true
+anchor_center = false
+metadata/_custom_type_script = "uid://ba5pocl2biuj"
+
+[resource]
+script = ExtResource("2_nbnhv")
+id = &""
+background = ExtResource("2_8hh7j")
+buttons = Array[ExtResource("1_lgkvs")]([SubResource("Resource_4advk")])
+show_back_button = true
+back_button_texture = ExtResource("1_4sw7n")
+back_button_position = Vector2(24, 24)
+back_button_size = Vector2(64, 64)
+back_button_tooltip = "返回"
+design_size = Vector2(1456, 816)
+keep_aspect = true
+metadata/_custom_type_script = "uid://bjolqxvxn6r0d"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://b2wub0ms8es6m"]
+[gd_scene load_steps=25 format=3 uid="uid://b2wub0ms8es6m"]
 
 [ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
 [ext_resource type="Script" uid="uid://dmnygjeo673qb" path="res://addons/story_editor/runtime/StoryRunner.gd" id="1_7ftmx"]
@@ -17,7 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://diqul6ouvfb8u" path="res://asset/png/character/face64/5.png" id="8_6okl4"]
 [ext_resource type="Texture2D" uid="uid://br6rbubcmpua8" path="res://asset/png/character/face64/6.png" id="11_w73ac"]
 [ext_resource type="PackedScene" uid="uid://skvo00upkv2p" path="res://scene/combat/BattleScene.tscn" id="14_cg8ds"]
-[ext_resource type="PackedScene" uid="uid://datpgnyw8dvwa" path="res://scene/ui/BigMap.tscn" id="15_hr58s"]
+[ext_resource type="PackedScene" uid="uid://cg52b7bjdq2th" path="res://scene/ui/SceneViewer.tscn" id="15_cg8ds"]
 [ext_resource type="Script" uid="uid://bqc6eh2635fpr" path="res://script/ui/mouse_sprite.gd" id="17_7ftmx"]
 [ext_resource type="Texture2D" uid="uid://kwvofq4rb22m" path="res://asset/png/icon/arrow-finger-border.png" id="17_7sjor"]
 
@@ -31,20 +31,43 @@ packed_scene = Dictionary[StringName, PackedScene]({
 })
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 
-[sub_resource type="Resource" id="Resource_4cigq"]
-script = ExtResource("4_4cigq")
-packed_scene = Dictionary[StringName, PackedScene]({
-&"MainMenu": ExtResource("6_qto5f")
-})
-metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+[sub_resource type="Animation" id="Animation_ssind"]
+resource_name = "fade_in"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
 
-[sub_resource type="Resource" id="Resource_0ybkd"]
-script = ExtResource("4_4cigq")
-packed_scene = Dictionary[StringName, PackedScene]({
-&"BattleScene": ExtResource("14_cg8ds"),
-&"BigMap": ExtResource("15_hr58s")
-})
-metadata/_custom_type_script = "uid://djwdy5wvw0nri"
+[sub_resource type="Animation" id="Animation_aextg"]
+resource_name = "fade_out"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wk762"]
+_data = {
+&"fade_in": SubResource("Animation_ssind"),
+&"fade_out": SubResource("Animation_aextg")
+}
 
 [node name="Game" type="Node"]
 
@@ -61,8 +84,9 @@ timeline_icons = Dictionary[StringName, Texture2D]({
 
 [node name="SceneManager" type="Node" parent="."]
 script = ExtResource("2_e7hha")
-packed_scene = SubResource("Resource_4cigq")
-scene_cached = SubResource("Resource_0ybkd")
+main_scene = ExtResource("6_qto5f")
+battle_scene = ExtResource("14_cg8ds")
+sceneviewer_scene = ExtResource("15_cg8ds")
 
 [node name="StoryRunner" type="Node" parent="."]
 script = ExtResource("1_7ftmx")
@@ -99,6 +123,21 @@ script = ExtResource("17_7ftmx")
 texture_normal = ExtResource("17_7sjor")
 offset_fix = Vector2(0, -1)
 particle_color = Color(1, 0.839216, 0.192157, 1)
+
+[node name="FadeRect" type="ColorRect" parent="."]
+modulate = Color(0, 0, 0, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_wk762")
+}
 
 [connection signal="pressed" from="CanvasLayer/debug/Btn_Battle" to="CanvasLayer/debug/Btn_Battle" method="_on_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Btn_BigMap" to="CanvasLayer/debug/Btn_BigMap" method="_on_pressed"]

@@ -136,7 +136,7 @@ func load_battle_map(map: PackedScene) -> bool:
 	_configure_board_plane()
 	_hook_subviewport_texture_to_plane()
 	subvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	print("战斗地图加载完毕 - ", subvp._current_scene)
+	print("战斗地图加载完毕 - ", subvp.get_cur_scene_path())
 	return true
 
 func _configure_board_plane() -> void:

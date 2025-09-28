@@ -1,0 +1,74 @@
+[gd_scene load_steps=4 format=3 uid="uid://cg52b7bjdq2th"]
+
+[ext_resource type="Script" uid="uid://dtb1k6150dl03" path="res://script/scene/SceneViewer.gd" id="1_ssind"]
+[ext_resource type="Texture2D" uid="uid://bohxon6rn71yr" path="res://asset/png/ui/main_menu_btn_exit.png" id="2_wk762"]
+[ext_resource type="Texture2D" uid="uid://cgjd1d5b3rlli" path="res://asset/png/ui/main_menu_btn_new.png" id="3_tpymy"]
+
+[node name="SceneViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ssind")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackButton" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -128.0
+offset_top = -64.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("2_wk762")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.48
+anchor_right = 1.0
+anchor_bottom = 0.52
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="TextureButton1" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+texture_normal = ExtResource("3_tpymy")
+
+[node name="TextureButton2" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+texture_normal = ExtResource("3_tpymy")
+
+[node name="TextureButton3" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+texture_normal = ExtResource("3_tpymy")
+
+[node name="TextureButton4" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+texture_normal = ExtResource("3_tpymy")
+
+[node name="TextureButton5" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+texture_normal = ExtResource("3_tpymy")
+
+[node name="Audio" type="AudioStreamPlayer" parent="."]
+
+[node name="SFX" type="AudioStreamPlayer" parent="."]
+
+[connection signal="pressed" from="BackButton" to="." method="_on_back_pressed"]
