@@ -11,14 +11,12 @@ func show_scene(data: SceneData) -> void:
 	stack.clear()
 	stack.append(data)
 	(viewer as Node).call("set_scene_data", data)
-	_show_viewer()
 
 func push_scene(data: SceneData) -> void:
 	if data == null:
 		return
 	stack.push_back(data)
 	(viewer as Node).call("set_scene_data", data)
-	_show_viewer()
 
 func pop_scene() -> void:
 	if stack.size() <= 1:
@@ -28,11 +26,24 @@ func pop_scene() -> void:
 	stack.pop_back()
 	var top : SceneData = stack.back()
 	(viewer as Node).call("set_scene_data", top)
-	_show_viewer()
 
 func current_scene() -> SceneData:
 	return stack.back() if stack.size() > 0 else null	
 
-func _show_viewer() -> void:
-	if viewer:
-		viewer.visible = true
+func is_root_scene() -> bool:
+	return stack.size() == 1
+
+func on_enter_scene_or_story() -> bool:
+	if viewer.current_data.story_choices.size() > 0:
+		if Game.g_runner and Game.g_runner.graph:
+			var cur_story_graph = Game.g_runner.graph
+			var valid_choices: Array[Choice] = []
+			for choice in viewer.current_data.story_choices:
+				if choice.story_graph == cur_story_graph:
+					valid_choices.append(choice.associate_c)
+			if valid_choices.size() > 0:
+				var chosen_i = randi_range(0, valid_choices.size() - 1)
+				if Game.g_runner.choose(valid_choices[chosen_i]):
+					return true
+	viewer.show_buttons()
+	return false

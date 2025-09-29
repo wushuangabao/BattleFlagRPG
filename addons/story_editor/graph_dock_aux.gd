@@ -138,7 +138,13 @@ func _on_undo_pressed():
 						graph_edit.connect_node(conn.from, conn.from_port, conn.to, conn.to_port)
 						var from_res = owner._find_res_node(conn.from)
 						if from_res != null:
-							from_res.outputs["out"] = conn.to
+							if from_res is BattleNode:
+								if conn.from_port == 0:
+									from_res.success = conn.to
+								elif conn.from_port == 1:
+									from_res.fail = conn.to		
+							elif from_res is ChoiceNode:
+								from_res.choices[conn.from_port].port = conn.to
 				elif conn.has("ref_node"):
 					var ref_node = owner._find_res_node(conn.ref_node)
 					if ref_node != null:

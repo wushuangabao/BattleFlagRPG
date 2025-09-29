@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="SceneData" load_steps=5 format=3 uid="uid://cvah7mhbncs8y"]
+[gd_resource type="Resource" script_class="SceneData" load_steps=6 format=3 uid="uid://cvah7mhbncs8y"]
 
 [ext_resource type="Script" uid="uid://ba5pocl2biuj" path="res://script/scene/SceneBtnData.gd" id="1_xno6h"]
 [ext_resource type="Texture2D" uid="uid://yg5haa1ohvo6" path="res://icon.svg" id="1_ynu3i"]
 [ext_resource type="Texture2D" uid="uid://tpwrljnjo5q5" path="res://asset/png/full_screen/outputs_20250922_17585380481508643_result_00537__49a4cf4e09.png" id="2_og0kc"]
 [ext_resource type="Script" uid="uid://bjolqxvxn6r0d" path="res://script/scene/SceneData.gd" id="2_ryy2u"]
+[ext_resource type="Script" uid="uid://q1odte263lca" path="res://script/scene/StoryChoicePort.gd" id="5_og0kc"]
 
 [resource]
 script = ExtResource("2_ryy2u")
@@ -12,9 +13,6 @@ background = ExtResource("2_og0kc")
 buttons = Array[ExtResource("1_xno6h")]([])
 show_back_button = true
 back_button_texture = ExtResource("1_ynu3i")
-back_button_position = Vector2(24, 24)
-back_button_size = Vector2(64, 64)
 back_button_tooltip = "返回"
-design_size = Vector2(1456, 816)
-keep_aspect = true
+story_choices = Array[ExtResource("5_og0kc")]([])
 metadata/_custom_type_script = "uid://bjolqxvxn6r0d"

@@ -28,6 +28,9 @@ func _ready() -> void:
 
 # SceneViewer 显示场景
 func show_scene(scene_data: SceneData) -> void:
+	if scene_data == null:
+		push_error("show_scene but scene_data is null.")
+		return
 	if _current_scene != sceneviewer_scene:
 		await goto_scene(sceneviewer_scene)
 	else:
@@ -37,6 +40,7 @@ func show_scene(scene_data: SceneData) -> void:
 		await _scene_cache[sceneviewer_scene].ready
 	_scene_navigator.show_scene(scene_data)
 	fade_rect_anim.play(&"fade_in")
+	_scene_navigator.on_enter_scene_or_story()
 
 # SceneViewer 压入场景
 func push_scene(scene_data: SceneData) -> void:
@@ -46,6 +50,7 @@ func push_scene(scene_data: SceneData) -> void:
 	await fade_rect_anim.animation_finished
 	_scene_navigator.push_scene(scene_data)
 	fade_rect_anim.play(&"fade_in")
+	_scene_navigator.on_enter_scene_or_story()
 
 # SceneViewer 弹出场景
 func pop_scene() -> void:
@@ -55,6 +60,7 @@ func pop_scene() -> void:
 	await fade_rect_anim.animation_finished
 	_scene_navigator.pop_scene()
 	fade_rect_anim.play(&"fade_in")
+	_scene_navigator.on_enter_scene_or_story()
 
 # 开始战斗
 func start_battle(battle_map: PackedScene) -> void:

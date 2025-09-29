@@ -83,21 +83,29 @@ func _goto(node_id: String) -> void:
 				_goto(node.get_next_for(node.success))
 			else:
 				Game.g_scenes.start_battle(node.battle)
-		&"ChoiceNode":                               # 选项（场景中卡片，非对话）
-			var options := PackedStringArray()
-			node = node as ChoiceNode
-			for chosen in node.choices:
-				var enabled := true
-				if chosen.condition != null:
-					enabled = chosen.condition.evaluate(state)
-				if enabled:
-					options.append(chosen.text)
-				else:
-					var txt = chosen.text_diabled if not chosen.text_disabled.is_empty else "Locked Yet"
-					options.append(txt)
-			emit_signal("choice_requested", node as ChoiceNode, options)
-		&"EndingNode":                               # 结局（游戏结束）
+		&"SceneChoiceNode":                           # 选项（场景中卡片，非对话）
+			if Game.g_scenes == null:
+				_preview_choices(node)
+			else:
+				var scene_data := node.scene_data as SceneData
+				if scene_data != null:
+					Game.g_scenes.show_scene(scene_data)
+		&"EndingNode":                                # 结局（游戏结束）
 			emit_signal("game_ended", node.ending_id)
+
+func _preview_choices(node: ChoiceNode) -> void:
+	print("预览模式，直接列出选项：")
+	var options := PackedStringArray()
+	for chosen in node.choices:
+		var enabled := true
+		if chosen.condition != null:
+			enabled = chosen.condition.evaluate(state)
+		if enabled:
+			options.append(chosen.text)
+		else:
+			var txt = chosen.text_diabled if not chosen.text_disabled.is_empty() else "Locked Yet"
+			options.append(txt)
+	emit_signal("choice_requested", node as ChoiceNode, options)
 
 func _apply_effects(effects: Array) -> void:
 	for e in effects:
@@ -110,20 +118,19 @@ func start(p_graph: StoryGraph, entry: String = "") -> void:
 	var start_id = entry if entry != "" else graph.entry_node
 	_goto(start_id)
 
-func choose(index: int) -> void:
+func choose(chosen: Choice) -> bool:
 	if not (current is ChoiceNode):
-		return
+		return false
 	var node := current as ChoiceNode
-	if index < 0 or index >= node.choices.size():
-		return
-	var chosen := node.choices[index]
+	if not node.choices.has(chosen):
+		return false
 	# 选项效果
 	if chosen.effects != null:
 		_apply_effects(chosen.effects)
 	# 跳转
 	var port_name := chosen.port
 	var target := node.get_next_for(port_name)
-	if target == "":
-		target = node.get_next_for("out")
 	if target != "":
 		_goto(target)
+		return true
+	return false

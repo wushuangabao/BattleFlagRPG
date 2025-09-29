@@ -144,12 +144,12 @@ func _on_save_as():
 func _add_node_ui(cls):
 	if graph_res == null:
 		_on_new()
-	var n: Resource = cls.new()
+	var n: StoryNode = cls.new()
 	n.id = _gen_id()
 	var gn := _create_graph_node(n, true)
 	n.position = gn.position_offset
 	graph_res.nodes.append(n)
-	if n is DialogueNode and graph_res.entry_node == "":
+	if n is ChoiceNode and graph_res.entry_node == "":
 		graph_res.entry_node = n.id
 		gn.set_slot_color_right(0, Color.RED)
 
@@ -177,6 +177,22 @@ func _on_connect_request(from_node, from_port, to_node, to_port):
 		if from_res.outputs.size() > 0:
 			push_warning("连接失败：DialogueNode未设置var_name，因此out端口最多连接1个节点")
 			return
+	elif from_res is BattleNode:
+		if from_port == 0 and not from_res.success.is_empty():
+			push_warning("连接失败：BattleNode.success端口最多连接1个节点")
+			return
+		elif from_port == 1 and not from_res.fail.is_empty():
+			push_warning("连接失败：BattleNode.fail端口最多连接1个节点")
+			return
+		if from_port == 0:
+			from_res.success = port_name
+		elif from_port == 1:
+			from_res.fail = port_name
+	elif from_res is ChoiceNode:
+		if not from_res.choices[from_port].port.is_empty():
+			push_warning("连接失败：ChoiceNode的%d号端口已连接" % from_port)
+			return
+		from_res.choices[from_port].port = port_name
 	from_res.outputs[port_name as String] = to_res.id
 	graph_edit.connect_node(from_node, from_port, to_node, to_port)
 
@@ -188,6 +204,13 @@ func _on_disconnect_request(from_node, from_port, to_node, to_port):
 	for k in keys:
 		if from_res.outputs[k] == to_node:
 			from_res.outputs.erase(k)
+	if from_res is ChoiceNode:
+		from_res.choices[from_port].port = ""
+	elif from_res is BattleNode:
+		if from_port == 0:
+			from_res.success = ""
+		elif from_port == 1:
+			from_res.fail = ""
 	graph_edit.disconnect_node(from_node, from_port, to_node, to_port)
 
 func _find_res_node(p_id: String) -> Resource:
@@ -223,10 +246,26 @@ func _rebuild_from_resource():
 		await tree.process_frame
 	# 连接
 	for n in graph_res.nodes:
-		for k in n.outputs.keys():
-			var target_id: String = n.outputs[k]
-			if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
-				graph_edit.connect_node(n.id, 0, target_id, 0)
+		if n is BattleNode:
+			if n.success and not n.success.is_empty() and n.outputs.has(n.success):
+				var target_id: String = n.outputs[n.success]
+				if node_map.has(target_id):
+					graph_edit.connect_node(n.id, 0, target_id, 0)
+			if n.fail and not n.fail.is_empty() and n.outputs.has(n.fail):
+				var target_id: String = n.outputs[n.fail]
+				if node_map.has(target_id):
+					graph_edit.connect_node(n.id, 1, target_id, 0)
+		elif n is ChoiceNode:
+			for i in range(n.choices.size()):
+				if not n.choices[i].port.is_empty() and n.outputs.has(n.choices[i].port):
+					var target_id: String = n.outputs[n.choices[i].port]
+					if node_map.has(target_id):
+						graph_edit.connect_node(n.id, i, target_id, 0)
+		else:
+			for k in n.outputs.keys():
+				var target_id: String = n.outputs[k]
+				if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
+					graph_edit.connect_node(n.id, 0, target_id, 0)
 
 func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 	var gn := GraphNode.new()
@@ -248,12 +287,15 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 		_update_references_on_name_change(n.id, t)
 	)
 	gn.add_child(lbl)
+	gn.clear_all_slots()
 	match gn.title:
 		&"DialogueNode":
 			_set_dialogue_node(gn, n, is_new)
 		&"BattleNode":
 			_set_battle_node(gn, n, is_new)
-		&"ChoiceNode":
+		&"MapChoiceNode":
+			_set_choice_node(gn, n, is_new)
+		&"SceneChoiceNode":
 			_set_choice_node(gn, n, is_new)
 		&"EndingNode":
 			_set_ending_node(gn, n, is_new)
@@ -274,22 +316,31 @@ func _set_dialogue_node(gn: GraphNode, n: DialogueNode, is_new: bool = false):
 	gn.set_slot(0, true, 0, Color.WHITE, true, 0, Color.WHITE)
 
 func _set_battle_node(gn: GraphNode, n: BattleNode, is_new: bool = false):
-	var success = LineEdit.new()
-	success.placeholder_text = "success"
+	var success = Label.new()
+	success.text = ""
 	if not is_new:
 		success.text = n.success
-	success.text_changed.connect(func(t): n.success = t)
 	gn.add_child(success)
-	var fail = LineEdit.new()
-	fail.placeholder_text = "fail"
+	var fail = Label.new()
+	fail.text = ""
 	if not is_new:
 		fail.text = n.fail
-	fail.text_changed.connect(func(t): n.fail = t)
 	gn.add_child(fail)
-	gn.set_slot(0, true, 0, Color.YELLOW, true, 0, Color.YELLOW)
+	gn.set_slot(0, true, 0, Color.YELLOW, false, 0, Color.YELLOW)
+	gn.set_slot(1, false, 0, Color.YELLOW, true, 0, Color.YELLOW)
+	gn.set_slot(2, false, 0, Color.YELLOW, true, 0, Color.YELLOW)
 
 func _set_choice_node(gn: GraphNode, n: ChoiceNode, is_new: bool = false):
-	gn.set_slot(0, true, 0, Color.GREEN, true, 0, Color.GREEN)
+	gn.set_slot(0, true, 0, Color.GREEN, false, 0, Color.GREEN)
+	for i in range(n.choices.size()):
+		var choice = n.choices[i]
+		var choice_txt = LineEdit.new()
+		if not is_new:
+			choice_txt.text = choice.text
+		choice_txt.placeholder_text = "choice"
+		choice_txt.text_changed.connect(func(t): choice.text = t)
+		gn.add_child(choice_txt)
+		gn.set_slot(i + 1, false, 0, Color.GREEN, true, 0, Color.GREEN)
 
 func _set_ending_node(gn: GraphNode, n: EndingNode, is_new: bool = false):
 	var ending_id = LineEdit.new()
@@ -312,6 +363,25 @@ func _update_references_on_name_change(node_id: String, new_name: String):
 	if graph_res == null:
 		return		
 	for source_node in graph_res.nodes:
+		if source_node is BattleNode:
+			if not source_node.success.is_empty() and source_node.outputs.has(source_node.success) and source_node.outputs[source_node.success] == node_id:
+				source_node.outputs.erase(source_node.success)
+				source_node.success = new_name
+				source_node.outputs[new_name] = node_id
+				continue
+			if not source_node.fail.is_empty() and source_node.outputs.has(source_node.fail) and source_node.outputs[source_node.fail] == node_id:
+				source_node.outputs.erase(source_node.fail)
+				source_node.fail = new_name
+				source_node.outputs[new_name] = node_id
+				continue
+		elif source_node is ChoiceNode:
+			for i in range(source_node.choices.size()):
+				var choice = source_node.choices[i]
+				if not choice.port.is_empty() and source_node.outputs.has(choice.port) and source_node.outputs[choice.port] == node_id:
+					source_node.outputs.erase(choice.port)
+					choice.port = new_name
+					source_node.outputs[new_name] = node_id
+					continue
 		var keys_to_update = []
 		for port_name in source_node.outputs.keys():
 			# 如果输出指向目标节点
@@ -353,8 +423,8 @@ func _on_set_entry_pressed():
 		if node == null:
 			push_error("找不到被选为入口的 StoryNode！")
 			return
-		if not node is DialogueNode:
-			push_warning("只能设置 DialogueNode 为入口")
+		if not node is ChoiceNode:
+			push_warning("只能设置 ChoiceNode 为入口")
 			return
 		if graph_res.entry_node != node.id:
 			if node_map.has(graph_res.entry_node):
@@ -387,15 +457,19 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 				"name":
 					if child.text != n.name:
 						child.text = n.name
-				"success":
-					if n is BattleNode:
-						child.text = (n as BattleNode).success
-				"fail":
-					if n is BattleNode:
-						child.text = (n as BattleNode).fail
+				"choice":
+					if n is ChoiceNode:
+						child.text = n.choices[child.get_index() - 1].text
 				"ending_id":
 					if n is EndingNode:
 						child.text = (n as EndingNode).ending_id
+		elif child is Label:
+			if n is BattleNode:
+				var idx = child.get_index()
+				if idx == 1:  # success标签
+					child.text = (n as BattleNode).success
+				elif idx == 2:  # fail标签
+					child.text = (n as BattleNode).fail
 	# 如果是名称变更，更新其他节点对该节点的引用键名
 	if property == "name":
 		_update_references_on_name_change(n.id, n.name)
@@ -458,8 +532,10 @@ func _on_add_menu_index_pressed(index: int) -> void:
 		1:
 			_add_node_ui(BattleNode)
 		2:
-			_add_node_ui(ChoiceNode)
+			_add_node_ui(MapChoiceNode)
 		3:
+			_add_node_ui(SceneChoiceNode)
+		4:
 			_add_node_ui(EndingNode)
 		_:
 			pass

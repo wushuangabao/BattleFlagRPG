@@ -1,15 +1,11 @@
 extends Control
 class_name StoryUI
 
-@onready var speaker_lbl: Label = %Speaker
-@onready var line_lbl: Label = %Line
 @onready var choices_vbox: VBoxContainer = %Choices
 
-var on_choice: Callable = func(idx:int): pass
+var on_choice: Callable
 
 func show_line(speaker: String, line: String) -> void:
-	speaker_lbl.text = speaker
-	line_lbl.text = line
 	_clear_choices()
 
 func show_choices(opts: PackedStringArray, on_choose: Callable) -> void:

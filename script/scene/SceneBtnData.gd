@@ -3,8 +3,6 @@ class_name SceneButtonData
 
 @export var name: StringName = &""
 @export var texture: Texture2D
-@export var position: Vector2 = Vector2.ZERO
-@export var size: Vector2 = Vector2(120, 48) # 按钮可点击区域大小（九宫/纯贴图都可）
 @export var tooltip: String = ""
 # 点击后要跳转的场景资源
 @export var target_scene: SceneData
