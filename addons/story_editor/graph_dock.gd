@@ -153,7 +153,7 @@ func _add_node_ui(cls):
 	graph_res.nodes.append(n)
 	if n is ChoiceNode and graph_res.entry_node == "":
 		graph_res.entry_node = n.id
-		gn.set_slot_color_right(0, Color.RED)
+		gn.set_slot_color_left(0, Color.RED)
 
 func _gen_id() -> String:
 	var id := "n_%x" % randi()
@@ -343,7 +343,7 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 		&"EndingNode":
 			_set_ending_node(gn, n, is_new)
 	if graph_res.entry_node == n.id:
-		gn.set_slot_color_right(0, Color.RED)
+		gn.set_slot_color_left(0, Color.RED)
 	graph_edit.add_child(gn)
 	node_map[n.id] = gn
 	return gn
@@ -478,9 +478,9 @@ func _on_set_entry_pressed():
 			if node_map.has(graph_res.entry_node):
 				var old_entry_node = node_map[graph_res.entry_node]
 				if old_entry_node:
-					old_entry_node.set_slot_color_right(0, Color.WHITE)
+					old_entry_node.set_slot_color_left(0, Color.GREEN)
 			graph_res.entry_node = node.id
-			selected_nodes[0].set_slot_color_right(0, Color.RED)
+			selected_nodes[0].set_slot_color_left(0, Color.RED)
 			print("设置入口节点为：%s(%s)" % [node.name, node.id])
 
 func _on_node_changed(property: String) -> void:
@@ -581,9 +581,9 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 			gn.set_slot(0, true, 0, Color.GREEN, false, 0, Color.GREEN)
 			for i in range(new_count):
 				gn.set_slot(i + 1, false, 0, Color.GREEN, true, 0, Color.GREEN)
-			# 如果该节点是入口节点，恢复右侧红色标记
+			# 如果该节点是入口节点，恢复左侧红色标记
 			if graph_res.entry_node == n.id:
-				gn.set_slot_color_right(0, Color.RED)
+				gn.set_slot_color_left(0, Color.RED)
 			# 按需重连：仅断开并重连本节点的所有输出
 			var conns = graph_edit.get_connection_list()
 			for c in conns.duplicate():

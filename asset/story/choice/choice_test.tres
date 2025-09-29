@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Choice" load_steps=3 format=3 uid="uid://j6skxsherul1"]
+
+[ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="1_il2rd"]
+[ext_resource type="Script" uid="uid://6cwwq3vlqmom" path="res://addons/story_editor/runtime/Choice.gd" id="2_gtcw3"]
+
+[resource]
+script = ExtResource("2_gtcw3")
+text = "d-a"
+text_disabled = "Locked Yet"
+effects = Array[ExtResource("1_il2rd")]([])
+port = "A"
+metadata/_custom_type_script = "uid://6cwwq3vlqmom"

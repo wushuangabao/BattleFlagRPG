@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://cxvlyqqyh6c6g" path="res://asset/Dialogic/timeline/timeline_test_2.dtl" id="6_bb037"]
 [ext_resource type="Script" uid="uid://ce2qotkg2fraf" path="res://addons/story_editor/node/EndingNode.gd" id="7_3tm8g"]
 [ext_resource type="Script" uid="uid://kveh2dwxglja" path="res://addons/story_editor/node/BattleNode.gd" id="8_m2vor"]
+[ext_resource type="Resource" uid="uid://j6skxsherul1" path="res://asset/story/choice/choice_test.tres" id="9_0nfgm"]
 [ext_resource type="Script" uid="uid://6cwwq3vlqmom" path="res://addons/story_editor/runtime/Choice.gd" id="10_51nue"]
 [ext_resource type="Resource" uid="uid://c18djaegv756j" path="res://asset/scene/village.tres" id="11_0nfgm"]
 [ext_resource type="Script" uid="uid://ty85c0d26hqi" path="res://addons/story_editor/node/SceneChoiceNode.gd" id="12_fcgof"]
@@ -70,17 +71,9 @@ outputs = Dictionary[String, String]({})
 name = "e2"
 effects = Array[ExtResource("1_1faki")]([])
 
-[sub_resource type="Resource" id="Resource_0nfgm"]
-script = ExtResource("10_51nue")
-text = "d2"
-text_disabled = "Locked Yet"
-effects = Array[ExtResource("1_1faki")]([])
-port = "A"
-metadata/_custom_type_script = "uid://6cwwq3vlqmom"
-
 [sub_resource type="Resource" id="Resource_fcgof"]
 script = ExtResource("10_51nue")
-text = "d1"
+text = "d 1"
 text_disabled = "Locked Yet"
 effects = Array[ExtResource("1_1faki")]([])
 port = "d 1"
@@ -89,9 +82,9 @@ metadata/_custom_type_script = "uid://6cwwq3vlqmom"
 [sub_resource type="Resource" id="Resource_hy3hp"]
 script = ExtResource("12_fcgof")
 scene_data = ExtResource("11_0nfgm")
-choices = Array[ExtResource("10_51nue")]([SubResource("Resource_0nfgm"), SubResource("Resource_fcgof")])
+choices = Array[ExtResource("10_51nue")]([ExtResource("9_0nfgm"), SubResource("Resource_fcgof")])
 id = "n_1010ca0c"
-position = Vector2(-140, 80)
+position = Vector2(-100, 140)
 outputs = Dictionary[String, String]({
 "A": "n_bfffdd83",
 "B": "n_a499480b",
@@ -106,7 +99,7 @@ battle = ExtResource("6_3tm8g")
 success = "e1"
 fail = "e2"
 id = "n_ded2716"
-position = Vector2(560, 320)
+position = Vector2(580, 300)
 outputs = Dictionary[String, String]({
 "e1": "n_43dc4cdd",
 "e2": "n_6c6293fa"
