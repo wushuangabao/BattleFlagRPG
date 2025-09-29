@@ -7,6 +7,9 @@ var on_choice: Callable
 
 func show_line(speaker: String, line: String) -> void:
 	_clear_choices()
+	var l := Label.new()
+	l.text = line
+	choices_vbox.add_child(l)
 
 func show_choices(opts: PackedStringArray, on_choose: Callable) -> void:
 	_clear_choices()

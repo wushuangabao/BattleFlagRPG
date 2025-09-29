@@ -1,5 +1,5 @@
 class_name BattleNode extends StoryNode
 
 @export var battle: PackedScene
-@export var success: String
-@export var fail: String
+@export_storage var success: String
+@export_storage var fail: String

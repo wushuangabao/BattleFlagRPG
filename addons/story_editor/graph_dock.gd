@@ -89,7 +89,7 @@ func _on_new():
 	graph_edit.clear_connections()
 	for c in graph_edit.get_children():
 		if c is GraphNode:
-			c.queue_free()
+			c.free()
 
 func _on_load():
 	var dlg := FileDialog.new()
@@ -175,23 +175,52 @@ func _on_connect_request(from_node, from_port, to_node, to_port):
 		return
 	if from_res is DialogueNode and (from_res.var_name == null or from_res.var_name.is_empty()):
 		if from_res.outputs.size() > 0:
-			push_warning("连接失败：DialogueNode未设置var_name，因此out端口最多连接1个节点")
-			return
+			# 若已存在连接，则断开旧连接并清理映射，然后继续建立新连接
+			var conns = graph_edit.get_connection_list()
+			for c in conns.duplicate():
+				if c.from_node == from_node and c.from_port == 0:
+					graph_edit.disconnect_node(c.from_node, c.from_port, c.to_node, c.to_port)
+			for k in from_res.outputs.keys():
+				from_res.outputs.erase(k)
 	elif from_res is BattleNode:
+		# 若该端口已有连接，则先断开旧连接并移除映射，再接入新连接
 		if from_port == 0 and not from_res.success.is_empty():
-			push_warning("连接失败：BattleNode.success端口最多连接1个节点")
-			return
+			var old_port_name: String = from_res.success
+			if from_res.outputs.has(old_port_name):
+				var old_target_id: String = from_res.outputs[old_port_name]
+				if not old_target_id.is_empty():
+					graph_edit.disconnect_node(from_node, from_port, old_target_id, 0)
+				from_res.outputs.erase(old_port_name)
 		elif from_port == 1 and not from_res.fail.is_empty():
-			push_warning("连接失败：BattleNode.fail端口最多连接1个节点")
-			return
+			var old_port_name: String = from_res.fail
+			if from_res.outputs.has(old_port_name):
+				var old_target_id: String = from_res.outputs[old_port_name]
+				if not old_target_id.is_empty():
+					graph_edit.disconnect_node(from_node, from_port, old_target_id, 0)
+				from_res.outputs.erase(old_port_name)
 		if from_port == 0:
 			from_res.success = port_name
 		elif from_port == 1:
 			from_res.fail = port_name
+		# 更新 BattleNode 对应 GraphNode 上的 Label 文本
+		var gn_battle: GraphNode = node_map.get(from_res.id, null)
+		if gn_battle:
+			for child in gn_battle.get_children():
+				if child is Label:
+					var idx := child.get_index()
+					if idx == 1:
+						child.text = from_res.success
+					elif idx == 2:
+						child.text = from_res.fail
 	elif from_res is ChoiceNode:
 		if not from_res.choices[from_port].port.is_empty():
-			push_warning("连接失败：ChoiceNode的%d号端口已连接" % from_port)
-			return
+			# 端口已连接：先断开旧连接并移除映射，再接入新连接
+			var old_port_name: String = from_res.choices[from_port].port
+			if from_res.outputs.has(old_port_name):
+				var old_target_id: String = from_res.outputs[old_port_name]
+				if not old_target_id.is_empty():
+					graph_edit.disconnect_node(from_node, from_port, old_target_id, 0)
+				from_res.outputs.erase(old_port_name)
 		from_res.choices[from_port].port = port_name
 	from_res.outputs[port_name as String] = to_res.id
 	graph_edit.connect_node(from_node, from_port, to_node, to_port)
@@ -211,6 +240,16 @@ func _on_disconnect_request(from_node, from_port, to_node, to_port):
 			from_res.success = ""
 		elif from_port == 1:
 			from_res.fail = ""
+		# 清空对应 GraphNode 上的 Label 文本以同步 UI
+		var gn_battle: GraphNode = node_map.get(from_res.id, null)
+		if gn_battle:
+			for child in gn_battle.get_children():
+				if child is Label:
+					var idx := child.get_index()
+					if idx == 1:
+						child.text = from_res.success
+					elif idx == 2:
+						child.text = from_res.fail
 	graph_edit.disconnect_node(from_node, from_port, to_node, to_port)
 
 func _find_res_node(p_id: String) -> Resource:
@@ -233,7 +272,7 @@ func _rebuild_from_resource():
 	graph_edit.clear_connections()
 	for c in graph_edit.get_children():
 		if c is GraphNode:
-			c.queue_free()
+			c.free()
 	# 等待所有节点完全移除
 	var tree = get_tree()
 	if tree != null:
@@ -450,6 +489,7 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 	if gn == null:
 		push_error("update_graph_node: 找不到对应的 GraphNode 节点！")
 		return
+	# removed: need_reconnect_outgoing no longer used
 	# 更新文本字段
 	for child in gn.get_children():
 		if child is LineEdit:  # 如果后续新增字段，请确保对应 LineEdit 的 placeholder_text 与资源属性保持一致
@@ -459,7 +499,14 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 						child.text = n.name
 				"choice":
 					if n is ChoiceNode:
-						child.text = n.choices[child.get_index() - 1].text
+						var idx := child.get_index() - 1
+						if idx >= 0 and idx < n.choices.size():
+							var ch := (n as ChoiceNode).choices[idx]
+							var txt := ""
+							if ch != null:
+								txt = ch.text
+							if child.text != txt:
+								child.text = txt
 				"ending_id":
 					if n is EndingNode:
 						child.text = (n as EndingNode).ending_id
@@ -470,25 +517,93 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 					child.text = (n as BattleNode).success
 				elif idx == 2:  # fail标签
 					child.text = (n as BattleNode).fail
-	# 如果是名称变更，更新其他节点对该节点的引用键名
-	if property == "name":
-		_update_references_on_name_change(n.id, n.name)
-	# 重新整理与该节点相关的连线
-	var conns = graph_edit.get_connection_list()
-	for c in conns.duplicate():
-		if c.from_node == n.id or c.to_node == n.id:
-			graph_edit.disconnect_node(c.from_node, c.from_port, c.to_node, c.to_port)
-	# 重新连接该节点的所有输出
-	for k in n.outputs.keys():
-		var target_id: String = n.outputs[k]
-		if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
-			graph_edit.connect_node(n.id, 0, target_id, 0)
-	# 重新连接指向该节点的输入
-	for src in graph_res.nodes:
-		for k in src.outputs.keys():
-			if src.outputs[k] == n.id:
-				if node_map.has(src.id) and node_map.has(n.id):
-					graph_edit.connect_node(src.id, 0, n.id, 0)
+	# ChoiceNode 端口与子控件增删同步，保持与 _set_choice_node 一致
+	if n is ChoiceNode:
+		var choice_children: Array = []
+		for cc in gn.get_children():
+			if cc is LineEdit and cc.placeholder_text == "choice":
+				choice_children.append(cc)
+		var old_count := choice_children.size()
+		var new_count := (n as ChoiceNode).choices.size()
+		if new_count != old_count:
+			# 清掉所有旧的 choice 行，避免索引错位
+			for cc in choice_children:
+				if cc:
+					cc.queue_free()
+			# 按 n.choices 顺序完整重建并绑定
+			for i in range(new_count):
+				var ch := (n as ChoiceNode).choices[i]
+				var choice_txt := LineEdit.new()
+				choice_txt.placeholder_text = "choice"
+				var txt := ""
+				if ch != null:
+					txt = ch.text
+				choice_txt.text = txt
+				var idx := i
+				choice_txt.text_changed.connect(func(t):
+					var item := (n as ChoiceNode).choices[idx]
+					if item == null:
+						item = Choice.new()
+						(n as ChoiceNode).choices[idx] = item
+					item.text = t
+				)
+				gn.add_child(choice_txt)
+			# 重建槽位，使端口定义与 _set_choice_node 一致
+			gn.clear_all_slots()
+			gn.set_slot(0, true, 0, Color.GREEN, false, 0, Color.GREEN)
+			for i in range(new_count):
+				gn.set_slot(i + 1, false, 0, Color.GREEN, true, 0, Color.GREEN)
+			# 如果该节点是入口节点，恢复右侧红色标记
+			if graph_res.entry_node == n.id:
+				gn.set_slot_color_right(0, Color.RED)
+			# 按需重连：仅断开并重连本节点的所有输出
+			var conns = graph_edit.get_connection_list()
+			for c in conns.duplicate():
+				if c.from_node == n.id:
+					graph_edit.disconnect_node(c.from_node, c.from_port, c.to_node, c.to_port)
+			for i in range(new_count):
+				var ch2 := (n as ChoiceNode).choices[i]
+				var port_name := ""
+				if ch2 != null:
+					port_name = ch2.port
+				if not port_name.is_empty() and n.outputs.has(port_name):
+					var target_id: String = n.outputs[port_name]
+					if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
+						graph_edit.connect_node(n.id, i, target_id, 0)
+		elif new_count == old_count:
+			# 检测顺序变化（不重建控件），仅按新索引重连
+			var expected: Dictionary = {}
+			for i in range(new_count):
+				var ch3 := (n as ChoiceNode).choices[i]
+				var port_name := ""
+				if ch3 != null:
+					port_name = ch3.port
+				var target_id := ""
+				if not port_name.is_empty() and n.outputs.has(port_name):
+					target_id = n.outputs[port_name]
+				expected[i] = target_id
+			var actual: Dictionary = {}
+			var conns = graph_edit.get_connection_list()
+			for c in conns:
+				if c.from_node == n.id:
+					actual[c.from_port] = c.to_node
+			var order_mismatch := false
+			for i in range(new_count):
+				var e := expected.get(i, "")
+				var a := actual.get(i, "")
+				if e != a:
+					order_mismatch = true
+					break
+			if order_mismatch:
+				# 断开本节点所有外向连接
+				for c in conns.duplicate():
+					if c.from_node == n.id:
+						graph_edit.disconnect_node(c.from_node, c.from_port, c.to_node, c.to_port)
+				# 按新索引重连
+				for i in range(new_count):
+					var target_id := expected.get(i, "")
+					if not target_id.is_empty() and node_map.has(n.id) and node_map.has(target_id):
+						graph_edit.connect_node(n.id, i, target_id, 0)
 
 # 检查 ProjectSettings 中是否存在给定的变量路径（如 "Folder.Var_test" 或更深层级如 "Folder.Sub.Var"）
 func _project_variable_exists(var_path: String) -> bool:
