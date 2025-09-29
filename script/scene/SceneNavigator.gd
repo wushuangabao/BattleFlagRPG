@@ -36,11 +36,10 @@ func is_root_scene() -> bool:
 func on_enter_scene_or_story() -> bool:
 	if viewer.current_data.story_choices.size() > 0:
 		if Game.g_runner and Game.g_runner.graph:
-			var cur_story_graph = Game.g_runner.graph
-			var valid_choices: Array[Choice] = []
+			var valid_choices = []
 			for choice in viewer.current_data.story_choices:
-				if choice.story_graph == cur_story_graph:
-					valid_choices.append(choice.associate_c)
+				if choice.condition == null or choice.condition.evaluate({}):
+					valid_choices.append(choice)
 			if valid_choices.size() > 0:
 				var chosen_i = randi_range(0, valid_choices.size() - 1)
 				if Game.g_runner.choose(valid_choices[chosen_i]):

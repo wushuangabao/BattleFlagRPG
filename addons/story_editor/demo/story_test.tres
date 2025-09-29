@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StoryGraph" load_steps=22 format=3 uid="uid://blwr216gupj3a"]
+[gd_resource type="Resource" script_class="StoryGraph" load_steps=23 format=3 uid="uid://blwr216gupj3a"]
 
 [ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="1_1faki"]
 [ext_resource type="Script" uid="uid://bljb6dkpa3oam" path="res://addons/story_editor/runtime/StoryNode.gd" id="1_6uq8v"]
@@ -19,7 +19,7 @@ script = ExtResource("3_fw4x2")
 timeline = ExtResource("4_fw4x2")
 var_name = "Folder.Var_test"
 id = "n1"
-position = Vector2(-220, -20)
+position = Vector2(100, 320)
 outputs = Dictionary[String, String]({
 "A": "n_bfffdd83",
 "B": "n_a499480b"
@@ -33,7 +33,7 @@ script = ExtResource("3_fw4x2")
 timeline = ExtResource("5_bb037")
 var_name = ""
 id = "n_bfffdd83"
-position = Vector2(60, -60)
+position = Vector2(360, 180)
 outputs = Dictionary[String, String]({
 "e1": "n_43dc4cdd"
 })
@@ -45,7 +45,7 @@ script = ExtResource("3_fw4x2")
 timeline = ExtResource("6_bb037")
 var_name = ""
 id = "n_a499480b"
-position = Vector2(40, 120)
+position = Vector2(340, 360)
 outputs = Dictionary[String, String]({
 "battle_test": "n_ded2716"
 })
@@ -56,7 +56,7 @@ effects = Array[ExtResource("1_1faki")]([])
 script = ExtResource("7_3tm8g")
 ending_id = "eee"
 id = "n_43dc4cdd"
-position = Vector2(480, -100)
+position = Vector2(780, 140)
 outputs = Dictionary[String, String]({})
 name = "e1"
 effects = Array[ExtResource("1_1faki")]([])
@@ -65,15 +65,23 @@ effects = Array[ExtResource("1_1faki")]([])
 script = ExtResource("7_3tm8g")
 ending_id = ""
 id = "n_6c6293fa"
-position = Vector2(540, 40)
+position = Vector2(840, 280)
 outputs = Dictionary[String, String]({})
 name = "e2"
 effects = Array[ExtResource("1_1faki")]([])
 
-[sub_resource type="Resource" id="Resource_50elq"]
+[sub_resource type="Resource" id="Resource_0nfgm"]
 script = ExtResource("10_51nue")
-text = "1"
-text_disabled = ""
+text = "d2"
+text_disabled = "Locked Yet"
+effects = Array[ExtResource("1_1faki")]([])
+port = "A"
+metadata/_custom_type_script = "uid://6cwwq3vlqmom"
+
+[sub_resource type="Resource" id="Resource_fcgof"]
+script = ExtResource("10_51nue")
+text = "d1"
+text_disabled = "Locked Yet"
 effects = Array[ExtResource("1_1faki")]([])
 port = "d 1"
 metadata/_custom_type_script = "uid://6cwwq3vlqmom"
@@ -81,10 +89,12 @@ metadata/_custom_type_script = "uid://6cwwq3vlqmom"
 [sub_resource type="Resource" id="Resource_hy3hp"]
 script = ExtResource("12_fcgof")
 scene_data = ExtResource("11_0nfgm")
-choices = Array[ExtResource("10_51nue")]([SubResource("Resource_50elq")])
+choices = Array[ExtResource("10_51nue")]([SubResource("Resource_0nfgm"), SubResource("Resource_fcgof")])
 id = "n_1010ca0c"
-position = Vector2(-460, 0)
+position = Vector2(-140, 80)
 outputs = Dictionary[String, String]({
+"A": "n_bfffdd83",
+"B": "n_a499480b",
 "d 1": "n1"
 })
 name = "start"
@@ -96,7 +106,7 @@ battle = ExtResource("6_3tm8g")
 success = "e1"
 fail = "e2"
 id = "n_ded2716"
-position = Vector2(260, 80)
+position = Vector2(560, 320)
 outputs = Dictionary[String, String]({
 "e1": "n_43dc4cdd",
 "e2": "n_6c6293fa"

@@ -103,7 +103,7 @@ func _preview_choices(node: ChoiceNode) -> void:
 		if enabled:
 			options.append(chosen.text)
 		else:
-			var txt = chosen.text_diabled if not chosen.text_disabled.is_empty() else "Locked Yet"
+			var txt = chosen.text_disabled if not chosen.text_disabled.is_empty() else "Locked Yet"
 			options.append(txt)
 	emit_signal("choice_requested", node as ChoiceNode, options)
 

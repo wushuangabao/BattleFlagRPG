@@ -17,8 +17,10 @@ var inspector : EditorInspector
 
 var graph_res: StoryGraph = null
 var node_map : Dictionary[String, GraphNode] = {} # id -> GraphNode
-var undo_stack = [] # 撤销栈，用于存储删除的节点信息
 var aux: GraphDockAux = null
+
+var edited_story_node: StoryNode = null
+var _choice_change_connected: Array = []
 
 func _ready():
 	if not Engine.is_editor_hint():
@@ -321,9 +323,11 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 	lbl.placeholder_text = "name"
 	if not is_new:
 		lbl.text = n.name
-	lbl.text_changed.connect(func(t): 
+	lbl.text_submitted.connect(func(t): 
 		n.name = t
 		_update_references_on_name_change(n.id, t)
+		if edited_story_node == n:
+			_on_save()
 	)
 	gn.add_child(lbl)
 	gn.clear_all_slots()
@@ -373,11 +377,9 @@ func _set_choice_node(gn: GraphNode, n: ChoiceNode, is_new: bool = false):
 	gn.set_slot(0, true, 0, Color.GREEN, false, 0, Color.GREEN)
 	for i in range(n.choices.size()):
 		var choice = n.choices[i]
-		var choice_txt = LineEdit.new()
-		if not is_new:
+		var choice_txt = Label.new()
+		if not is_new and choice.text:
 			choice_txt.text = choice.text
-		choice_txt.placeholder_text = "choice"
-		choice_txt.text_changed.connect(func(t): choice.text = t)
 		gn.add_child(choice_txt)
 		gn.set_slot(i + 1, false, 0, Color.GREEN, true, 0, Color.GREEN)
 
@@ -386,7 +388,11 @@ func _set_ending_node(gn: GraphNode, n: EndingNode, is_new: bool = false):
 	ending_id.placeholder_text = "ending_id"
 	if not is_new:
 		ending_id.text = n.ending_id
-	ending_id.text_changed.connect(func(t): n.ending_id = t)
+	ending_id.text_submitted.connect(func(t):
+		n.ending_id = t
+		if edited_story_node == n:
+			_on_save()
+	)
 	gn.add_child(ending_id)
 	gn.set_slot(0, true, 0, Color.RED, false, 0, Color.WHITE)
 
@@ -447,6 +453,9 @@ func _on_node_selected(node: GraphNode):
 		else:
 			_try_set_inspector()
 		EditorInterface.get_inspector().edit(node_res)
+		edited_story_node = node_res
+		if node_res is ChoiceNode:
+			_connect_resource_change_signals(node_res)
 
 func _on_set_entry_pressed():
 	if graph_res == null:
@@ -482,6 +491,36 @@ func _on_node_changed(property: String) -> void:
 	var edited = inspector.get_edited_object()
 	if edited is StoryNode:
 		_update_graph_node_for_resource(edited, property)
+		# 重新绑定资源变更信号，确保 choices 子资源的变更也能触发 UI 更新
+		if edited is ChoiceNode:
+			_connect_resource_change_signals(edited)
+
+# 监听被编辑资源及其子 Choice 资源的 changed 信号，以捕获容器内元素的变更
+func _connect_resource_change_signals(res: ChoiceNode) -> void:
+	if res == null:
+		return
+	_disconnect_resource_change_signals()
+	_choice_change_connected.clear()
+	edited_story_node = res
+	for ch in res.choices:
+		if ch != null and not ch.is_connected("changed", _on_resource_changed):
+			print("_connect_resource_change_signals node %s" % ch.text)
+			ch.changed.connect(_on_resource_changed)
+			_choice_change_connected.append(ch)
+
+func _disconnect_resource_change_signals() -> void:
+	for ch in _choice_change_connected:
+		if ch != null and ch.is_connected("changed", _on_resource_changed):
+			ch.changed.disconnect(_on_resource_changed)
+	_choice_change_connected.clear()
+	edited_story_node = null
+
+func _on_resource_changed() -> void:
+	if edited_story_node != null:
+		print("_on_resource_changed node %s(%s)" % [edited_story_node.name, edited_story_node.id])
+		_update_graph_node_for_resource(edited_story_node, "")
+		# choices 数组可能发生了增删，刷新子资源信号绑定
+		_connect_resource_change_signals(edited_story_node)
 
 # 仅更新发生改变的 StoryNode 对应的 GraphNode
 func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
@@ -489,7 +528,6 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 	if gn == null:
 		push_error("update_graph_node: 找不到对应的 GraphNode 节点！")
 		return
-	# removed: need_reconnect_outgoing no longer used
 	# 更新文本字段
 	for child in gn.get_children():
 		if child is LineEdit:  # 如果后续新增字段，请确保对应 LineEdit 的 placeholder_text 与资源属性保持一致
@@ -497,16 +535,6 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 				"name":
 					if child.text != n.name:
 						child.text = n.name
-				"choice":
-					if n is ChoiceNode:
-						var idx := child.get_index() - 1
-						if idx >= 0 and idx < n.choices.size():
-							var ch := (n as ChoiceNode).choices[idx]
-							var txt := ""
-							if ch != null:
-								txt = ch.text
-							if child.text != txt:
-								child.text = txt
 				"ending_id":
 					if n is EndingNode:
 						child.text = (n as EndingNode).ending_id
@@ -517,36 +545,36 @@ func _update_graph_node_for_resource(n: StoryNode, property: String) -> void:
 					child.text = (n as BattleNode).success
 				elif idx == 2:  # fail标签
 					child.text = (n as BattleNode).fail
+			elif n is ChoiceNode:
+				var idx = child.get_index() - 1
+				if idx >= 0 and idx < n.choices.size():
+					var ch := (n as ChoiceNode).choices[idx]
+					var txt := ""
+					if ch != null:
+						txt = ch.text
+					child.text = txt
 	# ChoiceNode 端口与子控件增删同步，保持与 _set_choice_node 一致
 	if n is ChoiceNode:
 		var choice_children: Array = []
 		for cc in gn.get_children():
-			if cc is LineEdit and cc.placeholder_text == "choice":
+			if cc is Label:
 				choice_children.append(cc)
 		var old_count := choice_children.size()
-		var new_count := (n as ChoiceNode).choices.size()
+		var new_choices := (n as ChoiceNode).choices
+		var new_count := 0
+		for ch in new_choices:
+			if ch != null:
+				new_count += 1
 		if new_count != old_count:
 			# 清掉所有旧的 choice 行，避免索引错位
 			for cc in choice_children:
 				if cc:
-					cc.queue_free()
+					cc.free()
 			# 按 n.choices 顺序完整重建并绑定
 			for i in range(new_count):
 				var ch := (n as ChoiceNode).choices[i]
-				var choice_txt := LineEdit.new()
-				choice_txt.placeholder_text = "choice"
-				var txt := ""
-				if ch != null:
-					txt = ch.text
-				choice_txt.text = txt
-				var idx := i
-				choice_txt.text_changed.connect(func(t):
-					var item := (n as ChoiceNode).choices[idx]
-					if item == null:
-						item = Choice.new()
-						(n as ChoiceNode).choices[idx] = item
-					item.text = t
-				)
+				var choice_txt := Label.new()
+				choice_txt.text = ch.text
 				gn.add_child(choice_txt)
 			# 重建槽位，使端口定义与 _set_choice_node 一致
 			gn.clear_all_slots()

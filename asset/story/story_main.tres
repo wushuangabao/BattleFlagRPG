@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StoryGraph" load_steps=17 format=3 uid="uid://ddfd06ssdylco"]
+[gd_resource type="Resource" script_class="StoryGraph" load_steps=22 format=3 uid="uid://ddfd06ssdylco"]
 
 [ext_resource type="Script" uid="uid://bljb6dkpa3oam" path="res://addons/story_editor/runtime/StoryNode.gd" id="1_1faki"]
 [ext_resource type="Script" uid="uid://cqt28jy2pcg0s" path="res://addons/story_editor/runtime/ChoiceEffect.gd" id="2_c2ac0"]
@@ -10,6 +10,9 @@
 [ext_resource type="Resource" uid="uid://dy4a8cd7eo6la" path="res://asset/Dialogic/timeline/timeline_test_1.dtl" id="5_mj656"]
 [ext_resource type="Script" uid="uid://bot004yitd8b0" path="res://addons/story_editor/runtime/StoryGraph.gd" id="6_8im30"]
 [ext_resource type="PackedScene" uid="uid://dp0j1m0xqlrck" path="res://asset/battle/map/test_battle_map.tscn" id="7_2f12m"]
+[ext_resource type="Script" uid="uid://6cwwq3vlqmom" path="res://addons/story_editor/runtime/Choice.gd" id="10_tbdfa"]
+[ext_resource type="Resource" uid="uid://c18djaegv756j" path="res://asset/scene/village.tres" id="11_5e00d"]
+[ext_resource type="Script" uid="uid://ty85c0d26hqi" path="res://addons/story_editor/node/SceneChoiceNode.gd" id="12_nsroa"]
 
 [sub_resource type="Resource" id="Resource_5fg8h"]
 script = ExtResource("3_r116x")
@@ -21,7 +24,7 @@ outputs = Dictionary[String, String]({
 "A": "n_bfffdd83",
 "B": "n_a499480b"
 })
-name = ""
+name = "start"
 effects = Array[ExtResource("2_c2ac0")]([])
 metadata/_custom_type_script = "uid://df2l5y3nftsnu"
 
@@ -81,10 +84,30 @@ outputs = Dictionary[String, String]({})
 name = "e2"
 effects = Array[ExtResource("2_c2ac0")]([])
 
+[sub_resource type="Resource" id="Resource_1u5lq"]
+script = ExtResource("10_tbdfa")
+text = "start-d"
+text_disabled = ""
+effects = Array[ExtResource("2_c2ac0")]([])
+port = "start"
+metadata/_custom_type_script = "uid://6cwwq3vlqmom"
+
+[sub_resource type="Resource" id="Resource_bbg08"]
+script = ExtResource("12_nsroa")
+scene_data = ExtResource("11_5e00d")
+choices = Array[ExtResource("10_tbdfa")]([SubResource("Resource_1u5lq")])
+id = "n_b5fd133b"
+position = Vector2(-460, -20)
+outputs = Dictionary[String, String]({
+"start": "n1"
+})
+name = ""
+effects = Array[ExtResource("2_c2ac0")]([])
+
 [resource]
 script = ExtResource("6_8im30")
 id = "main"
 title = "MAIN"
 entry_node = "n1"
-nodes = Array[ExtResource("1_1faki")]([SubResource("Resource_5fg8h"), SubResource("Resource_l1061"), SubResource("Resource_5iqrb"), SubResource("Resource_mj656"), SubResource("Resource_pvgde"), SubResource("Resource_q7nag")])
+nodes = Array[ExtResource("1_1faki")]([SubResource("Resource_5fg8h"), SubResource("Resource_l1061"), SubResource("Resource_5iqrb"), SubResource("Resource_mj656"), SubResource("Resource_pvgde"), SubResource("Resource_q7nag"), SubResource("Resource_bbg08")])
 metadata/_custom_type_script = "uid://bot004yitd8b0"
