@@ -27,6 +27,8 @@ func _ready() -> void:
 	anchors_preset = PRESET_FULL_RECT
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# 注册事件
+	Game.g_event.register_event("story_ended", func(_pa): show_buttons())
 
 func set_scene_data(data: SceneData) -> void:
 	current_data = data

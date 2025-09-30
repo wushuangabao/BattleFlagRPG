@@ -2,7 +2,6 @@ class_name StoryRunner extends AbstractSystem
 
 signal node_entered_for(session_id: String, node: StoryNode)
 signal choice_requested_for(session_id: String, node: ChoiceNode, options: PackedStringArray)
-signal game_ended_for(session_id: String, ending_id: String)
 
 var graph_manager: StoryGraphManager = StoryGraphManager.new()
 var active_session_id: String = ""
@@ -101,7 +100,7 @@ func _goto_on(session_id: String, node_id: String) -> void:
 			if Game.g_scenes == null:
 				_preview_choices_for(session_id, node)
 		&"EndingNode":                                # 结局（游戏结束）
-			emit_signal("game_ended_for", session_id, node.ending_id)
+			Game.g_event.send_event("story_ended", [session_id, node.ending_id])
 
 func _preview_choices_for(session_id: String, node: ChoiceNode) -> void:
 	print("预览模式，直接列出选项：")
