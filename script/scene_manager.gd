@@ -18,6 +18,9 @@ var _current_scene: PackedScene = null
 # 场景导航
 var _scene_navigator: SceneNavigator
 
+# 统一场景操作枚举
+enum SceneOp { SHOW, PUSH, POP }
+
 func _ready() -> void:
 	var scene_viewer = sceneviewer_scene.instantiate()
 	_scene_navigator = SceneNavigator.new(scene_viewer as SceneViewer)
@@ -26,41 +29,51 @@ func _ready() -> void:
 	goto_scene(main_scene)
 	print("场景管理器初始化完毕")
 
-# SceneViewer 显示场景
+## 统一的 SceneViewer 场景导航方法
+func _navigate_scene(op: int, scene_data: SceneData = null) -> void:
+	var in_viewer := _current_scene == sceneviewer_scene
+	var viewer := _scene_cache.get(sceneviewer_scene, null) as SceneViewer
+
+	match op:
+		SceneOp.SHOW:
+			if scene_data == null:
+				push_error("navigate_scene SHOW but scene_data is null.")
+				return
+			if not in_viewer:
+				await goto_scene(sceneviewer_scene)
+			else:
+				fade_rect_anim.play(&"fade_out")
+				await fade_rect_anim.animation_finished
+			if viewer and viewer.background_rect == null:
+				await viewer.ready
+			_scene_navigator.show_scene(scene_data)
+		SceneOp.PUSH:
+			if not in_viewer:
+				return
+			fade_rect_anim.play(&"fade_out")
+			await fade_rect_anim.animation_finished
+			_scene_navigator.push_scene(scene_data)
+		SceneOp.POP:
+			if not in_viewer:
+				return
+			fade_rect_anim.play(&"fade_out")
+			await fade_rect_anim.animation_finished
+			_scene_navigator.pop_scene()
+		_:
+			push_warning("navigate_scene: unknown op " + str(op))
+			return
+
+	fade_rect_anim.play(&"fade_in")
+	_scene_navigator.on_enter_scene_or_story()
+
 func show_scene(scene_data: SceneData) -> void:
-	if scene_data == null:
-		push_error("show_scene but scene_data is null.")
-		return
-	if _current_scene != sceneviewer_scene:
-		await goto_scene(sceneviewer_scene)
-	else:
-		fade_rect_anim.play(&"fade_out")
-		await fade_rect_anim.animation_finished
-	if (_scene_cache[sceneviewer_scene] as SceneViewer).background_rect == null:
-		await _scene_cache[sceneviewer_scene].ready
-	_scene_navigator.show_scene(scene_data)
-	fade_rect_anim.play(&"fade_in")
-	_scene_navigator.on_enter_scene_or_story()
+	_navigate_scene(SceneOp.SHOW, scene_data)
 
-# SceneViewer 压入场景
 func push_scene(scene_data: SceneData) -> void:
-	if _current_scene != sceneviewer_scene:
-		return
-	fade_rect_anim.play(&"fade_out")
-	await fade_rect_anim.animation_finished
-	_scene_navigator.push_scene(scene_data)
-	fade_rect_anim.play(&"fade_in")
-	_scene_navigator.on_enter_scene_or_story()
+	_navigate_scene(SceneOp.PUSH, scene_data)
 
-# SceneViewer 弹出场景
 func pop_scene() -> void:
-	if _current_scene != sceneviewer_scene:
-		return
-	fade_rect_anim.play(&"fade_out")
-	await fade_rect_anim.animation_finished
-	_scene_navigator.pop_scene()
-	fade_rect_anim.play(&"fade_in")
-	_scene_navigator.on_enter_scene_or_story()
+	_navigate_scene(SceneOp.POP)
 
 # 开始战斗
 func start_battle(battle_map: PackedScene) -> void:
