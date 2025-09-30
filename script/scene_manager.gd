@@ -31,38 +31,33 @@ func _ready() -> void:
 
 ## 统一的 SceneViewer 场景导航方法
 func _navigate_scene(op: int, scene_data: SceneData = null) -> void:
-	var in_viewer := _current_scene == sceneviewer_scene
+	if op != SceneOp.POP and scene_data == null:
+		push_error("navigate_scene but scene_data is null.")
+		return
 	var viewer := _scene_cache.get(sceneviewer_scene, null) as SceneViewer
-
+	if viewer == null:
+		push_error("navigate_scene but viewer is null.")
+		return
+	var in_viewer := _current_scene == sceneviewer_scene
+	if op != SceneOp.SHOW and not in_viewer:
+		push_warning("navigate_scene but not in viewer scene.")
+	elif not in_viewer:
+		await goto_scene(sceneviewer_scene)
+	if viewer.background_rect == null:
+		await viewer.ready
+	if in_viewer:
+		fade_rect_anim.play(&"fade_out")
+		await fade_rect_anim.animation_finished
 	match op:
 		SceneOp.SHOW:
-			if scene_data == null:
-				push_error("navigate_scene SHOW but scene_data is null.")
-				return
-			if not in_viewer:
-				await goto_scene(sceneviewer_scene)
-			else:
-				fade_rect_anim.play(&"fade_out")
-				await fade_rect_anim.animation_finished
-			if viewer and viewer.background_rect == null:
-				await viewer.ready
 			_scene_navigator.show_scene(scene_data)
 		SceneOp.PUSH:
-			if not in_viewer:
-				return
-			fade_rect_anim.play(&"fade_out")
-			await fade_rect_anim.animation_finished
 			_scene_navigator.push_scene(scene_data)
 		SceneOp.POP:
-			if not in_viewer:
-				return
-			fade_rect_anim.play(&"fade_out")
-			await fade_rect_anim.animation_finished
 			_scene_navigator.pop_scene()
 		_:
 			push_warning("navigate_scene: unknown op " + str(op))
 			return
-
 	fade_rect_anim.play(&"fade_in")
 	_scene_navigator.on_enter_scene_or_story()
 
