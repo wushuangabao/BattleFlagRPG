@@ -1,6 +1,6 @@
 class_name StoryGraph extends Resource
 
-@export var id: String = "graph"
+var id: String
 @export var title: String = ""
 @export var entry_node: String = ""
 @export var nodes: Array[StoryNode] = []
@@ -21,5 +21,5 @@ func remove_node(node_id: String) -> void:
 			return
 
 func ensure_entry() -> void:
-	if entry_node == "" and nodes.size() > 0:
+	if (entry_node == null or entry_node.is_empty()) and nodes.size() > 0:
 		entry_node = nodes[0].id

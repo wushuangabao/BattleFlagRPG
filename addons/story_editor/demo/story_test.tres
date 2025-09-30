@@ -12,15 +12,15 @@
 [ext_resource type="Script" uid="uid://kveh2dwxglja" path="res://addons/story_editor/node/BattleNode.gd" id="8_m2vor"]
 [ext_resource type="Resource" uid="uid://j6skxsherul1" path="res://asset/story/choice/choice_test.tres" id="9_0nfgm"]
 [ext_resource type="Script" uid="uid://6cwwq3vlqmom" path="res://addons/story_editor/runtime/Choice.gd" id="10_51nue"]
-[ext_resource type="Resource" uid="uid://c18djaegv756j" path="res://asset/scene/village.tres" id="11_0nfgm"]
-[ext_resource type="Script" uid="uid://ty85c0d26hqi" path="res://addons/story_editor/node/SceneChoiceNode.gd" id="12_fcgof"]
+[ext_resource type="Script" uid="uid://bjolqxvxn6r0d" path="res://script/scene/SceneData.gd" id="11_0nfgm"]
+[ext_resource type="Script" uid="uid://bt5f6py66e084" path="res://addons/story_editor/node/ChoiceNode.gd" id="12_fcgof"]
 
 [sub_resource type="Resource" id="Resource_5fg8h"]
 script = ExtResource("3_fw4x2")
 timeline = ExtResource("4_fw4x2")
 var_name = "Folder.Var_test"
 id = "n1"
-position = Vector2(100, 320)
+position = Vector2(140, 320)
 outputs = Dictionary[String, String]({
 "A": "n_bfffdd83",
 "B": "n_a499480b"
@@ -81,13 +81,12 @@ metadata/_custom_type_script = "uid://6cwwq3vlqmom"
 
 [sub_resource type="Resource" id="Resource_hy3hp"]
 script = ExtResource("12_fcgof")
-scene_data = ExtResource("11_0nfgm")
 choices = Array[ExtResource("10_51nue")]([ExtResource("9_0nfgm"), SubResource("Resource_fcgof")])
+triggers = Dictionary[ExtResource("11_0nfgm"), int]({})
 id = "n_1010ca0c"
-position = Vector2(-100, 140)
+position = Vector2(-60, 160)
 outputs = Dictionary[String, String]({
 "A": "n_bfffdd83",
-"B": "n_a499480b",
 "d 1": "n1"
 })
 name = "start"
@@ -109,7 +108,6 @@ effects = Array[ExtResource("1_1faki")]([])
 
 [resource]
 script = ExtResource("1_l50ia")
-id = "main"
 title = "MAIN"
 entry_node = "n_1010ca0c"
 nodes = Array[ExtResource("1_6uq8v")]([SubResource("Resource_5fg8h"), SubResource("Resource_l1061"), SubResource("Resource_5iqrb"), SubResource("Resource_pvgde"), SubResource("Resource_q7nag"), SubResource("Resource_hy3hp"), SubResource("Resource_51nue")])

@@ -52,17 +52,15 @@ text = "设为入口"
 [node name="AddBtn" type="MenuButton" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 text = "+节点"
-item_count = 5
+item_count = 4
 popup/item_0/text = "对话"
 popup/item_0/id = 0
 popup/item_1/text = "战斗"
 popup/item_1/id = 1
-popup/item_2/text = "地图"
-popup/item_2/id = 2
-popup/item_3/text = "场景"
-popup/item_3/id = 3
-popup/item_4/text = "结局"
-popup/item_4/id = 4
+popup/item_2/text = "场景"
+popup/item_2/id = 3
+popup/item_3/text = "结局"
+popup/item_3/id = 4
 
 [node name="DelBtn" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
@@ -90,6 +88,55 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 right_disconnects = true
+connections = Array[Dictionary]([{
+"from_node": &"n1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_bfffdd83",
+"to_port": 0
+}, {
+"from_node": &"n1",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_a499480b",
+"to_port": 0
+}, {
+"from_node": &"n_bfffdd83",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_43dc4cdd",
+"to_port": 0
+}, {
+"from_node": &"n_a499480b",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_ded2716",
+"to_port": 0
+}, {
+"from_node": &"n_1010ca0c",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_bfffdd83",
+"to_port": 0
+}, {
+"from_node": &"n_1010ca0c",
+"from_port": 1,
+"keep_alive": false,
+"to_node": &"n1",
+"to_port": 0
+}, {
+"from_node": &"n_ded2716",
+"from_port": 0,
+"keep_alive": false,
+"to_node": &"n_43dc4cdd",
+"to_port": 0
+}, {
+"from_node": &"n_ded2716",
+"from_port": 1,
+"keep_alive": false,
+"to_node": &"n_6c6293fa",
+"to_port": 0
+}])
 
 [node name="Inspector" type="Control" parent="VBoxContainer/HSplitContainer"]
 custom_minimum_size = Vector2(300, 0)

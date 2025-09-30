@@ -336,9 +336,7 @@ func _create_graph_node(n: StoryNode, is_new: bool = false) -> GraphNode:
 			_set_dialogue_node(gn, n, is_new)
 		&"BattleNode":
 			_set_battle_node(gn, n, is_new)
-		&"MapChoiceNode":
-			_set_choice_node(gn, n, is_new)
-		&"SceneChoiceNode":
+		&"ChoiceNode":
 			_set_choice_node(gn, n, is_new)
 		&"EndingNode":
 			_set_ending_node(gn, n, is_new)
@@ -675,10 +673,8 @@ func _on_add_menu_index_pressed(index: int) -> void:
 		1:
 			_add_node_ui(BattleNode)
 		2:
-			_add_node_ui(MapChoiceNode)
+			_add_node_ui(ChoiceNode)
 		3:
-			_add_node_ui(SceneChoiceNode)
-		4:
 			_add_node_ui(EndingNode)
 		_:
 			pass

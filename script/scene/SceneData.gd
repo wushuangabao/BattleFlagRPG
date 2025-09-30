@@ -10,6 +10,3 @@ class_name SceneData
 @export var show_back_button: bool = true
 @export var back_button_texture: Texture2D
 @export var back_button_tooltip: String = "返回"
-
-# 关联的故事节点
-@export var story_choices: Array[Choice]

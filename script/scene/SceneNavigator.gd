@@ -34,15 +34,22 @@ func is_root_scene() -> bool:
 	return stack.size() == 1
 
 func on_enter_scene_or_story() -> bool:
-	if viewer.current_data.story_choices.size() > 0:
-		if Game.g_runner and Game.g_runner.graph:
-			var valid_choices = []
-			for choice in viewer.current_data.story_choices:
-				if choice.condition == null or choice.condition.evaluate({}):
-					valid_choices.append(choice)
-			if valid_choices.size() > 0:
-				var chosen_i = randi_range(0, valid_choices.size() - 1)
-				if Game.g_runner.choose(valid_choices[chosen_i]):
-					return true
+	if Game.g_runner and Game.g_runner.graph_manager and Game.g_runner.active_session_id.is_empty():
+		var valid_choices = []
+		for graph in Game.g_runner.graph_manager.get_valid_graphs():
+			var choice_node := graph["current"] as ChoiceNode
+			if choice_node.triggers.has(viewer.current_data):
+				var choice := (choice_node.choices[choice_node.triggers[viewer.current_data]]) as Choice
+				if choice.condition == null or choice.condition.evaluate(graph["state"]):
+					var choice_data := {
+						"graph": graph["graph"],
+						"choice": choice
+					}
+					valid_choices.append(choice_data)
+		if valid_choices.size() > 0:
+			var chosen_i = randi_range(0, valid_choices.size() - 1)
+			var chosen = valid_choices[chosen_i]
+			if Game.g_runner.choose_for(chosen["graph"].id, chosen["choice"]):
+				return true
 	viewer.show_buttons()
 	return false

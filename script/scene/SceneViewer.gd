@@ -67,6 +67,8 @@ func show_buttons() -> void:
 		btn.texture_normal = btn_data.texture
 		btn.tooltip_text = btn_data.tooltip
 		btn.set_meta("data", btn_data)
+		if btn.is_connected("pressed", _on_button_pressed):
+			btn.disconnect("pressed", _on_button_pressed)
 		btn.connect("pressed", _on_button_pressed.bind(btn))
 		
 		# 创建浮现动画
