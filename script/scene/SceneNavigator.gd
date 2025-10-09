@@ -20,8 +20,6 @@ func push_scene(data: SceneData) -> void:
 
 func pop_scene() -> void:
 	if stack.size() <= 1:
-		# 已经是根场景了：可选择关闭 viewer 或保持
-		# 这里选择保持在根不再弹出
 		return
 	stack.pop_back()
 	var top : SceneData = stack.back()

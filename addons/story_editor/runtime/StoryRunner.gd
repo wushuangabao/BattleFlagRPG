@@ -153,3 +153,53 @@ func choose_for(session_id: String, chosen: Choice) -> bool:
 		_goto_on(session_id, target)
 		return true
 	return false
+
+# 保存/读取接口（用于游戏存档系统）
+func save_state() -> Dictionary:
+	var result: Dictionary = {"sessions": []}
+	# 保存所有会话：图资源路径、当前节点、变量、访问记录与激活标记
+	if graph_manager == null:
+		return result
+	for sid in graph_manager._sessions.keys():
+		var s := graph_manager.get_session(sid)
+		if s.is_empty():
+			continue
+		var g: StoryGraph = s.get("graph", null)
+		var cur: StoryNode = s.get("current", null)
+		var st: Dictionary = s.get("state", {"variables": {}, "visited": {}})
+		var entry: Dictionary = {
+			"id": sid,
+			"graph_path": g.resource_path if g else "",
+			"current_id": cur.id if cur else "",
+			"variables": st.get("variables", {}),
+			"visited": st.get("visited", {}),
+			"active": active_session_id == sid,
+		}
+		result["sessions"].append(entry)
+	return result
+
+func restore_state(data: Dictionary) -> void:
+	if graph_manager == null:
+		return
+	active_session_id = ""
+	var sessions: Array = data.get("sessions", [])
+	for sess in sessions:
+		var graph_path: String = sess.get("graph_path", "")
+		if graph_path == "":
+			continue
+		var g: StoryGraph = load(graph_path)
+		if g == null:
+			push_warning("Restore story failed: graph not found " + graph_path)
+			continue
+		var sid := graph_manager.create_session(g)
+		var current_id: String = sess.get("current_id", "")
+		if current_id != "":
+			var node := g.get_node_by_id(current_id)
+			if node:
+				graph_manager.set_current(sid, node)
+				graph_manager.mark_visited(sid, current_id)
+		var st := graph_manager.get_state(sid)
+		st["variables"] = sess.get("variables", {})
+		st["visited"] = sess.get("visited", {})
+		if sess.get("active", false):
+			active_session_id = sid

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
 SettingManager="*res://script/SettingManager.gd"
+GameSaver="*res://script/GameSaver.gd"
 
 [dialogic]
 
@@ -70,7 +71,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/story_editor/plugin.cfg")
 
 [input]
 

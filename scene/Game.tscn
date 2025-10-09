@@ -103,6 +103,7 @@ offset_left = -91.0
 offset_top = 785.52
 offset_bottom = 851.52
 grow_horizontal = 0
+grow_vertical = 0
 
 [node name="Btn_Battle" type="Button" parent="CanvasLayer/debug"]
 layout_mode = 2

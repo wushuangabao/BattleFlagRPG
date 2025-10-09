@@ -29,6 +29,9 @@ func _ready() -> void:
 	goto_scene(main_scene)
 	print("场景管理器初始化完毕")
 
+func push_scene_data(scene_data: SceneData) -> void:
+	_scene_navigator.stack.push_back(scene_data)
+
 ## 统一的 SceneViewer 场景导航方法
 func _navigate_scene(op: int, scene_data: SceneData = null) -> void:
 	if op != SceneOp.POP and scene_data == null:
@@ -39,9 +42,7 @@ func _navigate_scene(op: int, scene_data: SceneData = null) -> void:
 		push_error("navigate_scene but viewer is null.")
 		return
 	var in_viewer := _current_scene == sceneviewer_scene
-	if op != SceneOp.SHOW and not in_viewer:
-		push_warning("navigate_scene but not in viewer scene.")
-	elif not in_viewer:
+	if not in_viewer:
 		await goto_scene(sceneviewer_scene)
 	if viewer.background_rect == null:
 		await viewer.ready
@@ -68,7 +69,16 @@ func push_scene(scene_data: SceneData) -> void:
 	_navigate_scene(SceneOp.PUSH, scene_data)
 
 func pop_scene() -> void:
-	_navigate_scene(SceneOp.POP)
+	if _scene_navigator.is_root_scene():
+		var packed_scene := _scene_navigator.current_scene().back_to_map_scene
+		if packed_scene:
+			Game.g_scenes.goto_scene(packed_scene)
+			_scene_navigator.stack.clear()
+	else:
+		_navigate_scene(SceneOp.POP)
+
+func clear_scene() -> void:
+	_scene_navigator.stack.clear()
 
 # 开始战斗
 func start_battle(battle_map: PackedScene) -> void:
@@ -96,7 +106,8 @@ func goto_scene(p_scene: PackedScene) -> void:
 	if _current_scene and _current_scene == p_scene:
 		return
 	if _current_scene != null:
-		fade_rect_anim.play(&"fade_out")
+		if fade_rect_anim.is_playing() == false:
+			fade_rect_anim.play(&"fade_out")
 		await fade_rect_anim.animation_finished
 	if get_child_count() > 0:
 		var old_scene = get_child(0)

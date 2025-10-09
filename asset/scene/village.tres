@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="SceneData" load_steps=8 format=3 uid="uid://c18djaegv756j"]
+[gd_resource type="Resource" script_class="SceneData" load_steps=9 format=3 uid="uid://c18djaegv756j"]
 
 [ext_resource type="Texture2D" uid="uid://yg5haa1ohvo6" path="res://icon.svg" id="1_4sw7n"]
 [ext_resource type="Script" uid="uid://ba5pocl2biuj" path="res://script/scene/SceneBtnData.gd" id="1_lgkvs"]
 [ext_resource type="Texture2D" uid="uid://bu6hl0rfdc6pb" path="res://asset/png/full_screen/outputs_20250922_17585380573885200_result_00632__c2fbdaf51a.png" id="2_8hh7j"]
 [ext_resource type="Script" uid="uid://bjolqxvxn6r0d" path="res://script/scene/SceneData.gd" id="2_nbnhv"]
+[ext_resource type="PackedScene" uid="uid://datpgnyw8dvwa" path="res://scene/map/BigMap.tscn" id="2_r7dm0"]
 [ext_resource type="Resource" uid="uid://cvah7mhbncs8y" path="res://asset/scene/inside_inn.tres" id="4_4advk"]
 [ext_resource type="Texture2D" uid="uid://cgjd1d5b3rlli" path="res://asset/png/ui/main_menu_btn_new.png" id="4_8hh7j"]
 
@@ -25,4 +26,5 @@ buttons = Array[ExtResource("1_lgkvs")]([SubResource("Resource_4advk")])
 show_back_button = true
 back_button_texture = ExtResource("1_4sw7n")
 back_button_tooltip = "返回"
+back_to_map_scene = ExtResource("2_r7dm0")
 metadata/_custom_type_script = "uid://bjolqxvxn6r0d"
