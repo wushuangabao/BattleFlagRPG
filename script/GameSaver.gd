@@ -5,6 +5,9 @@ const SAVE_VERSION := 1
 const ACTION_SAVE_QUICK := "save_quick"
 const ACTION_LOAD_QUICK := "load_quick"
 
+# 存档/读档过程防护标志：进行中时禁止再次触发
+var _is_processing: bool = false
+
 func _ready() -> void:
 	_ensure_actions()
 
@@ -21,6 +24,8 @@ func _ensure_actions() -> void:
 		InputMap.action_add_event(ACTION_LOAD_QUICK, ev2)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _is_processing:
+		return
 	if event.is_action_pressed(ACTION_SAVE_QUICK):
 		save_slot()
 	elif event.is_action_pressed(ACTION_LOAD_QUICK):
@@ -30,8 +35,13 @@ func get_save_path(slot: int = 1) -> String:
 	return "user://save_%d.json" % slot
 
 func save_slot(slot: int = 1) -> bool:
+	if _is_processing:
+		push_warning("Save ignored: operation in progress")
+		return false
+	_is_processing = true
 	if Game.g_scenes == null:
 		push_warning("Save failed: SceneManager not ready")
+		_is_processing = false
 		return false
 	var scene_info: Dictionary = {}
 	scene_info["current_scene_path"] = Game.g_scenes._current_scene.resource_path if Game.g_scenes._current_scene else ""
@@ -42,6 +52,20 @@ func save_slot(slot: int = 1) -> bool:
 		for sd in Game.g_scenes._scene_navigator.stack:
 			if sd and sd is SceneData:
 				(scene_info["stack_paths"] as Array).append(sd.resource_path)
+
+	# 若当前正在战斗，记录战斗前的原场景及其场景栈
+	scene_info["origin_scene_path"] = ""
+	scene_info["origin_stack_paths"] = []
+	if Game.g_scenes and Game.g_scenes.origin_path:
+		scene_info["origin_scene_path"] = Game.g_scenes.origin_path
+		# 若原场景是 SceneViewer，则记录其栈
+		if Game.g_scenes.origin_path != "" and Game.g_scenes.sceneviewer_scene and Game.g_scenes.origin_path == Game.g_scenes.sceneviewer_scene.resource_path:
+			var origin_stack: Array = []
+			if Game.g_scenes._scene_navigator and Game.g_scenes._scene_navigator.stack:
+				for sd2 in Game.g_scenes._scene_navigator.stack:
+					if sd2 and sd2 is SceneData:
+						origin_stack.append(sd2.resource_path)
+			scene_info["origin_stack_paths"] = origin_stack
 
 	var story_info: Dictionary = {}
 	if Game.g_runner:
@@ -73,29 +97,39 @@ func save_slot(slot: int = 1) -> bool:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f == null:
 		push_warning("Save failed: cannot open file " + path)
+		_is_processing = false
 		return false
 	f.store_string(JSON.stringify(data))
 	f.close()
+
+	_is_processing = false
 	return true
 
 func load_slot(slot: int = 1) -> bool:
+	if _is_processing:
+		push_warning("Load ignored: operation in progress")
+		return false
+	_is_processing = true
 	var path := get_save_path(slot)
 	if not FileAccess.file_exists(path):
 		push_warning("Load failed: file not found " + path)
+		_is_processing = false
 		return false
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null:
 		push_warning("Load failed: cannot open file " + path)
+		_is_processing = false
 		return false
 	var txt := f.get_as_text()
 	f.close()
 	var parse = JSON.parse_string(txt)
 	if parse == null or not (parse is Dictionary):
 		push_warning("Load failed: parse json error")
+		_is_processing = false
 		return false
 	var data: Dictionary = parse
 
-	# 恢复角色
+	print("开始恢复角色...")
 	if Game.g_actors and ActorManager._actors_nameMap:
 		var actors_info: Array = data.get("actors", [])
 		for a in actors_info:
@@ -116,11 +150,40 @@ func load_slot(slot: int = 1) -> bool:
 			if st.MP:
 				st.MP.set_value(int(a.get("mp", st.MP.value)))
 
-	# 恢复场景
+	print("开始恢复剧情...")
+	var battle_map_to_start: PackedScene = null
+	if Game.g_runner:
+		Game.g_runner.restore_state(data.get("story", {}))
+		# 如果当前剧情节点为战斗节点，则记录需要启动的战斗地图
+		var sid := Game.g_runner.active_session_id
+		if sid != "":
+			var cur_node := Game.g_runner.graph_manager.get_current(sid)
+			if cur_node and (cur_node is BattleNode):
+				battle_map_to_start = (cur_node as BattleNode).battle
+
+	print("开始恢复场景...")
 	if Game.g_scenes:
 		var scene_info: Dictionary = data.get("scene", {})
 		var in_viewer: bool = scene_info.get("in_viewer", false)
-		if in_viewer:
+		# 若当前剧情为战斗节点：进入战斗并恢复原场景（战斗前场景）
+		if battle_map_to_start != null:
+			var origin_scene_path: String = scene_info.get("origin_scene_path", "")
+			var origin_stack_paths: Array = scene_info.get("origin_stack_paths", [])
+			if origin_scene_path != "":
+				var origin_ps: PackedScene = load(origin_scene_path)
+				if origin_ps:
+					# 启动新战斗（等待场景切换完成）
+					await Game.g_scenes.start_battle(battle_map_to_start, origin_ps)
+					# 恢复原场景
+					if Game.g_scenes.sceneviewer_scene and origin_ps == Game.g_scenes.sceneviewer_scene:
+						Game.g_scenes.clear_scene()
+						var osize := origin_stack_paths.size()
+						if osize > 0:
+							for i in range(0, osize):
+								var sd_o: SceneData = load(origin_stack_paths[i])
+								if sd_o:
+									Game.g_scenes.push_scene_data(sd_o)
+		elif in_viewer:
 			var stack_paths: Array = scene_info.get("stack_paths", [])
 			var stack_size = stack_paths.size()
 			if stack_size > 0:
@@ -129,7 +192,7 @@ func load_slot(slot: int = 1) -> bool:
 					var sd: SceneData = load(stack_paths[i])
 					if sd:
 						if i + 1 == stack_size:
-							Game.g_scenes.push_scene(sd)
+							await Game.g_scenes.push_scene(sd)
 						else:
 							Game.g_scenes.push_scene_data(sd)
 		else:
@@ -139,8 +202,6 @@ func load_slot(slot: int = 1) -> bool:
 				if ps:
 					await Game.g_scenes.goto_scene(ps)
 
-	# 恢复剧情
-	if Game.g_runner:
-		Game.g_runner.restore_state(data.get("story", {}))
-
+	await get_tree().create_timer(1.0).timeout
+	_is_processing = false
 	return true

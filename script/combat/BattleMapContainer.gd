@@ -26,7 +26,7 @@ func loadScene_battleMap(scene_map: PackedScene) -> BattleMap:
 func release_battleMap() -> void:
 	if get_child_count() > 0:
 		_current_scene = null
-		get_child(0).queue_free() # 释放当前场景
+		get_child(0).free() # 释放当前场景
 
 func get_cur_scene_path() -> String:
 	if not _current_scene:

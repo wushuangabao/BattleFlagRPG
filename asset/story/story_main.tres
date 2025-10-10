@@ -91,7 +91,7 @@ metadata/_custom_type_script = "uid://6cwwq3vlqmom"
 script = ExtResource("10_kqsvu")
 choices = Array[ExtResource("8_wan7x")]([SubResource("Resource_0nfgm"), SubResource("Resource_fcgof")])
 triggers = Dictionary[ExtResource("10_tbdfa"), int]({
-ExtResource("11_5e00d"): 0
+ExtResource("11_5e00d"): 1
 })
 id = "n_1010ca0c"
 position = Vector2(60, 220)

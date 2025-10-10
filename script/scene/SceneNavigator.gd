@@ -6,10 +6,18 @@ var stack: Array[SceneData] = []
 func _init(scene_viewer: SceneViewer) -> void:
 	viewer = scene_viewer
 
-func show_scene(data: SceneData) -> void:
-	# 清空栈，直接显示一个场景
-	stack.clear()
-	stack.append(data)
+# 在栈中寻找并显示场景
+func show_scene(data: SceneData = null) -> void:
+	if data == null:
+		data = stack.back()
+	var index := stack.find(data)
+	if index == -1:
+		stack.clear()
+		stack.append(data)
+		(viewer as Node).call("set_scene_data", data)
+		return
+	stack = stack.slice(0, index + 1)
+	assert(stack.back() == data)
 	(viewer as Node).call("set_scene_data", data)
 
 func push_scene(data: SceneData) -> void:

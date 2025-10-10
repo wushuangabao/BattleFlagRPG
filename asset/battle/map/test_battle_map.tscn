@@ -13,9 +13,11 @@ script = ExtResource("3_soc4e")
 my_script = ExtResource("2_bxxp4")
 metadata/_custom_type_script = "uid://dpsqnsulag2qx"
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="CanvasLayer" type="CanvasLayer" node_paths=PackedStringArray("ground", "flag")]
 script = ExtResource("1_o8354")
 lose_checker = SubResource("Resource_yp0ia")
+ground = NodePath("TilemapRoot2D/Ground")
+flag = NodePath("TilemapRoot2D/Flag")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(633, 405)
@@ -36,3 +38,7 @@ tile_map_data = PackedByteArray("AAARAAoAAAAPAAMAAAAWAAoAAAAPAAQAAAAZAAoAAAAPAAM
 tile_set = ExtResource("5_2f7ip")
 navigation_enabled = false
 script = ExtResource("7_85oxp")
+unit_team_id = Dictionary[StringName, int]({
+&"test_actor": 3
+})
+player_team_id = Array[int]([3])

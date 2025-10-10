@@ -115,6 +115,8 @@ func get_actors_not_in_team(id: Game.TeamID) -> Array[ActorController]:
 	return actors
 
 func let_actor_move(a: ActorController) -> void:
+	if a.base3d.get_cur_path().size() <= 1:
+		return
 	scene.let_actor_move(a)
 	_cell_map.erase(a.base3d.get_cur_cell())
 	_cell_map[a.base3d.get_cur_path().back()] = a
@@ -211,15 +213,16 @@ func on_actor_mp_changed(actor, new_mp, old_mp):
 
 # 开始战斗时，由 SceneManager 调用
 func init_with_battle_scene(battle_scene: PackedScene) -> void:
-	if _cur_battle_scene != battle_scene:
-		_cur_state = BattleState.Init
-		_actors.clear()
-		_cell_map.clear()
+	_cur_state = BattleState.Init
+	_actors.clear()
+	_cell_map.clear()
+	if battle_scene:
 		_cur_battle_scene = battle_scene
-		if battle_scene:
-			_cur_battle_path = battle_scene.get_path()
-		else:
-			_cur_battle_path = ""
+		_cur_battle_path = battle_scene.get_path()
+	if _cur_battle_path.is_empty() or _cur_battle_scene == null:
+		push_error("init_with_battle_scene but battle_name is empty")
+		return
+	on_battle_start()
 
 # 节点首次加载到场景树完毕时，由 BattleScene 调用
 func init_with_scene_node(node: BattleScene) -> void:
@@ -233,13 +236,12 @@ func init_with_scene_node(node: BattleScene) -> void:
 
 func on_battle_start() -> void:
 	print("战斗场景已添加，开始加载地图：", _cur_battle_path)
-	if _cur_battle_path.is_empty() or _cur_battle_scene == null:
-		push_error("on_battle_start but battle_name is empty")
-		return
 	if scene == null:
 		push_error("on_battle_start but battle scene is null")
 		return
 	
+	scene.is_released_ok = false
+
 	# 初始化战斗随机种子（如果没有设置，使用当前时间）
 	if _battle_seed == 0:
 		_battle_seed = Time.get_unix_time_from_system() as int
@@ -248,7 +250,7 @@ func on_battle_start() -> void:
 	
 	var ok = await scene.load_battle_map(_cur_battle_scene)
 	if ok:
-		create_initial_units_on_battle_map()
+		await create_initial_units_on_battle_map()
 		scene.timeline.start()
 		_cur_state = BattleState.Wait
 	else:
@@ -296,17 +298,24 @@ func create_initial_units_on_battle_map() -> void:
 			if not map.is_player_team(actor.team_id):
 				team_ids_not_player.append(actor.team_id)
 	_turn_controller.set_battle_teams(map.get_player_team_id(), team_ids_not_player)
+	for a in _actors:
+		if a.AP == null:
+			await a.base3d.initialized
 	print("战斗单位已加载完毕")
-	
 
 func on_battle_map_unload() -> void:
-	# 防止在之后的 base3d 释放时被连带着释放掉
-	for a in _actors:
-		if Game.g_actors.is_character(a.base3d):
-			a.base3d.remove_child(a)
-	init_with_battle_scene(null)
+	# 清理 timeline，停止回合循环
+	if _turn_controller:
+		_turn_controller.stop_turn_loop()
 	_turn_controller.timeline.clear_on_change_scene()
 	_turn_controller.set_battle_teams([], [])
+	# 清理 actors 和相关数据
+	_actors.clear()
+	_cell_map.clear()
+	# 重置战斗状态
+	_cur_state = BattleState.Uninit
+	cur_actor = null
+	cur_action = null
 
 #endregion
 

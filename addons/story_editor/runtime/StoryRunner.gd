@@ -181,7 +181,14 @@ func save_state() -> Dictionary:
 func restore_state(data: Dictionary) -> void:
 	if graph_manager == null:
 		return
+	# 读档前：清空当前所有会话/图
 	active_session_id = ""
+	if graph_manager._sessions != null:
+		# 确保移除所有已有的 StoryGraph 会话
+		for sid in graph_manager._sessions.keys():
+			graph_manager.remove_session(sid)
+		# 双保险，清空字典
+		graph_manager._sessions.clear()
 	var sessions: Array = data.get("sessions", [])
 	for sess in sessions:
 		var graph_path: String = sess.get("graph_path", "")
@@ -191,7 +198,18 @@ func restore_state(data: Dictionary) -> void:
 		if g == null:
 			push_warning("Restore story failed: graph not found " + graph_path)
 			continue
-		var sid := graph_manager.create_session(g)
+		var sid = sess.get("id", "")
+		if sid == "":
+			push_warning("Restore story failed: sid is null - " + graph_path)
+			continue
+		# 根据存档重建会话（保留原 sid）
+		g.ensure_entry()
+		var session := {
+			"graph": g,
+			"current": null,
+			"state": {"variables": {}, "visited": {}}
+		}
+		graph_manager._sessions[sid] = session
 		var current_id: String = sess.get("current_id", "")
 		if current_id != "":
 			var node := g.get_node_by_id(current_id)

@@ -62,7 +62,8 @@ func clear_on_change_scene() -> void:
 	ready_queue.clear()
 	gain_ap_map.clear()
 	for a in texture_map:
-		texture_map[a].queue_free()
+		remove_child(texture_map[a])
+		texture_map[a].free()
 	texture_map.clear()
 
 func _on_actor_die(a: ActorController) -> void:

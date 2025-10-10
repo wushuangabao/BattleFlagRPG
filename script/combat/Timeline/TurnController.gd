@@ -3,6 +3,7 @@ class_name TurnController extends AbstractController
 var timeline : TimelineController
 
 var _actor
+var _stop_requested := false
 
 # 玩家队伍列表：任意一个队伍全部死亡时玩家失败
 var player_teams: Array[Game.TeamID] = []
@@ -25,11 +26,26 @@ func set_battle_teams(player_team_list: Array[Game.TeamID], enemy_team_list: Arr
 	player_teams = player_team_list
 	enemy_teams = enemy_team_list
 
+func stop_turn_loop() -> void:
+	_stop_requested = true
+	print("[TurnController] 请求停止 do_turn 循环")
+
 func do_turn(actor: ActorController) -> void:
-	print("现在是 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
+	_stop_requested = false
+	print("现在是 %s （%s，AP=%d）的回合..." % [actor.my_name, str(actor), actor.get_AP()])
+	
+	# 调试：打印准备队列中的角色名字和AP
+	var _rq_msg := "ready_queue: "
+	for a in timeline.ready_queue:
+		_rq_msg += str(a.my_name) + "(%s,AP=%d) " % [str(a), a.get_AP()]
+	print(_rq_msg)
+
 	_actor = actor  # _actor 才是当前选择、执行动作的角色，actor 不是！因为在 while 循环中，可能重新赋值 _actor 为其他角色
 	var battle = Game.g_combat
 	while true:
+		if _stop_requested:
+			print("[TurnController] 停止标记命中，退出 do_turn 循环")
+			break
 		# 角色是否可行动
 		if not _actor.is_alive() or not has_affordable_actions(_actor):
 			if _try_next_actor_do_turn():
@@ -39,11 +55,14 @@ func do_turn(actor: ActorController) -> void:
 		# 选择动作
 		battle.begin_to_chose_action_for(_actor)
 		var action: ActionBase = await Game.g_combat.action_chosed
+		if _stop_requested:
+			print("[TurnController] 在等待 action_chosed 后收到停止请求，退出")
+			break
 		if action == null:
 			print("动作无效 - ", _actor.my_name)
 			continue
 		if not action.validate(_actor):
-			print("动作未通过校验 - ", _actor.my_name)
+			print("动作未通过校验 - %s(%s) - %s" % [_actor.my_name, str(_actor), action.get_action_name()])
 			continue
 		# 选择动作完毕
 		_actor.anim_player.highlight_off()
@@ -58,6 +77,9 @@ func do_turn(actor: ActorController) -> void:
 		# 选择目标，或者取消动作
 		if action.target_type != ActionBase.TargetType.None:
 			var ok = await battle.chose_action_target(_actor, action)
+			if _stop_requested:
+				print("[TurnController] 在等待 chose_action_target 后收到停止请求，退出")
+				break
 			if not ok:
 				continue
 		# 动作消耗
@@ -65,6 +87,12 @@ func do_turn(actor: ActorController) -> void:
 		timeline.update_actor_btn_pos(_actor, true)
 		# 执行动作
 		await battle.let_actor_do_action(_actor, action)
+		if _stop_requested:
+			print("[TurnController] 在等待 let_actor_do_action 后收到停止请求，退出")
+			break
+	if _stop_requested:
+		_actor = null
+		return
 	battle.turn_ended()
 	var battle_result = _check_battle_end()
 	var is_battle_end = battle_result[0]
@@ -93,7 +121,7 @@ func change_cur_actor_to(actor: ActorController) -> bool:
 	if _actor == null:
 		do_turn(actor)
 	else:
-		print("已经切换到 ", actor.my_name, "的回合...（AP=", actor.get_AP(), "）")
+		print("已经切换到 %s （%s，AP=%d）的回合..." % [actor.my_name, str(actor), actor.get_AP()])
 		_actor = actor
 	Game.g_combat.scene.select_current_actor(actor)
 	return true
@@ -112,6 +140,9 @@ func _check_battle_end() -> Array:
 	var battle = Game.g_combat
 
 	# 先执行 BattleMap 的自定义检查器
+	if battle.scene.subvp.get_child_count() < 1:
+		push_warning("BattleMap 未初始化")
+		return [false, false]
 	var map = battle.scene.subvp.get_child(0)
 	if map and map is BattleMap:
 		if map.win_checker:

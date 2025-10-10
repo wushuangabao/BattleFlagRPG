@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=44 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -20,9 +20,7 @@
 [ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="13_662wh"]
 [ext_resource type="Script" uid="uid://ba0gvnqsvcpa" path="res://script/ui/btn_action.gd" id="14_4gioj"]
 [ext_resource type="Script" uid="uid://byxtnaoo2710d" path="res://script/combat/Action/ActionDefend.gd" id="14_dwjhn"]
-[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="14_pomew"]
 [ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="15_662wh"]
-[ext_resource type="Script" uid="uid://camissxpceiep" path="res://script/combat/Effect/ConditionBase.gd" id="15_ga0e4"]
 [ext_resource type="Script" uid="uid://b0hmy44do600x" path="res://script/combat/Effect/DamageEffect.gd" id="16_ol0sb"]
 [ext_resource type="Script" uid="uid://5hvrwn0fjsgu" path="res://script/combat/Action/ActionSkipTurn.gd" id="17_5n8sn"]
 [ext_resource type="Script" uid="uid://bkdbyyw7vdvyv" path="res://script/combat/Action/ActionRecover.gd" id="18_rq0px"]
@@ -89,7 +87,7 @@ has_splash = false
 splash_range = 1.0
 splash_damage_ratio = 0.5
 power_coefficient = 1.0
-conditions = Array[ExtResource("15_ga0e4")]([])
+conditions = []
 tags = Array[StringName]([])
 effect_name = ""
 description = ""
@@ -112,7 +110,7 @@ cast_time = 0.0
 area_range = SubResource("Resource_662wh")
 area_chose = SubResource("Resource_ga0e4")
 filters = Array[StringName]([])
-effects = Array[ExtResource("14_pomew")]([SubResource("Resource_yhjk3")])
+effects = [SubResource("Resource_yhjk3")]
 caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 

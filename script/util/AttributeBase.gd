@@ -30,13 +30,15 @@ func set_value(new_value: int) -> void:
 	value = clamp(new_value, 0, _maximum) as int
 
 func register(on_value_changed: Callable, on_maximum_changed = null):
-	value_changed.connect(on_value_changed)
-	if on_maximum_changed:
+	if not value_changed.is_connected(on_value_changed):
+		value_changed.connect(on_value_changed)
+	if on_maximum_changed and not maximum_changed.is_connected(on_maximum_changed):
 		maximum_changed.connect(on_maximum_changed)
 
 func unregister(on_value_changed: Callable, on_maximum_changed = null):
-	value_changed.disconnect(on_value_changed)
-	if on_maximum_changed:
+	if value_changed.is_connected(on_value_changed):
+		value_changed.disconnect(on_value_changed)
+	if on_maximum_changed and maximum_changed.is_connected(on_maximum_changed):
 		maximum_changed.disconnect(on_maximum_changed)
 
 func _init(a: ActorController, default_value: int = 10, default_maximum: int = 10) -> void:

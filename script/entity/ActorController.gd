@@ -95,13 +95,20 @@ func set_actor_data(actor_name) -> void:
 	print("角色基础属性数据初始化完毕 - ", actor_name)
 
 func _enter_tree() -> void:
-	print("角色已经加载到树中 ", my_name)
-	my_stat = UnitStat.new(self)
+	_state = ActorState.Idle
+	_action = null
+	tags.clear()
+	buffs.clear()
+	actions.clear()
+	tmp_timeline_y = 0.0
+	facing_direction = FacingDirection.Right # 默认向右
 	AP = AttributeBase.new(self, 0, TimelineController.AP_MAX)
+	if my_stat == null:
+		my_stat = UnitStat.new(self)
 	Game.g_combat.get_architecture().register_actor(self)
 
 func _exit_tree() -> void:
-	print("角色已从树中移除 ", my_name)
+	# print("角色已从树中移除 ", my_name)
 	Game.g_combat.get_architecture().unregister_actor(self)
 
 func _process(delta: float) -> void:

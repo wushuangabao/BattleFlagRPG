@@ -5,7 +5,7 @@ func _on_btn_new_game_pressed() -> void:
 	if Game.g_scenes == null:
 		return
 	var first := load("res://asset/scene/village.tres") as SceneData
-	Game.g_scenes.show_scene(first)
+	Game.g_scenes.push_scene(first)
 	if Game.g_runner:
 		print("start story")
 		Game.g_runner.start(preload("res://asset/story/story_main.tres"))

@@ -112,15 +112,6 @@ func _ready() -> void:
 	if my_system == null:
 		my_system = Game.g_combat
 		my_system.init_with_scene_node(self)
-	my_system.on_battle_start()
-
-# 每次切到战斗场景都会调用
-# 此时子节点还未添加
-func _enter_tree() -> void:
-	if my_system == null:
-		return
-	# Game.g_event.register_event(destination, on_event)
-	my_system.on_battle_start()
 
 func load_battle_map(map: PackedScene) -> bool:
 	var new_node := await subvp.loadScene_battleMap(map)
@@ -164,12 +155,24 @@ func _hook_subviewport_texture_to_plane() -> void:
 	board_plane.set_surface_override_material(0, mat)
 
 # 切换场景时释放资源
-func release_on_change_scene():
-	for u in _unit_list:
-		u.queue_free()
-	_unit_list.clear()
+signal battle_scene_released_ok
+var is_released_ok := false
+func release_on_change_scene() -> void:
+	print("开始释放战斗场景资源...")
+	_cur_unit = null
+	_target_units.clear()
 	subvp.release_battleMap()
 	my_system.on_battle_map_unload()
+	for u in _unit_list:
+		if is_instance_valid(u):
+			if Game.g_actors.is_character(u.actor):
+				u.remove_child(u.actor) # 防止actor和父节点一起free
+			u.queue_free()
+			remove_child(u)
+	_unit_list.clear()
+	print("战斗场景资源释放完毕")
+	battle_scene_released_ok.emit()
+	is_released_ok = true
 
 #endregion
 

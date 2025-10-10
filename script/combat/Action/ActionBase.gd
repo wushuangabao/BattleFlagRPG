@@ -23,6 +23,7 @@ func get_state() -> ActionState:
 
 func validate(actor: ActorController) -> bool:
 	if Game.g_combat.get_battle_state() != BattleSystem.BattleState.ActorIdle:
+		print_debug("动作 %s 校验失败，当前战斗状态是 %d" % [get_action_name(), Game.g_combat.get_battle_state()])
 		return false
 	for s in cost:
 		match s:
