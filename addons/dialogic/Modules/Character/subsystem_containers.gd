@@ -232,7 +232,7 @@ func load_position_container(position_id: String) -> DialogicNode_PortraitContai
 	container.container_ids = info.container_ids
 	container.position = info.position
 	container.rotation = info.rotation
-	container.size = info.size
+	container.call_deferred("set_size", info.size)
 	container.pivot_mode = info.pivot_mode
 	container.pivot_value = info.pivot_value
 	container.origin_anchor = info.origin_anchor
