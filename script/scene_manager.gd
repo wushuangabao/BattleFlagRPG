@@ -4,7 +4,7 @@ class_name SceneManager extends AbstractSystem
 @export var battle_scene: PackedScene
 @export var sceneviewer_scene: PackedScene
 
-@onready var fade_rect_anim: AnimationPlayer = $"../AnimationPlayer"
+@onready var fade_rect_anim: AnimationPlayer = $"../mouse_layer/AnimationPlayer"
 
 # 缓存常用的场景，避免反复释放加载
 var _scene_cache: Dictionary[PackedScene, Node] = {}

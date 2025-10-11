@@ -2,6 +2,7 @@
 class_name Game
 
 const CONFIG_PATH := "user://settings.cfg"
+const SAVE_FOLDER := "user://saves/"
 
 const Debug = 1
 const pi_4 = PI / 4.0  # 45度

@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=46 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
@@ -23,7 +23,9 @@
 [ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="15_662wh"]
 [ext_resource type="Script" uid="uid://b0hmy44do600x" path="res://script/combat/Effect/DamageEffect.gd" id="16_ol0sb"]
 [ext_resource type="Script" uid="uid://5hvrwn0fjsgu" path="res://script/combat/Action/ActionSkipTurn.gd" id="17_5n8sn"]
+[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="18_4nkfg"]
 [ext_resource type="Script" uid="uid://bkdbyyw7vdvyv" path="res://script/combat/Action/ActionRecover.gd" id="18_rq0px"]
+[ext_resource type="Script" uid="uid://camissxpceiep" path="res://script/combat/Effect/ConditionBase.gd" id="19_j1stj"]
 [ext_resource type="Texture2D" uid="uid://cdi1wlm03n753" path="res://asset/png/ui/battle_actions.png" id="23_ol0sb"]
 [ext_resource type="Texture2D" uid="uid://crxo3ml1k53xg" path="res://asset/png/icon/arrow-up.png" id="31_cowrm"]
 [ext_resource type="Texture2D" uid="uid://dtidltf1cren6" path="res://asset/png/icon/arrow-upleft.png" id="31_hexu1"]
@@ -87,7 +89,7 @@ has_splash = false
 splash_range = 1.0
 splash_damage_ratio = 0.5
 power_coefficient = 1.0
-conditions = []
+conditions = Array[ExtResource("19_j1stj")]([])
 tags = Array[StringName]([])
 effect_name = ""
 description = ""
@@ -110,7 +112,7 @@ cast_time = 0.0
 area_range = SubResource("Resource_662wh")
 area_chose = SubResource("Resource_ga0e4")
 filters = Array[StringName]([])
-effects = [SubResource("Resource_yhjk3")]
+effects = Array[ExtResource("18_4nkfg")]([SubResource("Resource_yhjk3")])
 caster_anim = &"attack"
 metadata/_custom_type_script = "uid://dpyiyx506qhs6"
 

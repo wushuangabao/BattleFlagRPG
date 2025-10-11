@@ -5,6 +5,7 @@ signal choice_requested_for(session_id: String, node: ChoiceNode, options: Packe
 
 var graph_manager: StoryGraphManager = StoryGraphManager.new()
 var active_session_id: String = ""
+var is_in_battle: bool = false
 
 func on_init() -> void:
 	register_event("battle_end", _on_battle_end)
@@ -21,6 +22,7 @@ func _on_battle_end(player_victory: bool) -> void:
 		_goto_on(active_session_id, node.get_next_for(node.success))
 	else:
 		_goto_on(active_session_id, node.get_next_for(node.fail))
+	is_in_battle = false
 
 func _init() -> void:
 	Dialogic.timeline_started.connect(_on_timeline_started)
@@ -96,6 +98,7 @@ func _goto_on(session_id: String, node_id: String) -> void:
 				_goto_on(session_id, node.get_next_for(node.success))
 			else:
 				Game.g_scenes.start_battle(node.battle)
+				is_in_battle = true
 		&"ChoiceNode":                               # 选项（场景中卡片，非对话）
 			if Game.g_scenes == null:
 				_preview_choices_for(session_id, node)
@@ -124,7 +127,7 @@ func _apply_effects_for(session_id: String, effects: Array) -> void:
 			e.apply(st)
 
 func start(p_graph: StoryGraph, entry: String = "") -> String:
-	var sid := graph_manager.create_session(p_graph, entry)
+	var sid := graph_manager.create_session(p_graph)
 	_set_active_session(sid)
 	var start_id = entry if entry != "" else p_graph.entry_node
 	_goto_on(sid, start_id)
@@ -155,40 +158,22 @@ func choose_for(session_id: String, chosen: Choice) -> bool:
 	return false
 
 # 保存/读取接口（用于游戏存档系统）
-func save_state() -> Dictionary:
+func save_story_state() -> Dictionary:
 	var result: Dictionary = {"sessions": []}
 	# 保存所有会话：图资源路径、当前节点、变量、访问记录与激活标记
-	if graph_manager == null:
-		return result
-	for sid in graph_manager._sessions.keys():
-		var s := graph_manager.get_session(sid)
-		if s.is_empty():
-			continue
-		var g: StoryGraph = s.get("graph", null)
-		var cur: StoryNode = s.get("current", null)
-		var st: Dictionary = s.get("state", {"variables": {}, "visited": {}})
-		var entry: Dictionary = {
-			"id": sid,
-			"graph_path": g.resource_path if g else "",
-			"current_id": cur.id if cur else "",
-			"variables": st.get("variables", {}),
-			"visited": st.get("visited", {}),
-			"active": active_session_id == sid,
-		}
-		result["sessions"].append(entry)
+	if graph_manager:
+		graph_manager.save_to(result, active_session_id)
 	return result
 
-func restore_state(data: Dictionary) -> void:
+func restore_story_state(data: Dictionary) -> String:
 	if graph_manager == null:
-		return
-	# 读档前：清空当前所有会话/图
-	active_session_id = ""
-	if graph_manager._sessions != null:
-		# 确保移除所有已有的 StoryGraph 会话
-		for sid in graph_manager._sessions.keys():
-			graph_manager.remove_session(sid)
-		# 双保险，清空字典
-		graph_manager._sessions.clear()
+		push_error("StoryRunner 读档错误: graph_manager is null")
+		return ""
+	# 读档前：清空所有数据
+	# active_session_id = ""  # 在load_game()中已经设置过
+	graph_manager.clear_sessions()
+	# 读档：加载所有会话
+	var ret: String = ""
 	var sessions: Array = data.get("sessions", [])
 	for sess in sessions:
 		var graph_path: String = sess.get("graph_path", "")
@@ -202,22 +187,16 @@ func restore_state(data: Dictionary) -> void:
 		if sid == "":
 			push_warning("Restore story failed: sid is null - " + graph_path)
 			continue
-		# 根据存档重建会话（保留原 sid）
-		g.ensure_entry()
-		var session := {
-			"graph": g,
-			"current": null,
-			"state": {"variables": {}, "visited": {}}
-		}
-		graph_manager._sessions[sid] = session
+		var cur_node = null
 		var current_id: String = sess.get("current_id", "")
 		if current_id != "":
-			var node := g.get_node_by_id(current_id)
-			if node:
-				graph_manager.set_current(sid, node)
-				graph_manager.mark_visited(sid, current_id)
-		var st := graph_manager.get_state(sid)
-		st["variables"] = sess.get("variables", {})
-		st["visited"] = sess.get("visited", {})
+			cur_node = g.get_node_by_id(current_id)
+		var state := {"variables": sess.get("variables", {}), "visited": sess.get("visited", {})}
+		# 根据存档重建会话（保留原 sid）
+		graph_manager.create_session(g, sid, cur_node)
+		graph_manager.mark_visited(sid, current_id)
+		graph_manager.set_state(sid, state)
+		# 设置当前激活的会话
 		if sess.get("active", false):
-			active_session_id = sid
+			ret = sid
+	return ret

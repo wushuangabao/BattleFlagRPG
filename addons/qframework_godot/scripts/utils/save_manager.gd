@@ -1,17 +1,16 @@
 ## TODO 加密处理和懒加载
 
 class_name SaveManager extends Node
-const SAVE_FOLDER = "user://saves/"
 const SAVE_FILE_EXTENSION = ".save"
 
 ## 获取模型的存储路径
 static func get_save_path(slot_id: int, model_name: String) -> String:
-	return SAVE_FOLDER + str(slot_id) + "/" + model_name + SAVE_FILE_EXTENSION
+	return Game.SAVE_FOLDER + str(slot_id) + "/" + model_name + SAVE_FILE_EXTENSION
 	
 ## 保存单个模型
 static func save_model(slot_id: int, model: AbstractModel) -> Error:
 	var model_name = model.get_script().get_path().get_file().get_basename()
-	var slot_dir = SAVE_FOLDER + str(slot_id)
+	var slot_dir = Game.SAVE_FOLDER + str(slot_id)
 	
 	# 确保存档目录存在
 	if not DirAccess.dir_exists_absolute(slot_dir):

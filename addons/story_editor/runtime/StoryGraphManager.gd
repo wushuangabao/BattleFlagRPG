@@ -11,14 +11,15 @@ class_name StoryGraphManager
 
 var _sessions: Dictionary[String, Dictionary] = {}
 
-func create_session(graph: StoryGraph, entry: String = "") -> String:
-	var sid := _gen_session_id(graph)
+func create_session(graph: StoryGraph, sid: String = "", current_node: StoryNode = null) -> String:
+	if sid == "":
+		sid = _gen_session_id(graph)
 	if _sessions.has(sid):
-		push_warning("StoryGraphManager: session already exists: %s" % sid)
+		push_error("StoryGraphManager: session already exists: %s" % sid)
 	graph.id = sid
 	var session := {
 		"graph": graph,
-		"current": null,
+		"current": current_node,
 		"state": {"variables": {}, "visited": {}}
 	}
 	_sessions[sid] = session
@@ -26,7 +27,8 @@ func create_session(graph: StoryGraph, entry: String = "") -> String:
 	if graph.entry_node and graph.entry_node != "":
 		var entry_node = graph.get_node_by_id(graph.entry_node)
 		if entry_node != null:
-			session["current"] = entry_node
+			if current_node == null:
+				session["current"] = entry_node
 		else:
 			push_warning("StoryGraphManager create_session: %s 没有找到入口节点 %s" % [graph.title, graph.entry_node])
 	else:
@@ -39,6 +41,12 @@ func has_session(id: String) -> bool:
 func remove_session(id: String) -> void:
 	if _sessions.has(id):
 		_sessions.erase(id)
+
+func clear_sessions() -> void:
+	if _sessions != null:
+		for sid in _sessions.keys():
+			remove_session(sid)
+		_sessions.clear()
 
 func get_session(id: String) -> Dictionary:
 	return _sessions.get(id, {})
@@ -61,6 +69,12 @@ func get_state(id: String) -> Dictionary:
 	var s := get_session(id)
 	return s.get("state", {"variables": {}, "visited": {}})
 
+func set_state(id: String, state: Dictionary) -> void:
+	var s := get_session(id)
+	if s.is_empty():
+		return
+	s["state"] = state
+
 func mark_visited(id: String, node_id: String) -> void:
 	var st := get_state(id)
 	st["visited"][node_id] = true
@@ -80,3 +94,21 @@ func get_valid_graphs() -> Array[Dictionary]:
 		if s.has("current") and s["current"] != null and (s["current"] is ChoiceNode):
 			valid_graphs.append(s)
 	return valid_graphs
+
+func save_to(result: Dictionary, active_session_id: String) -> void:
+	for sid in _sessions.keys():
+		var s := _sessions[sid]
+		if s.is_empty():
+			continue
+		var g: StoryGraph = s.get("graph", null)
+		var cur: StoryNode = s.get("current", null)
+		var st: Dictionary = s.get("state", {"variables": {}, "visited": {}})
+		var sess: Dictionary = {
+			"id": sid,
+			"graph_path": g.resource_path if g else "",
+			"current_id": cur.id if cur else "",
+			"variables": st.get("variables", {}),
+			"visited": st.get("visited", {}),
+			"active": active_session_id == sid,
+		}
+		result["sessions"].append(sess)

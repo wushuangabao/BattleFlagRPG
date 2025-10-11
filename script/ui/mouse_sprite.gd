@@ -24,6 +24,10 @@ func _ready() -> void:
 	z_index = 999  # 设置较高的z_index值
 	z_as_relative = false  # 使z_index为绝对值，不受父节点影响
 
+	# 将父 CanvasLayer 置于高层，避免被对话UI遮挡
+	if get_parent() is CanvasLayer:
+		get_parent().layer = 999
+
 func _process(_delta) -> void:
 	global_position = get_global_mouse_position()
 
