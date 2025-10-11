@@ -71,7 +71,7 @@ func _goto_on(session_id: String, node_id: String) -> void:
 	if node == null:
 		push_error("StoryRunner: node not found: %s" % node_id)
 		return
-	print("StoryRunner: goto %s(%s) [session=%s]" % [node.name, node_id, session_id])
+	print("StoryRunner: goto %s(%s) [session=%s(%s)]" % [node.name, node_id, g.title, session_id])
 	graph_manager.set_current(session_id, node)
 	# 标记访问
 	graph_manager.mark_visited(session_id, node.id)

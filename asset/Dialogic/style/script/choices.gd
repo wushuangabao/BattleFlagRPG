@@ -2,7 +2,7 @@
 extends VBoxContainer
 
 # 视口里的固定坐标：要把“边缘上的点”锁到这里
-var lock_point: Vector2 = Vector2(1050, 600)
+@export var lock_point: Vector2 = Vector2(1620, 965)
 
 # 选择哪条边：0=Left, 1=Right, 2=Top, 3=Bottom
 @export_enum("Left", "Right", "Top", "Bottom")
@@ -27,10 +27,10 @@ func _ready() -> void:
 	top_level = true
 
 	# 把控件的四个锚点都设置为 0，也就是把控件的锚点全部固定在父节点的左上角（绝对像素模式）
-	anchor_left = 0.0
-	anchor_right = 0.0
-	anchor_top = 0.0
-	anchor_bottom = 0.0
+	#anchor_left = 0.0
+	#anchor_right = 0.0
+	#anchor_top = 0.0
+	#anchor_bottom = 0.0
 
 	if auto_grow_from_locked_edge:
 		_apply_auto_grow()

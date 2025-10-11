@@ -20,16 +20,13 @@ mouse_filter = 2
 script = ExtResource("1_kurgw")
 
 [node name="Choices" type="VBoxContainer" parent="."]
+top_level = true
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -86.0
-offset_top = -171.0
-grow_horizontal = 0
-grow_vertical = 0
+offset_left = 1620.0
+offset_top = 879.5
+offset_right = 1706.0
+offset_bottom = 1050.5
+grow_vertical = 2
 mouse_filter = 2
 alignment = 1
 script = ExtResource("2_v65b0")
@@ -51,11 +48,6 @@ text = "Some text"
 script = ExtResource("1_w632k")
 
 [node name="DialogicNode_ChoiceButton4" type="Button" parent="Choices"]
-layout_mode = 2
-text = "Some text"
-script = ExtResource("1_w632k")
-
-[node name="DialogicNode_ChoiceButton5" type="Button" parent="Choices"]
 layout_mode = 2
 text = "Some text"
 script = ExtResource("1_w632k")
