@@ -8,6 +8,9 @@ const ACTION_LOAD_QUICK := "load_quick"
 # 存档/读档过程防护标志：进行中时禁止再次触发
 var _is_processing: bool = false
 
+# 当前正在进行读档的session ID
+var cur_active_session_id: String = ""
+
 func _ready() -> void:
 	_ensure_actions()
 
@@ -157,7 +160,10 @@ func load_game(slot: int = 0) -> bool:
 	_load_actors_info(data)		
 
 	print("开始恢复剧情...")
-	var cur_active_session_id := Game.g_runner.restore_story_state(data.get("story", {}))
+	var story_data = data.get("story", {})
+	if story_data == {}:
+		push_warning("Load %d.save: story data is empty" % [slot])
+	cur_active_session_id = Game.g_runner.restore_story_state(story_data)
 
 	# 如果当前剧情节点为战斗节点，则记录需要启动的战斗地图
 	var battle_map_to_start: PackedScene = null
@@ -175,10 +181,10 @@ func load_game(slot: int = 0) -> bool:
 
 	print("开始恢复对话...")
 	Dialogic.Save.load(str(slot))
+	Game.g_runner.active_session_id = cur_active_session_id
+	cur_active_session_id = ""
 
 	await get_tree().create_timer(0.6).timeout
-	Game.g_runner.active_session_id = cur_active_session_id
-	
 	print("读档成功 - ", str(slot))
 	_is_processing = false
 	return true
