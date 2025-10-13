@@ -1,0 +1,195 @@
+[gd_scene load_steps=10 format=3 uid="uid://bcjtoey3n1cm"]
+
+[ext_resource type="Script" uid="uid://b6k6cimo20y2w" path="res://GBIS_demos/3_shop/shop.gd" id="1_al8bw"]
+[ext_resource type="Script" uid="uid://c5rou3jm33pbt" path="res://addons/grid_base_inventory_system/core/view/item/drop_area_view.gd" id="2_1ct8h"]
+[ext_resource type="Script" uid="uid://b3x4mwtjmm4tp" path="res://addons/grid_base_inventory_system/core/view/container/inventory/inventory_view.gd" id="3_10b22"]
+[ext_resource type="Script" uid="uid://gqt6pq4lt0gw" path="res://addons/grid_base_inventory_system/core/view/container/shop/shop_view.gd" id="3_iguho"]
+[ext_resource type="Script" uid="uid://c5uqs7o5b2w68" path="res://addons/grid_base_inventory_system/core/model/item/item_data.gd" id="4_5ac5d"]
+[ext_resource type="Resource" uid="uid://dpx3omowkx6ty" path="res://GBIS_demos/resources/consumable_1.tres" id="5_al8bw"]
+[ext_resource type="Resource" uid="uid://ce8kda8rqy6h2" path="res://GBIS_demos/resources/equipment_1.tres" id="6_cut32"]
+[ext_resource type="Resource" uid="uid://cuj07urfi512p" path="res://GBIS_demos/resources/stackable_1.tres" id="7_665db"]
+[ext_resource type="PackedScene" uid="uid://bmtorijdfu4jh" path="res://GBIS_demos/item_info/item_info.tscn" id="9_cut32"]
+
+[node name="Shop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_al8bw")
+items = Array[ExtResource("4_5ac5d")]([ExtResource("5_al8bw"), ExtResource("6_cut32"), ExtResource("7_665db")])
+
+[node name="DropAreaView" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 3747.0
+offset_bottom = 2126.0
+script = ExtResource("2_1ct8h")
+metadata/_custom_type_script = "uid://c5rou3jm33pbt"
+
+[node name="Inventory" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 97.0
+offset_right = 558.0
+offset_bottom = 555.0
+color = Color(0.17027, 0.17027, 0.17027, 1)
+
+[node name="InventoryView" type="Control" parent="Inventory"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -159.5
+offset_top = -393.0
+offset_right = 160.5
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_10b22")
+container_name = "demo3_inventory"
+container_columns = 10
+container_rows = 12
+stack_num_font_size = 12
+stack_num_margin = 2
+stack_num_color = Color(0.856916, 0.880705, 0.757161, 1)
+metadata/_custom_type_script = "uid://b3x4mwtjmm4tp"
+
+[node name="Label" type="Label" parent="Inventory"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -83.0
+offset_right = 83.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Inventory"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonCloseInventory" type="Button" parent="Inventory"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -69.0
+offset_top = 9.0
+offset_right = -10.0
+offset_bottom = 54.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "X"
+
+[node name="Shop" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 568.0
+offset_top = 97.0
+offset_right = 1096.0
+offset_bottom = 555.0
+color = Color(0.17027, 0.17027, 0.17027, 1)
+
+[node name="Label" type="Label" parent="Shop"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -112.0
+offset_top = 3.0
+offset_right = 112.0
+offset_bottom = 55.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Shop"
+horizontal_alignment = 1
+
+[node name="ButtonCloseStorage" type="Button" parent="Shop"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -67.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 55.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "X"
+
+[node name="ShopView" type="Control" parent="Shop"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -391.0
+offset_right = 256.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("3_iguho")
+goods = Array[ExtResource("4_5ac5d")]([ExtResource("5_al8bw"), ExtResource("6_cut32"), ExtResource("7_665db")])
+container_name = "demo3_shop"
+container_columns = 16
+container_rows = 12
+gird_background_color_empty = Color(0.241501, 0.402256, 0.329933, 1)
+stack_num_font_size = 12
+stack_num_margin = 2
+metadata/_custom_type_script = "uid://gqt6pq4lt0gw"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+offset_left = 38.0
+offset_top = 97.0
+offset_right = 176.0
+offset_bottom = 268.0
+
+[node name="ButtonToggleInventory" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Toggle Inventory"
+
+[node name="ButtonToggleShop" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Toggle Shop"
+
+[node name="ButtonAddTestItems" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Add Test Items"
+
+[node name="ButtonSave" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Save Game"
+
+[node name="ButtonLoad" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Load Game"
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 354.0
+offset_top = 29.0
+offset_right = 916.0
+offset_bottom = 78.0
+text = "Click an item to buy it. 
+Drag an item to the shop to sell it."
+
+[node name="ItemInfo" parent="." instance=ExtResource("9_cut32")]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 354.0
+offset_right = 212.0
+offset_bottom = 408.0
+
+[connection signal="pressed" from="Inventory/ButtonCloseInventory" to="." method="_on_button_close_inventory_pressed"]
+[connection signal="pressed" from="Shop/ButtonCloseStorage" to="." method="_on_button_close_storage_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonToggleInventory" to="." method="_on_button_toggle_inventory_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonToggleShop" to="." method="_on_button_toggle_storage_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonAddTestItems" to="." method="_on_button_add_test_items_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonSave" to="." method="_on_button_save_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonLoad" to="." method="_on_button_load_pressed"]
