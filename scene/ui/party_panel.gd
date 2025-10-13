@@ -16,16 +16,15 @@ var _filtered: Array[ActorController] = []
 
 func _ready() -> void:
 	_setup_sort_options()
-	_setup_filter_options()
 	_connect_signals()
-	_refresh()
+	_refresh(null)
 
 func _connect_signals() -> void:
 	Game.g_event.register_event("party_changed", _refresh)
 	Game.g_event.register_event("member_updated", _on_member_updated) # todo 发送事件
-	search_box.text_changed.connect(func(_t): _refresh())
-	sort_option.item_selected.connect(func(_i): _refresh())
-	sect_filter.item_selected.connect(func(_i): _refresh())
+	search_box.text_changed.connect(_refresh)
+	sort_option.item_selected.connect(_refresh)
+	sect_filter.item_selected.connect(_refresh)
 
 func _setup_sort_options() -> void:
 	sort_option.clear()
@@ -72,7 +71,7 @@ func _clear_cards() -> void:
 	for c in cards_root.get_children():
 		c.queue_free()
 
-func _refresh() -> void:
+func _refresh(_p) -> void:
 	_setup_filter_options() # 门派列表随成员变化刷新
 	_apply_filter()
 	_clear_cards()

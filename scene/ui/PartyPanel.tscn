@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c2dl30soa24f1"]
+[gd_scene load_steps=3 format=3 uid="uid://c2dl30soa24f1"]
 
 [ext_resource type="Script" uid="uid://d37vejt4ub8kx" path="res://scene/ui/party_panel.gd" id="1_4o3n0"]
+[ext_resource type="PackedScene" uid="uid://oio53s2uu8xf" path="res://scene/ui/PartyMemberCard.tscn" id="2_3atjl"]
 
 [node name="PartyPanel" type="Control"]
 layout_mode = 3
@@ -10,19 +11,38 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_4o3n0")
+member_card_scene = ExtResource("2_3atjl")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 35
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 35
+theme_override_constants/margin_bottom = 20
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+
+[node name="CardsRoot" type="VFlowContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
 layout_mode = 2
 
 [node name="Toolbar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 8
 
-[node name="Search" type="LineEdit" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="Count" type="Label" parent="MarginContainer/VBoxContainer/Toolbar"]
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 
 [node name="Sort" type="OptionButton" parent="MarginContainer/VBoxContainer/Toolbar"]
@@ -31,11 +51,8 @@ layout_mode = 2
 [node name="Filter" type="OptionButton" parent="MarginContainer/VBoxContainer/Toolbar"]
 layout_mode = 2
 
-[node name="Count" type="Label" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="Search" type="LineEdit" parent="MarginContainer/VBoxContainer/Toolbar"]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="CardsRoot" type="VFlowContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
-layout_mode = 2
+placeholder_text = "search..."
+alignment = 2

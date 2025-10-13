@@ -83,16 +83,16 @@ func add_member(data: ActorController) -> void:
 		members.append(data)
 		Game.g_event.send_event("party_changed")
 
-func remove_member(name: String) -> void:
+func remove_member(p_name: String) -> void:
 	for i in members.size():
-		if members[i].my_name == name:
+		if members[i].my_name == p_name:
 			members.remove_at(i)
 			Game.g_event.send_event("party_changed")
 			return
 
-func get_member(name: String) -> ActorController:
+func get_member(p_name: String) -> ActorController:
 	for m in members:
-		if m.my_name == name:
+		if m.my_name == p_name:
 			return m
 	return null
 

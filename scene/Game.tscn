@@ -1,12 +1,10 @@
-[gd_scene load_steps=25 format=3 uid="uid://b2wub0ms8es6m"]
+[gd_scene load_steps=24 format=3 uid="uid://b2wub0ms8es6m"]
 
-[ext_resource type="Script" uid="uid://8pkiqnfbn7fr" path="res://script/ui/btn_battle.gd" id="1_4aemu"]
 [ext_resource type="Script" uid="uid://dmnygjeo673qb" path="res://addons/story_editor/runtime/StoryRunner.gd" id="1_7ftmx"]
 [ext_resource type="Script" uid="uid://c8ya50ntb6sau" path="res://script/ActorManager.gd" id="1_vg7sv"]
 [ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/unit/unit.tscn" id="2_0qanc"]
 [ext_resource type="Script" uid="uid://b5tl5tdpd0gmr" path="res://script/scene_manager.gd" id="2_e7hha"]
 [ext_resource type="PackedScene" uid="uid://df70ys3x6ucts" path="res://scene/unit/enemy_1.tscn" id="3_qto5f"]
-[ext_resource type="Script" uid="uid://ur0u8m7o7v4u" path="res://script/ui/btn_big_map.gd" id="3_t585p"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_4cigq"]
 [ext_resource type="PackedScene" uid="uid://d1gt6rid3jyor" path="res://scene/unit/enemy_2.tscn" id="4_64o46"]
 [ext_resource type="Texture2D" uid="uid://b4yi1c7ttdp6c" path="res://asset/png/character/face64/2.png" id="5_4cigq"]
@@ -20,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://cg52b7bjdq2th" path="res://scene/ui/SceneViewer.tscn" id="15_cg8ds"]
 [ext_resource type="Script" uid="uid://bqc6eh2635fpr" path="res://script/ui/mouse_sprite.gd" id="17_7ftmx"]
 [ext_resource type="Texture2D" uid="uid://kwvofq4rb22m" path="res://asset/png/icon/arrow-finger-border.png" id="17_7sjor"]
+[ext_resource type="Script" uid="uid://qv5br4heub8m" path="res://scene/debug.gd" id="17_cg8ds"]
 
 [sub_resource type="Resource" id="Resource_f6bub"]
 script = ExtResource("4_4cigq")
@@ -99,21 +98,24 @@ anchor_left = 1.0
 anchor_top = 0.156
 anchor_right = 1.0
 anchor_bottom = 0.156
-offset_left = -91.0
-offset_top = 785.52
-offset_bottom = 851.52
+offset_left = -97.0
+offset_top = 378.52
+offset_bottom = 479.52
 grow_horizontal = 0
 grow_vertical = 0
+script = ExtResource("17_cg8ds")
 
 [node name="Btn_Battle" type="Button" parent="CanvasLayer/debug"]
 layout_mode = 2
 text = "Battle Test"
-script = ExtResource("1_4aemu")
 
 [node name="Btn_BigMap" type="Button" parent="CanvasLayer/debug"]
 layout_mode = 2
 text = "Big Map"
-script = ExtResource("3_t585p")
+
+[node name="Btn_Party" type="Button" parent="CanvasLayer/debug"]
+layout_mode = 2
+text = "Party Panel"
 
 [node name="mouse_layer" type="CanvasLayer" parent="."]
 
@@ -141,5 +143,6 @@ libraries = {
 &"": SubResource("AnimationLibrary_wk762")
 }
 
-[connection signal="pressed" from="CanvasLayer/debug/Btn_Battle" to="CanvasLayer/debug/Btn_Battle" method="_on_pressed"]
-[connection signal="pressed" from="CanvasLayer/debug/Btn_BigMap" to="CanvasLayer/debug/Btn_BigMap" method="_on_pressed"]
+[connection signal="pressed" from="CanvasLayer/debug/Btn_Battle" to="CanvasLayer/debug" method="_on_btnBattle_pressed"]
+[connection signal="pressed" from="CanvasLayer/debug/Btn_BigMap" to="CanvasLayer/debug" method="_on_btnBigmap_pressed"]
+[connection signal="pressed" from="CanvasLayer/debug/Btn_Party" to="CanvasLayer/debug" method="_on_btnParty_pressed"]
