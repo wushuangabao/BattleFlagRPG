@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=3 uid="uid://oio53s2uu8xf"]
+
+[ext_resource type="Script" uid="uid://do7yy87hjvfn1" path="res://scene/ui/party_member_card.gd" id="1_ta62g"]
+
+[node name="PartyMemberCard" type="PanelContainer"]
+custom_minimum_size = Vector2(320, 96)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ta62g")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Lv" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Sect" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HPbar" type="TextureProgressBar" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MPbar" type="TextureProgressBar" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatesRoot" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Detail" type="Button" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2

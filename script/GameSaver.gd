@@ -31,7 +31,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _is_processing:
 		return
 	if Game.g_scenes == null:
-		push_warning("Save/Load failed: SceneManager not ready")
+		#push_warning("Save/Load failed: SceneManager not ready")
 		return
 	if Game.g_scenes._current_scene == Game.g_scenes.main_scene:
 		return
