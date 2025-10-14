@@ -36,6 +36,22 @@ static func get_base_attrs() -> Array:
 		_base_attrs = g_luban.get_base_attrs() as Array
 		return _base_attrs
 
+# 门派
+enum Sect {
+	None,
+	RYJiao,
+	HuaShan,
+	WuDang,
+	ShaoLin
+}
+static var SectNames := [ # todo 读表初始化
+	"无门派",
+	"日月神教",
+	"华山派",
+	"武当派",
+	"少林寺"
+]
+
 # 阵营
 enum Camp {
 	Player,

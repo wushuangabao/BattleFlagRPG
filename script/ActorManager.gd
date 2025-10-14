@@ -3,19 +3,13 @@ class_name ActorManager extends AbstractSystem
 
 @export var actors : PackedSceneDictionary # 存储角色对应的 UnitBase3D 节点
 @export var timeline_icons : Dictionary[StringName, Texture2D]
+@export var main_character : StringName = "test_actor" # 主角
 
 # party 队伍
 var members: Array[ActorController] = []
 
-static var _actors_nameMap  : Dictionary = {}:    # 所有角色的控制器
-	set(value):
-		var cleaned_dict = {}
-		for key in value:
-			if value[key] is ActorController:
-				cleaned_dict[key] = value[key]
-			else:
-				push_error("字典键 %s 的值类型错误: 期望 ActorController，得到 %s" % [key, typeof(_actors_nameMap[key])])
-		_actors_nameMap = cleaned_dict
+# 所有角色的控制器
+var _actors_nameMap: Dictionary[StringName, ActorController] = {}
 
 # 初始化：创建具名角色的实例，建立全局引用
 func _ready() -> void:
@@ -24,6 +18,7 @@ func _ready() -> void:
 			var new_actor = ActorController.new()
 			new_actor.my_name = actor_name
 			_actors_nameMap[actor_name] = new_actor
+	members.append(_actors_nameMap[main_character])
 	Game.g_actors = self
 	print("角色管理器初始化完毕")
 
@@ -42,6 +37,16 @@ func get_actor_by_name(actor_name: StringName) -> ActorController:
 		return _actors_nameMap[actor_name]
 	else:
 		return null
+
+func get_all_characters() -> Array[ActorController]:
+	var ret: Array[ActorController] = []
+	for actor_name in _actors_nameMap.keys():
+		ret.append(_actors_nameMap[actor_name])
+	return ret
+
+func init_all_characters() -> void:
+	for actor_name in _actors_nameMap.keys():
+		_actors_nameMap[actor_name].init_actor_data(actor_name)
 
 # 是否为全局唯一的角色（属性是随着游戏进程而变化的）
 # 这种角色称为具名角色，不存在名为 ActorDefault 的子节点
@@ -99,7 +104,7 @@ func get_member(p_name: String) -> ActorController:
 func get_all_members() -> Array[ActorController]:
 	return members.duplicate()
 
-func sort_members(by: String = "level", ascending: bool = false) -> void:
+func sort_members(by: String = "LV", ascending: bool = false) -> void:
 	members.sort_custom(func(a: ActorController, b: ActorController) -> bool:
 		var av = a.my_stat.get(by)
 		var bv = b.my_stat.get(by)

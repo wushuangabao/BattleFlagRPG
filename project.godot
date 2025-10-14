@@ -27,7 +27,8 @@ GBIS="*res://addons/grid_base_inventory_system/core/grid_base_inventory_system.g
 directories/dch_directory={
 "character_fangzhang": "res://asset/Dialogic/character/character_fangzhang.dch",
 "character_shengnv": "res://asset/Dialogic/character/character_shengnv.dch",
-"character_test": "res://asset/Dialogic/character/character_test.dch"
+"character_test": "res://asset/Dialogic/character/character_test.dch",
+"test_actor": "res://asset/Dialogic/character/test_actor.dch"
 }
 directories/dtl_directory={
 "timeline/timeline_test": "res://asset/Dialogic/timeline/timeline_test.dtl",
@@ -63,6 +64,7 @@ layout/style_list=["res://asset/Dialogic/style/New_File.tres"]
 layout/default_style="res://asset/Dialogic/style/New_File.tres"
 choices/hotkey_behaviour=1
 glossary/default_case_sensitive=true
+portraits/default_portrait="res://addons/dialogic/Modules/HighlightPortrait/simple_highlight_portrait.tscn"
 
 [display]
 

@@ -1,24 +1,41 @@
-[gd_scene load_steps=2 format=3 uid="uid://oio53s2uu8xf"]
+[gd_scene load_steps=3 format=3 uid="uid://oio53s2uu8xf"]
 
 [ext_resource type="Script" uid="uid://do7yy87hjvfn1" path="res://scene/ui/party_member_card.gd" id="1_ta62g"]
+[ext_resource type="Texture2D" uid="uid://b27x3a4kwalse" path="res://asset/png/character/portrait/young_man_1.png" id="2_oar1v"]
 
-[node name="PartyMemberCard" type="PanelContainer"]
-custom_minimum_size = Vector2(320, 96)
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="PartyMemberCard" type="ColorRect"]
+custom_minimum_size = Vector2(500, 100)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -50.0
+offset_right = 250.0
+offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
+color = Color(2.88785e-07, 0.206975, 0.207408, 1)
 script = ExtResource("1_ta62g")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
+offset_right = 500.0
+offset_bottom = 100.0
 
 [node name="Portrait" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_oar1v")
+expand_mode = 1
+stretch_mode = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2

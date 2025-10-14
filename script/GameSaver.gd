@@ -80,18 +80,12 @@ func save_game(slot: int = 0) -> bool:
 			_save_battle_info(scene_info) # 记录战斗前的原场景及其场景栈
 
 	var actors_info: Array = []
-	if Game.g_actors and ActorManager._actors_nameMap:
-		for _name in ActorManager._actors_nameMap.keys():
-			var actor: ActorController = ActorManager._actors_nameMap[_name]
+	if Game.g_actors:
+		var actors = Game.g_actors.get_all_characters()
+		for actor in actors:
 			if not actor or not actor.my_stat:
 				continue
-			var st: UnitStat = actor.my_stat
-			actors_info.append({
-				"name": str(_name),
-				"lv": st.LV.value if st.LV else 1,
-				"hp": st.HP.value if st.HP else 0,
-				"mp": st.MP.value if st.MP else 0,
-			})
+			actors_info.append(actor.serialize())
 
 	var data := {
 		"version": SAVE_VERSION,
@@ -239,6 +233,7 @@ func _load_actors_info(data: Dictionary) -> void:
 		var actor: ActorController = Game.g_actors.get_actor_by_name(_name)
 		if not actor or not actor.my_stat:
 			continue
+		actor.deserialize(a)
 		var st: UnitStat = actor.my_stat
 		# 先恢复等级以便重新计算最大值
 		if st.LV:

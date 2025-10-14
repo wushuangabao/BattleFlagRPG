@@ -2,9 +2,12 @@
 class_name ActorController extends AbstractController
 
 var my_stat  : UnitStat         # 数据
+var character: DialogicCharacter# Dialogic角色数据
+
 var AP       : AttributeBase    # 行动点
 var tmp_timeline_y : float      # 在 timeline 上头像的 y 坐标
 
+var sect     : = Game.Sect.None   # 门派
 var camp     : = Game.Camp.Player # 阵营
 var team_id  : = Game.TeamID.Red  # 队伍
 
@@ -88,11 +91,12 @@ var action:
 			else:
 				_state = ActorState.Idle # 动作执行一瞬间就结束了，不用发信号
 
- # 读取存档或者初始化数值表
-func set_actor_data(actor_name) -> void:
+ # 初始化角色数值表
+func init_actor_data(actor_name) -> void:
 	my_name = actor_name
 	my_stat = UnitStat.new(self)
-	print("角色基础属性数据初始化完毕 - ", actor_name)
+	character = DialogicResourceUtil.get_character_resource(actor_name)
+	print("角色[%s]基础属性数据初始化完毕" % actor_name)
 
 func _enter_tree() -> void:
 	_state = ActorState.Idle
@@ -186,3 +190,78 @@ func animate_take_damage_after(seconds: float, context: Dictionary) -> void:
 		print(my_name, " 闪避了")
 		#anim_player.play(&"ShanBi")
 	anim_player.highlight_with_animation(UnitAnimatedSprite3D.HighLightType.ReceiveDamage, false)
+
+# 序列化：导出完整角色信息
+func serialize() -> Dictionary:
+	var st: UnitStat = my_stat
+	var base_vals: Array = []
+	if st and st.base_attr and st.base_attr.attrs:
+		for i in st.base_attr.attrs.size():
+			base_vals.append(st.base_attr.attrs[i].value)
+	var tags_out: Array = []
+	if tags:
+		for t in tags:
+			tags_out.append(str(t))
+	return {
+		"name": str(my_name),
+		"sect": int(sect),
+		"camp": int(camp),
+		"team_id": int(team_id),
+		"facing_direction": int(facing_direction),
+		"ap": AP.value if AP else 0,
+		"lv": st.LV.value if st and st.LV else 1,
+		"hp": st.HP.value if st and st.HP else 0,
+		"mp": st.MP.value if st and st.MP else 0,
+		"base_attrs": base_vals,
+		"gear": st.gear if st else {},
+		"tags": tags_out,
+		"character_id": str(my_name), # 用唯一标识映射 .dch
+	}
+
+# 反序列化：从字典恢复角色状态
+func deserialize(data: Dictionary) -> void:
+	sect = data.get("sect", sect)
+	camp = data.get("camp", camp)
+	team_id = data.get("team_id", team_id)
+
+	var fd := int(data.get("facing_direction", int(facing_direction)))
+	match fd:
+		0: facing_direction = FacingDirection.Right
+		1: facing_direction = FacingDirection.Down
+		2: facing_direction = FacingDirection.Left
+		3: facing_direction = FacingDirection.Up
+		_: facing_direction = FacingDirection.Right
+
+	if AP:
+		AP.set_value(int(data.get("ap", AP.value)))
+
+	var st: UnitStat = my_stat
+	if st and st.LV:
+		st.LV.set_value(int(data.get("lv", st.LV.value)))
+
+	# 基础属性先恢复，再刷新战斗属性
+	var base_vals: Array = data.get("base_attrs", [])
+	if st and st.base_attr and base_vals.size() == 5:
+		for i in range(5):
+			st.base_attr.attrs[i].set_value(int(base_vals[i]))
+
+	# 装备字典
+	if st:
+		st.gear = data.get("gear", st.gear)
+		st.update_all_by_base_attr()
+
+	# 恢复当前 HP/MP（受最大值限制）
+	if st and st.HP:
+		st.HP.set_value(int(data.get("hp", st.HP.value)))
+	if st and st.MP:
+		st.MP.set_value(int(data.get("mp", st.MP.value)))
+
+	# 标签
+	var tags_in: Array = data.get("tags", [])
+	tags = []
+	for t in tags_in:
+		tags.append(StringName(str(t)))
+
+	# 角色资源
+	var char_id = data.get("character_id", str(my_name))
+	character = DialogicResourceUtil.get_character_resource(char_id as String)

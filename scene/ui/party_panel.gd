@@ -1,12 +1,12 @@
 extends Control
 class_name PartyPanel
 
-@onready var search_box: LineEdit = $MarginContainer/VBoxContainer/Toolbar/Search
-@onready var sort_option: OptionButton = $MarginContainer/VBoxContainer/Toolbar/Sort
-@onready var sect_filter: OptionButton = $MarginContainer/VBoxContainer/Toolbar/Filter
-@onready var count_label: Label = $MarginContainer/VBoxContainer/Toolbar/Count
-@onready var scroll: ScrollContainer = $MarginContainer/VBoxContainer/ScrollContainer
-@onready var cards_root: VFlowContainer = $MarginContainer/VBoxContainer/ScrollContainer/CardsRoot
+@export var search_box: LineEdit
+@export var sort_option: OptionButton
+@export var sect_filter: OptionButton
+@export var count_label: Label
+@export var scroll: ScrollContainer
+@export var cards_root: VFlowContainer
 
 # 卡片预制
 @export var member_card_scene: PackedScene
@@ -38,30 +38,44 @@ func _setup_filter_options() -> void:
 	sect_filter.add_item("全部", -1)
 	# 动态收集现有门派
 	var sects := {}
-	for m in Game.g_actors.get_all_members():
+	for m in Game.g_actors.members:
 		sects[m.sect] = true
-	for s in sects.keys():
-		sect_filter.add_item(s)
+	for i in sects.keys():
+		sect_filter.add_item(Game.SectNames[i])
 
 func _apply_sort(arr: Array[ActorController]) -> void:
 	var mode := sort_option.get_selected_id()
 	match mode:
-		0: arr.sort_custom(func(a, b): return a.level > b.level)
-		1: arr.sort_custom(func(a, b): return a.display_name < b.display_name)
-		2: arr.sort_custom(func(a, b): return a.sect < b.sect if a.sect != b.sect else a.display_name < b.display_name)
-		3: arr.sort_custom(func(a, b): return a.hp > b.hp)
+		0: arr.sort_custom(_sort_by_level)
+		1: arr.sort_custom(_sort_by_nickname)
+		2: arr.sort_custom(_sort_by_sect)
+		3: arr.sort_custom(_sort_by_maxhp)
 		_: pass
 
+func _sort_by_level(a: ActorController, b: ActorController) -> bool:
+	return a.my_stat.LV.value > b.my_stat.LV.value if a.my_stat.LV.value != b.my_stat.LV.value else _sort_by_nickname(a, b)
+
+func _sort_by_maxhp(a: ActorController, b: ActorController) -> bool:
+	return a.my_stat.HP.maximum > b.my_stat.HP.maximum if a.my_stat.HP.maximum != b.my_stat.HP.maximum else _sort_by_nickname(a, b)
+
+func _sort_by_sect(a: ActorController, b: ActorController) -> bool:
+	return a.sect < b.sect if a.sect != b.sect else _sort_by_nickname(a, b)
+
+func _sort_by_nickname(a: ActorController, b: ActorController) -> bool:
+	var an = a.character.get_display_name_translated()
+	var bn = b.character.get_display_name_translated()
+	return an < bn
+
 func _apply_filter() -> void:
-	var all := Game.g_actors.get_all_members()
+	var all := Game.g_actors.members
 	var q := search_box.text.strip_edges().to_lower()
 	var sect_sel_text := "" if sect_filter.get_selected_id() == -1 else sect_filter.get_item_text(sect_filter.get_selected())
 	_filtered.clear()
 	for m in all:
-		if sect_sel_text != "" and m.sect != sect_sel_text:
+		if sect_sel_text != "全部" and Game.SectNames[m.sect] != sect_sel_text:
 			continue
 		if q != "":
-			var combined := ("%s %s %s" % [m.display_name, m.sect, m.note]).to_lower()
+			var combined := ("%s %s" % [m.character.get_display_name_translated(), Game.SectNames[m.sect]]).to_lower()
 			if not combined.find(q) >= 0:
 				continue
 		_filtered.append(m)
