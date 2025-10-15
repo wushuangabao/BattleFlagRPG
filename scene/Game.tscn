@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dmnygjeo673qb" path="res://addons/story_editor/runtime/StoryRunner.gd" id="1_7ftmx"]
 [ext_resource type="Script" uid="uid://c8ya50ntb6sau" path="res://script/ActorManager.gd" id="1_vg7sv"]
-[ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/unit/unit.tscn" id="2_0qanc"]
 [ext_resource type="Script" uid="uid://b5tl5tdpd0gmr" path="res://script/scene_manager.gd" id="2_e7hha"]
+[ext_resource type="PackedScene" uid="uid://ccfg142jih75k" path="res://scene/unit/anim/test_actor.tscn" id="2_ls1fb"]
 [ext_resource type="PackedScene" uid="uid://df70ys3x6ucts" path="res://scene/unit/enemy_1.tscn" id="3_qto5f"]
 [ext_resource type="Script" uid="uid://djwdy5wvw0nri" path="res://script/util/PackedSceneDictionary.gd" id="4_4cigq"]
 [ext_resource type="PackedScene" uid="uid://d1gt6rid3jyor" path="res://scene/unit/enemy_2.tscn" id="4_64o46"]
@@ -23,7 +23,7 @@
 [sub_resource type="Resource" id="Resource_f6bub"]
 script = ExtResource("4_4cigq")
 packed_scene = Dictionary[StringName, PackedScene]({
-&"test_actor": ExtResource("2_0qanc"),
+&"test_actor": ExtResource("2_ls1fb"),
 &"test_enemy": ExtResource("3_qto5f"),
 &"test_enemy_2": ExtResource("4_64o46"),
 &"test_enemy_3": ExtResource("5_msms8")

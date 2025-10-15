@@ -283,13 +283,14 @@ func create_initial_units_on_battle_map() -> void:
 			var look := true if _actors.is_empty() else false
 			if Game.Debug == 1:
 				print("开始添加单位 ", _actors.size() + 1 ,"：", unit_name, "，坐标(", cell.x, ",", cell.y, ") 队伍 ", map.get_team_by_cell(cell))
-			var unit := scene.add_unit_to(template, cell, look)
+			var unit: UnitBase3D
 			if not actor_manager.get_actor_by_name(unit_name):
+				unit = scene.add_unit_to(template, cell, false, look)
 				actor = unit.get_child(1) # 获取子节点 ActorDefault
 			else:
+				unit = scene.add_unit_to(template, cell, true, look)
 				unit.add_child(actor)
 			unit.actor = actor
-			unit.anim = unit.get_child(0)
 			actor.base3d = unit
 			actor.anim_player = unit.anim
 			actor.team_id = map.get_team_by_cell(cell)

@@ -2,7 +2,8 @@
 class_name UnitBase3D extends Marker3D
 
 @export var move_time: float = 0.5
-@onready var anim: UnitAnimatedSprite3D = $anim
+@export var anim: UnitAnimatedSprite3D
+@export var default_anim: PackedScene
 @onready var bar_hp: TextureProgressBar = $SubViewport/HP
 @onready var bar_mp: TextureProgressBar = $SubViewport/MP
 
@@ -136,6 +137,15 @@ func move_by_current_path():
 
 func is_arrived_target_cell() -> bool:
 	return is_target_cell(_cell)
+
+# 初始化角色动画节点
+func add_anim_node(anim_scene: PackedScene) -> void:
+	if anim_scene.can_instantiate():
+		anim = anim_scene.instantiate()
+	else:
+		push_warning("add_anim_node %s fail! use default." % anim_scene.resource_path)
+		anim = default_anim.instantiate()
+	$AnimRoot.add_child(anim)
 
 func _animate_bar(bar: TextureProgressBar, tween: Tween, to_value: float, duration: float) -> void:
 	to_value = clampf(to_value, bar.min_value, bar.max_value)

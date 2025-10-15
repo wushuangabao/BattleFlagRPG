@@ -1,7 +1,8 @@
-[gd_scene load_steps=46 format=3 uid="uid://skvo00upkv2p"]
+[gd_scene load_steps=47 format=3 uid="uid://skvo00upkv2p"]
 
 [ext_resource type="Script" uid="uid://cqv7uqecu6ns1" path="res://scene/combat/battle_scene.gd" id="1_1h8kx"]
 [ext_resource type="Script" uid="uid://dbo03vf6xjbns" path="res://script/util/Camera3D_movable.gd" id="2_frx6r"]
+[ext_resource type="PackedScene" uid="uid://c4u5c7mip2iby" path="res://scene/unit/unit.tscn" id="2_j1stj"]
 [ext_resource type="Script" uid="uid://cehlq5ttemtda" path="res://script/combat/BattleMapContainer.gd" id="3_4gioj"]
 [ext_resource type="Script" uid="uid://iddsq04swqps" path="res://script/combat/Timeline/TimelineController.gd" id="6_vpcar"]
 [ext_resource type="Script" uid="uid://b72u7y76ws4bn" path="res://script/combat/Timeline/TurnController.gd" id="6_wwrlq"]
@@ -130,6 +131,7 @@ size = Vector2(1920, 15)
 
 [node name="BattleScene" type="Node3D"]
 script = ExtResource("1_1h8kx")
+character_base_scene = ExtResource("2_j1stj")
 board_plane_path = NodePath("plane")
 camera_path = NodePath("Camera3D")
 subviewport_path = NodePath("MapContainer")

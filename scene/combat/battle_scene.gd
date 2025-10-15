@@ -1,6 +1,7 @@
 class_name BattleScene
 extends Node3D
 
+@export var character_base_scene: PackedScene
 @export var board_plane_path: NodePath
 @export var camera_path: NodePath
 @export var subviewport_path: NodePath
@@ -36,10 +37,15 @@ var cell_world_size = Game.cell_world_size
 
 #region 角色控制
 
-func add_unit_to(unit_template: PackedScene, cell: Vector2i, islook:= false) -> UnitBase3D:
+func add_unit_to(unit_template: PackedScene, cell: Vector2i, is_character: bool, islook:= false) -> UnitBase3D:
 	if ground_layer == null:
 		push_error("add unit to Nil ground!")
-	var new_unit = unit_template.instantiate() as UnitBase3D
+	var new_unit: UnitBase3D
+	if is_character:
+		new_unit = character_base_scene.instantiate()
+		new_unit.add_anim_node(unit_template)
+	else:
+		new_unit = unit_template.instantiate()
 	new_unit.map = ground_layer
 	new_unit.set_cur_cell(cell)
 	if islook:
