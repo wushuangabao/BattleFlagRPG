@@ -26,7 +26,16 @@ packed_scene = Dictionary[StringName, PackedScene]({
 &"test_actor": ExtResource("2_ls1fb"),
 &"test_enemy": ExtResource("3_qto5f"),
 &"test_enemy_2": ExtResource("4_64o46"),
-&"test_enemy_3": ExtResource("5_msms8")
+&"test_enemy_3": ExtResource("5_msms8"),
+&"test_member_1": ExtResource("2_ls1fb"),
+&"test_member_2": ExtResource("2_ls1fb"),
+&"test_member_3": ExtResource("2_ls1fb"),
+&"test_member_4": ExtResource("2_ls1fb"),
+&"test_member_5": ExtResource("2_ls1fb"),
+&"test_member_6": ExtResource("2_ls1fb"),
+&"test_member_7": ExtResource("2_ls1fb"),
+&"test_member_8": ExtResource("2_ls1fb"),
+&"test_member_9": ExtResource("2_ls1fb")
 })
 metadata/_custom_type_script = "uid://djwdy5wvw0nri"
 

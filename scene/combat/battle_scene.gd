@@ -17,6 +17,7 @@ extends Node3D
 @onready var timeline := get_node(timeline_path) as TimelineController
 @onready var turn_controller := get_node(turn_contr_path) as TurnController
 @onready var bottom_panel := $TurnController/Background/bottom_panel as BottomPanel
+@onready var attack_btn = $TurnController/actions/attack
 
 var _cur_unit : UnitBase3D = null
 var _unit_list : Array[UnitBase3D]
@@ -59,6 +60,8 @@ func _on_cur_actor_initialized(unit_node: UnitBase3D) -> void:
 	if unit_node != _cur_unit:
 		return
 	bottom_panel.set_actor(unit_node.actor)
+	if attack_btn and unit_node and unit_node.actor:
+		attack_btn.set_skill(unit_node.actor.get_skill_by_index(0))
 	camera.set_target_immediately(_cur_unit)
 
 # 选择预览角色（相机聚焦、高亮轮廓）
@@ -89,6 +92,8 @@ func select_current_actor(actor: ActorController) -> void:
 	_cur_unit = actor.base3d
 	_cur_unit.on_selected()
 	select_preview_actor(actor)
+	if attack_btn:
+		attack_btn.set_skill(actor.get_skill_by_index(0))
 
 func let_actor_move(actor: ActorController) -> void:
 	actor.base3d.move_by_current_path()

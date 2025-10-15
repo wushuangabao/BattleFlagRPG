@@ -2,14 +2,13 @@ class_name PartyMemberCard extends ColorRect
 
 signal member_clicked(member: ActorController)
 
-@onready var portrait: TextureRect = $HBoxContainer/Portrait
+@onready var portrait: TextureRect = $HBoxContainer/MarginContainer/Portrait
 @onready var name_label: Label = $HBoxContainer/VBoxContainer/HBoxContainer/Name
-@onready var lv_label: Label = $HBoxContainer/VBoxContainer/HBoxContainer/Lv
+@onready var lv_label: Label = $TextureRect/Lv
 @onready var sect_label: Label = $HBoxContainer/VBoxContainer/HBoxContainer/Sect
 @onready var hp_bar: TextureProgressBar = $HBoxContainer/VBoxContainer/HPbar
 @onready var mp_bar: TextureProgressBar = $HBoxContainer/VBoxContainer/MPbar
 @onready var states_root: HBoxContainer = $HBoxContainer/VBoxContainer/StatesRoot
-@onready var detail_btn: Button = $HBoxContainer/VBoxContainer/Detail
 
 var member: ActorController
 
@@ -21,9 +20,7 @@ var state_icons := {
 }
 
 func _ready() -> void:
-	detail_btn.pressed.connect(func(): emit_signal("member_clicked", member))
-	# 整张卡可点击
-	gui_input.connect(_on_gui_input)
+	gui_input.connect(_on_gui_input) # 整张卡可点击
 
 func set_member(data: ActorController) -> void:
 	member = data
@@ -32,22 +29,9 @@ func set_member(data: ActorController) -> void:
 func refresh() -> void:
 	if not member or not member.character:
 		return
-	# 读取头像图片路径（兼容 export_overrides.image 或 path 字段）
-	var info: Dictionary = member.character.get_portrait_info(member.character.default_portrait)
-	var tex_path := ""
-	if info.has("export_overrides") and info.export_overrides.has("image"):
-		tex_path = str(info.export_overrides.image)
-	elif info.has("path"):
-		tex_path = str(info.path)
-	# 去除可能存在的引号
-	tex_path = tex_path.strip_edges().trim_prefix('"').trim_suffix('"')
-	var tex := load(tex_path)
-	if tex is Texture2D:
-		portrait.texture = tex
-	else:
-		push_warning("加载头像失败: " + tex_path)
+	portrait.texture = Game.g_actors.get_timeline_icon_by_actor_name(member.my_name, floor(portrait.size))
 	name_label.text = member.character.get_display_name_translated()
-	lv_label.text = "Lv.%d" % member.my_stat.LV.value
+	lv_label.text = str(member.my_stat.LV.value)
 	sect_label.text = Game.SectNames[member.sect]
 	hp_bar.max_value = member.my_stat.HP.maximum
 	hp_bar.value = member.my_stat.HP.value

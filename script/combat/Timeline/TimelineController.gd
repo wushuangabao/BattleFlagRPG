@@ -80,7 +80,8 @@ func start() -> void:
 		var btn = packed_sprite.instantiate() as TextureButton
 		btn.position.x = btn_origin_x
 		btn.position.y = btn_origin_y
-		btn.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(a.my_name)
+		var icon := Game.g_actors.get_timeline_icon_by_actor_name(a.my_name, floor(btn.size))
+		btn.texture_normal = icon
 		btn.mouse_entered.connect(on_mouse_enter_btn.bind(btn))
 		btn.mouse_exited.connect(on_mouse_exit_btn.bind(btn))
 		btn.set_actor(a)

@@ -73,13 +73,16 @@ func is_character(actor) -> bool:
 				return false
 	return true
 
-func get_timeline_icon_by_actor_name(n: StringName) -> Texture2D:
+func get_timeline_icon_by_actor_name(n: StringName, p_size: Vector2i) -> ImageTexture:
+	var texture: Texture2D
 	if timeline_icons.has(n):
-		var texture: Texture2D = timeline_icons[n]
-		if texture:
-			return texture
-	push_warning("加载 timeline 图标失败，角色名：", n)
-	return timeline_icons[&"default"]
+		texture = timeline_icons[n]
+	if texture == null:
+		push_warning("加载角色[%s]图标失败，使用默认图标" % n)
+		texture = timeline_icons[&"default"]
+	var img := texture.get_image()
+	img.resize(p_size.x, p_size.y, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(img)
 
 #region party
 

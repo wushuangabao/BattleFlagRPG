@@ -57,7 +57,7 @@ placeholder_text = "search..."
 alignment = 2
 
 [node name="Control" type="Control" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(508, 900)
+custom_minimum_size = Vector2(508, 1000)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -72,7 +72,7 @@ grow_vertical = 2
 size_flags_vertical = 6
 horizontal_scroll_mode = 0
 
-[node name="CardsRoot" type="VFlowContainer" parent="MarginContainer/VBoxContainer/Control/ScrollContainer"]
+[node name="CardsRoot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Control/ScrollContainer"]
 custom_minimum_size = Vector2(500, 100)
 layout_mode = 2
 size_flags_horizontal = 3

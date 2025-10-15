@@ -39,7 +39,7 @@ func set_actor(actor: ActorController) -> void:
 	if actor == null:
 		return
 	_cur_actor = actor
-	texture_button.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(actor.my_name)
+	texture_button.texture_normal = Game.g_actors.get_timeline_icon_by_actor_name(actor.my_name, floor(texture_button.size))
 	# 刷新属性
 	LV.text = str(_cur_actor.my_stat.LV.value)
 	STR.text = str(_cur_actor.my_stat.base_attr.at(0))

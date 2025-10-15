@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=10 format=3 uid="uid://5pta076f164x"]
+
+[ext_resource type="Script" uid="uid://bnwylwjjqdr4h" path="res://script/entity/skill/SkillAreaShape.gd" id="1_7mbpn"]
+[ext_resource type="Script" uid="uid://c6dtfvb5c5c2f" path="res://script/combat/Effect/EffectBase.gd" id="1_vwt3f"]
+[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="2_l07uo"]
+[ext_resource type="Script" uid="uid://camissxpceiep" path="res://script/combat/Effect/ConditionBase.gd" id="3_xgf1i"]
+[ext_resource type="Script" uid="uid://b0hmy44do600x" path="res://script/combat/Effect/DamageEffect.gd" id="4_eguc0"]
+[ext_resource type="Texture2D" uid="uid://wg23u1kbd2ah" path="res://asset/png/icon/attack.png" id="5_r4pkj"]
+
+[sub_resource type="Resource" id="Resource_4brt5"]
+script = ExtResource("1_7mbpn")
+custom_id = -1
+shape_type = 2
+d_inner = 1
+d_outer = 3
+target_range = 0
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_pv3o6"]
+script = ExtResource("1_7mbpn")
+custom_id = -1
+shape_type = 1
+d_inner = 1
+d_outer = 3
+target_range = 0
+is_blockable = false
+metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
+
+[sub_resource type="Resource" id="Resource_7bw3o"]
+script = ExtResource("4_eguc0")
+damage_type = 0
+hit_count = 1
+hit_interval = 0.3
+has_splash = false
+splash_range = 1.0
+splash_damage_ratio = 0.5
+power_coefficient = 2.0
+conditions = Array[ExtResource("3_xgf1i")]([])
+tags = Array[StringName]([])
+effect_name = ""
+description = ""
+metadata/_custom_type_script = "uid://b0hmy44do600x"
+
+[resource]
+script = ExtResource("2_l07uo")
+target_rule = 1
+name = "佛山无影腿"
+icon = ExtResource("5_r4pkj")
+tags = Array[StringName]([])
+desc = ""
+cost = Dictionary[StringName, int]({
+&"AP": 2,
+&"MP": 50
+})
+cool_down = 0.0
+charges = 0
+cast_time = 0.0
+area_range = SubResource("Resource_pv3o6")
+area_chose = SubResource("Resource_4brt5")
+filters = Array[StringName]([])
+effects = Array[ExtResource("1_vwt3f")]([SubResource("Resource_7bw3o")])
+caster_anim = &"attack"
+metadata/_custom_type_script = "uid://dpyiyx506qhs6"

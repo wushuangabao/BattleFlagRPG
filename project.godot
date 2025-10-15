@@ -28,7 +28,16 @@ directories/dch_directory={
 "character_fangzhang": "res://asset/Dialogic/character/character_fangzhang.dch",
 "character_shengnv": "res://asset/Dialogic/character/character_shengnv.dch",
 "character_test": "res://asset/Dialogic/character/character_test.dch",
-"test_actor": "res://asset/Dialogic/character/test_actor.dch"
+"test_actor": "res://asset/Dialogic/character/test_actor.dch",
+"test_member_1": "res://asset/Dialogic/character/test_member_1.dch",
+"test_member_2": "res://asset/Dialogic/character/test_member_2.dch",
+"test_member_3": "res://asset/Dialogic/character/test_member_3.dch",
+"test_member_4": "res://asset/Dialogic/character/test_member_4.dch",
+"test_member_5": "res://asset/Dialogic/character/test_member_5.dch",
+"test_member_6": "res://asset/Dialogic/character/test_member_6.dch",
+"test_member_7": "res://asset/Dialogic/character/test_member_7.dch",
+"test_member_8": "res://asset/Dialogic/character/test_member_8.dch",
+"test_member_9": "res://asset/Dialogic/character/test_member_9.dch"
 }
 directories/dtl_directory={
 "timeline/timeline_test": "res://asset/Dialogic/timeline/timeline_test.dtl",

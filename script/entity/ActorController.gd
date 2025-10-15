@@ -17,6 +17,7 @@ var actions  : Array[ActionBase]  # 待执行动作列表
 
 @export var my_name  : StringName     # 角色名（唯一）
 @export var base3d   : UnitBase3D     # 在场景中显示用
+@export var skills   : Array[Skill]   # 技能列表
 @export var anim_player: UnitAnimatedSprite3D # 动画节点的引用
 
 enum ActorState {
@@ -96,7 +97,10 @@ func init_actor_data(actor_name) -> void:
 	my_name = actor_name
 	my_stat = UnitStat.new(self)
 	character = DialogicResourceUtil.get_character_resource(actor_name)
-	print("角色[%s]基础属性数据初始化完毕" % actor_name)
+	if character == null:
+		push_warning("角色[%s]未配置 Dialogic 角色信息" % actor_name)
+	else:
+		print("角色[%s]基础属性数据初始化完毕" % actor_name)
 
 func _enter_tree() -> void:
 	_state = ActorState.Idle
@@ -168,6 +172,65 @@ func add_buff(buf: BuffBase) -> bool:
 func add_action(act: ActionBase) -> void:
 	actions.push_back(act)
 
+#region 技能相关
+
+func learn_skill(skill: Skill) -> void:
+	if skill == null:
+		return
+	if skills == null:
+		skills = []
+	if not skills.has(skill):
+		skills.append(skill)
+
+func forget_skill(skill: Skill) -> void:
+	if skills == null or skill == null:
+		return
+	skills.erase(skill)
+
+func get_skill_by_name(n: String) -> Skill:
+	if skills == null:
+		return null
+	for s in skills:
+		if s and s.name == n:
+			return s
+	return null
+
+func get_skill_by_index(i: int) -> Skill:
+	if skills == null:
+		return null
+	if i >= 0 and i < skills.size():
+		return skills[i]
+	return null
+
+func add_skill_by_path(res_path: String) -> bool:
+	if res_path == "":
+		return false
+	var res = load(res_path)
+	if res and res is Skill:
+		learn_skill(res)
+		return true
+	return false
+
+func _find_skill_resource_by_name(n: String) -> Skill:
+	var dir := DirAccess.open("res://asset/skill")
+	if dir:
+		dir.list_dir_begin()
+		var fn := dir.get_next()
+		while fn != "":
+			if fn.ends_with(".tres"):
+				var path := "res://asset/skill/" + fn
+				var r = load(path)
+				if r and r is Skill:
+					var s: Skill = r
+					if str(s.name) == n:
+						dir.list_dir_end()
+						return s
+			fn = dir.get_next()
+		dir.list_dir_end()
+	return null
+
+#endregion
+
 func is_alive() -> bool:
 	return my_stat.HP.value > 0
 
@@ -202,6 +265,15 @@ func serialize() -> Dictionary:
 	if tags:
 		for t in tags:
 			tags_out.append(str(t))
+	var skills_out: Array = []
+	if skills:
+		for s in skills:
+			if s:
+				var rp := (s as Resource).resource_path if s is Resource else ""
+				skills_out.append({
+					"name": str(s.name),
+					"path": rp
+				})
 	return {
 		"name": str(my_name),
 		"sect": int(sect),
@@ -215,6 +287,7 @@ func serialize() -> Dictionary:
 		"base_attrs": base_vals,
 		"gear": st.gear if st else {},
 		"tags": tags_out,
+		"skills": skills_out,
 		"character_id": str(my_name), # 用唯一标识映射 .dch
 	}
 
@@ -265,3 +338,21 @@ func deserialize(data: Dictionary) -> void:
 	# 角色资源
 	var char_id = data.get("character_id", str(my_name))
 	character = DialogicResourceUtil.get_character_resource(char_id as String)
+
+	# 技能
+	var skills_in: Array = data.get("skills", [])
+	if skills_in and skills_in is Array:
+		skills.clear()
+		for it in skills_in:
+			if it is Dictionary:
+				var p := str(it.get("path", ""))
+				var n := str(it.get("name", ""))
+				var sk: Skill = null
+				if not p.is_empty():
+					var r = load(p)
+					if r and r is Skill:
+						sk = r
+				if sk == null and not n.is_empty():
+					sk = _find_skill_resource_by_name(n)
+				if sk:
+					skills.append(sk)

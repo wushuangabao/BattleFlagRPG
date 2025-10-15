@@ -6,7 +6,7 @@ class_name PartyPanel
 @export var sect_filter: OptionButton
 @export var count_label: Label
 @export var scroll: ScrollContainer
-@export var cards_root: VFlowContainer
+@export var cards_root: VBoxContainer
 
 # 卡片预制
 @export var member_card_scene: PackedScene

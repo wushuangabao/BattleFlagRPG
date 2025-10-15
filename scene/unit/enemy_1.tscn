@@ -1,8 +1,10 @@
-[gd_scene load_steps=26 format=3 uid="uid://df70ys3x6ucts"]
+[gd_scene load_steps=28 format=3 uid="uid://df70ys3x6ucts"]
 
 [ext_resource type="Script" uid="uid://6je7cd7a1ex8" path="res://script/combat/Unit/UnitBase3D.gd" id="1_hnofr"]
 [ext_resource type="Texture2D" uid="uid://b80n8ho4bruas" path="res://asset/png/character/animation/test_run.png" id="2_rpfj5"]
+[ext_resource type="Script" uid="uid://dpyiyx506qhs6" path="res://script/entity/skill/Skill.gd" id="5_77b4y"]
 [ext_resource type="Texture2D" uid="uid://8p4y5jf2flki" path="res://asset/png/ui/flag_top_bar_under.png" id="6_bqxqm"]
+[ext_resource type="Resource" uid="uid://5pta076f164x" path="res://asset/skill/佛山无影腿.tres" id="6_hnofr"]
 [ext_resource type="Texture2D" uid="uid://c053d0eosprnt" path="res://asset/png/ui/flag_top_bar_hp.png" id="7_77b4y"]
 [ext_resource type="Texture2D" uid="uid://d2khofp304ln0" path="res://asset/png/ui/flag_top_bar_mp.png" id="8_hnofr"]
 [ext_resource type="Script" uid="uid://cmni5q8nut0hb" path="res://script/entity/ActorController.gd" id="10_2d5li"]
@@ -169,6 +171,7 @@ script = ExtResource("10_cen02")
 script = ExtResource("10_2d5li")
 my_name = &"杂兵1"
 base3d = NodePath("..")
+skills = Array[ExtResource("5_77b4y")]([ExtResource("6_hnofr")])
 anim_player = NodePath("../anim")
 
 [node name="SubViewport" type="SubViewport" parent="."]

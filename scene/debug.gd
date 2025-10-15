@@ -9,4 +9,9 @@ func _on_btnBigmap_pressed() -> void:
 
 
 func _on_btnParty_pressed() -> void:
+	for i in range(1, 10):
+		var n = "test_member_%d" % i
+		var a = Game.g_actors.get_actor_by_name(n)
+		a.init_actor_data(n)
+		Game.g_actors.add_member(a)
 	Game.g_scenes.goto_scene(load("res://scene/ui/PartyPanel.tscn"))
