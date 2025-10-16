@@ -48,6 +48,28 @@ var path_cells: Array[Vector2i] = []
 var chose_area_cells: Array[Vector2i] = []
 var skill_area_cells: Array[Vector2i] = []
 
+@export_group("actor_facing_indicator")
+@export var facing_indicator_size_ratio: float = 0.64
+@export var facing_indicator_size_ratio_selected: float = 0.95
+@export var facing_indicator_border_width: float = 3.0
+@export var facing_indicator_player_border_color: Color = Color(0.1, 0.9, 0.1, 0.95)
+@export var facing_indicator_enemy_border_color: Color = Color(0.9, 0.1, 0.1, 0.95)
+@export var facing_indicator_team_colors: Dictionary[int, Color] = {
+	int(Game.TeamID.Red): Color(0.9, 0.1, 0.1, 0.95),
+	int(Game.TeamID.Yellow): Color(0.9, 0.8, 0.1, 0.95),
+	int(Game.TeamID.Blue): Color(0.1, 0.2, 0.9, 0.95),
+	int(Game.TeamID.Green): Color(0.1, 0.9, 0.1, 0.95),
+	int(Game.TeamID.White): Color(0.95, 0.95, 0.95, 0.95),
+	int(Game.TeamID.Black): Color(0.1, 0.1, 0.1, 0.95)
+}
+
+# 存储需要在地面上绘制的朝向指示器
+# 每项字典包含：{"cell": Vector2i, "dir": Vector2, "color": Color}
+var facing_indicators: Array = []
+var facing_indicator_map: Dictionary[ActorController, Dictionary] = {}
+
+var flag_layer: FlagLayer = null
+
 func _ready():
 	# 创建overlay节点用于绘制移动范围和路径
 	if overlay == null:
@@ -76,6 +98,19 @@ func set_path(path: Array[Vector2i]):
 func clear_path():
 	path_cells.clear()
 	overlay.queue_redraw()
+
+func set_facing_indicators(items: Array) -> void:
+	facing_indicators = items
+	overlay.queue_redraw()
+
+func update_facing_indicator_for(actor: ActorController, cell: Vector2i, dir: Vector2) -> void:
+	facing_indicator_map[actor] = {"cell": cell, "dir": dir}
+	overlay.queue_redraw()
+
+func remove_facing_indicator_for(actor: ActorController) -> void:
+	if facing_indicator_map.has(actor):
+		facing_indicator_map.erase(actor)
+		overlay.queue_redraw()
 
 func clear_on_cur_actor_move() -> void:
 	set_reachable({})

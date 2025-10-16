@@ -22,6 +22,9 @@ var _current_path: Array[Vector2i] = []
 var _tween_hp : Tween
 var _tween_mp : Tween
 
+# 朝向/位置指示器脏标记：当格子或朝向变化时置为 true
+var facing_dirty := true
+
 func get_pos_2d() -> Vector2:
 	return Vector2(global_position.x, global_position.z)
 
@@ -37,6 +40,7 @@ func get_cur_path() -> Array[Vector2i]:
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
 	_cell = cell
 	_dir = dir
+	facing_dirty = true
 
 func is_target_cell(cell: Vector2i) -> bool:
 	return cell == _target_cell
@@ -76,15 +80,16 @@ func _process(_delta):
 			var idx = _current_path.find(_cell)
 			if idx != -1 and idx < _current_path.size() - 1:
 				var next_cell = _current_path[idx + 1]
-				_dir = next_cell - _cell
-				# 更新ActorController的面朝方向
-				if actor:
-					actor.update_facing_direction(_dir)
+				var new_dir: Vector2i = next_cell - _cell
+				if new_dir != _dir:
+					_dir = new_dir
+					facing_dirty = true
+					if actor:
+						actor.update_facing_direction()
 				if next_cell.x < _cell.x and not anim.flip_h:
 					anim.flip_h = true
 				elif next_cell.x > _cell.x and anim.flip_h:
 					anim.flip_h = false
-		return
 
 func _update_path(preview: bool):
 	if not _reachable.has(_target_cell):
@@ -126,7 +131,10 @@ func move_by_current_path():
 	for i in range(1, _current_path.size()):
 		var c = _current_path[i]
 		tween.tween_property(self, ^"global_position", GridHelper.to_world_player_3d(map, c), move_time)
-		tween.tween_callback(func(): _cell = c) # 每到一个格子就更新位置
+		tween.tween_callback(func():
+			_cell = c
+			facing_dirty = true
+		) # 每到一个格子就更新位置
 	tween.finished.connect(func():
 		_cell = _target_cell # 不要立刻设置_cell到目标位置，要等移动完
 		_is_moving = false

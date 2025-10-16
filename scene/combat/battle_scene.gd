@@ -130,6 +130,7 @@ func load_battle_map(map: PackedScene) -> bool:
 		return false
 	ground_layer = new_node.ground
 	flag_layer   = new_node.flag
+	ground_layer.flag_layer = flag_layer
 	var dim = ground_layer.get_tilemap_dimensions()
 	map_cols = dim.x
 	map_rows = dim.y
@@ -199,7 +200,6 @@ func _unhandled_input(event: InputEvent) -> void:
 						tar.anim_player.highlight_off()
 					Game.g_event.send_event("event_chose_target", ground_layer.skill_area_cells) # 选择目标
 					return
-			_cell_mouse_on = _get_cell_mouse_on()
 			if _cell_mouse_on:
 				_on_cell_clicked(_cell_mouse_on)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
@@ -233,9 +233,9 @@ func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 			ground_layer.highlight_cell(cell, &"select_other_team_actor")
 
 func _process(_delta: float) -> void:
+	_get_cell_mouse_on()
 	var battle_state = my_system.get_battle_state()
 	if battle_state == BattleSystem.BattleState.ChoseActionTarget and my_system.cur_action and my_system.cur_actor:
-		_cell_mouse_on = _get_cell_mouse_on()
 		if _cell_mouse_on:
 			if ground_layer.chose_area_cells.has(_cell_mouse_on):
 				ground_layer.highlight_cell(_cell_mouse_on, &"reachable")
@@ -255,23 +255,29 @@ func _process(_delta: float) -> void:
 				for tar in _target_units:
 					tar.anim_player.highlight_off()
 				_target_units.clear()
-	else:
-		_cell_mouse_on = null
+	elif battle_state == BattleSystem.BattleState.ActorIdle:
+		if _cell_mouse_on and _cur_unit:
+			_cur_unit.set_target_cell(_cell_mouse_on)
+	# 更新地面上的朝向指示器（按需）
+	if _should_update_facing_indicators():
+		_update_facing_indicators()
 
-func _get_cell_mouse_on():
+func _get_cell_mouse_on() -> void:
 	var mouse_pos = get_viewport().get_mouse_position()
 	var from = camera.project_ray_origin(mouse_pos)
 	var dir = camera.project_ray_normal(mouse_pos)
 	# 与 y=0 平面求交
 	if absf(dir.y) < 1e-6: # 射线几乎平行于地面
-		return null
+		_cell_mouse_on = null
+		return
 	var t = -from.y / dir.y
 	if t <= 0.0: # 交点在摄像机背后
-		return null
+		_cell_mouse_on = null
+		return
 	var hit = from + dir * t
 	# draw_debug_ray(from, hit)
 	# 将世界坐标映射到格子坐标
-	return ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
+	_cell_mouse_on = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from
@@ -300,5 +306,28 @@ func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	# 延迟清理
 	await get_tree().create_timer(2.0).timeout
 	line.queue_free()
+
+#endregion
+
+#region 朝向指示器更新
+func _should_update_facing_indicators() -> bool:
+	if my_system == null:
+		return false
+	for a in my_system.get_actors():
+		if a and a.base3d and a.base3d._is_moving == false and a.base3d.facing_dirty:
+			return true
+	return false
+
+func _update_facing_indicators() -> void:
+	if ground_layer == null:
+		return
+	for a in my_system.get_actors():
+		if a == null or BattleSystem.is_instance_valid(a.base3d) == false:
+			continue
+		if a.base3d.facing_dirty and a.base3d._is_moving == false:
+			var cell: Vector2i = a.base3d.get_cur_cell()
+			var dir2i: Vector2i = a.get_facing_vector()
+			ground_layer.update_facing_indicator_for(a, cell, Vector2(dir2i.x, dir2i.y))
+			a.base3d.facing_dirty = false
 
 #endregion

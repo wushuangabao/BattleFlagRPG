@@ -189,23 +189,32 @@ func on_chose_target(target):
 
 func on_actor_hp_changed(actor, new_hp, old_hp):
 	print("BattleSystem 收到信号：", actor.my_name, " hp=", new_hp)
-	# 头顶血条
-	var bar_hp = actor.base3d.bar_hp
-	bar_hp.max_value = actor.get_MaxHP()
-	bar_hp.set_value_no_signal(old_hp)
-	actor.base3d.animate_hp_bar(new_hp)
-	# 行动条头像
-	if _turn_controller.timeline.texture_map.has(actor):
-		var p = (bar_hp.max_value - new_hp) / bar_hp.max_value
-		_turn_controller.timeline.texture_map[actor].set_hp_progress(p)
+	if is_instance_valid(actor.base3d):
+		# 头顶血条
+		var bar_hp = actor.base3d.bar_hp
+		bar_hp.max_value = actor.get_MaxHP()
+		bar_hp.set_value_no_signal(old_hp)
+		actor.base3d.animate_hp_bar(new_hp)
+		# 行动条头像
+		if _turn_controller.timeline.texture_map.has(actor):
+			var p = (bar_hp.max_value - new_hp) / bar_hp.max_value
+			_turn_controller.timeline.texture_map[actor].set_hp_progress(p)
 
 func on_actor_mp_changed(actor, new_mp, old_mp):
 	print("BattleSystem 收到信号：mp=", actor.my_name, " mp=", new_mp)
-	# 头顶蓝条
-	var bar_mp = actor.base3d.bar_mp
-	bar_mp.max_value = actor.my_stat.MP.maximum
-	bar_mp.set_value_no_signal(old_mp)
-	actor.base3d.animate_mp_bar(new_mp)
+	if is_instance_valid(actor.base3d):
+		# 头顶蓝条
+		var bar_mp = actor.base3d.bar_mp
+		bar_mp.max_value = actor.my_stat.MP.maximum
+		bar_mp.set_value_no_signal(old_mp)
+		actor.base3d.animate_mp_bar(new_mp)
+
+static func is_instance_valid(o) -> bool:
+	if o == null:
+		return false
+	if is_instance_valid(o) and not o.is_queued_for_deletion():
+		return true
+	return false
 
 #endregion
 
@@ -292,6 +301,7 @@ func create_initial_units_on_battle_map() -> void:
 				unit.add_child(actor)
 			unit.actor = actor
 			actor.base3d = unit
+			actor.update_facing_direction()
 			actor.anim_player = unit.anim
 			actor.team_id = map.get_team_by_cell(cell)
 			_actors.push_back(actor)

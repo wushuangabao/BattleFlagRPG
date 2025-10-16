@@ -39,7 +39,8 @@ func get_state() -> ActorState:
 	return _state
 
 # 根据移动方向更新面朝方向
-func update_facing_direction(dir: Vector2i) -> void:
+func update_facing_direction() -> void:
+	var dir = base3d._dir
 	if dir.x > 0:
 		facing_direction = FacingDirection.Right
 	elif dir.x < 0:
