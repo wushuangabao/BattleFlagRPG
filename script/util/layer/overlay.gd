@@ -152,11 +152,7 @@ func connect_edges(edges: Array) -> Array:
 	return boundary
 
 func _draw_path_with_direction(actor: ActorController, points: PackedVector2Array) -> void:
-	var is_player_team = grid.flag_layer.is_player_team(actor.team_id)
-	var border_col: Color = grid.facing_indicator_player_border_color if is_player_team else grid.facing_indicator_enemy_border_color
-	for i in range(points.size() - 1):
-		draw_line(points[i], points[i + 1], border_col, grid.path_line_width)
-	var fill_col: Color = grid.facing_indicator_team_colors[actor.team_id]
+	var col: Color = grid.facing_indicator_team_colors[actor.team_id]
 	# 绘制起点箭头
 	var curr_cell := grid.path_cells[0]
 	var next_cell := grid.path_cells[1]
@@ -165,7 +161,7 @@ func _draw_path_with_direction(actor: ActorController, points: PackedVector2Arra
 	if dir == Vector2.ZERO:
 		return
 	var size: float = GridHelper.cell_size.x * grid.facing_indicator_size_ratio_selected
-	points[0] = _draw_triangle(center2d, dir, size, fill_col, border_col)[1]
+	points[0] = _draw_triangle(center2d, dir, size, col)[1]
 	# 绘制终点箭头
 	var last_i = grid.path_cells.size() - 1
 	curr_cell = grid.path_cells[last_i]
@@ -175,10 +171,10 @@ func _draw_path_with_direction(actor: ActorController, points: PackedVector2Arra
 	if dir == Vector2.ZERO:
 		return
 	size = GridHelper.cell_size.x * grid.facing_indicator_size_ratio
-	points[last_i] = _draw_triangle(center2d, dir, size, fill_col, border_col)[0]
+	points[last_i] = _draw_triangle(center2d, dir, size, col)[0]
 	# 绘制路径
 	for i in range(points.size() - 1):
-		draw_line(points[i], points[i + 1], border_col, grid.path_line_width)
+		draw_line(points[i], points[i + 1], col, grid.path_line_width)
 
 func _draw_facing_indicator(actor: ActorController) -> void:
 	var item = grid.facing_indicator_map[actor]
@@ -190,8 +186,8 @@ func _draw_facing_indicator(actor: ActorController) -> void:
 		return
 	# 颜色按队伍区分
 	var is_player_team := grid.flag_layer.is_player_team(actor.team_id)
-	var fill_col: Color = grid.facing_indicator_team_colors[actor.team_id]
-	var border_col: Color = grid.facing_indicator_player_border_color if is_player_team else grid.facing_indicator_enemy_border_color
+	var fill_col: Color = grid.facing_indicator_player_color if is_player_team else grid.facing_indicator_enemy_color
+	var border_col: Color = grid.facing_indicator_team_colors[actor.team_id]
 	var center2d: Vector2 = grid.map_to_local(cell)
 	var size: float
 	var cur_cell := grid.hightlight_cell_map[&"current_actor"]
@@ -201,7 +197,7 @@ func _draw_facing_indicator(actor: ActorController) -> void:
 		size = GridHelper.cell_size.x * grid.facing_indicator_size_ratio
 	_draw_triangle(center2d, dir, size, fill_col, border_col)
 
-func _draw_triangle(center2d: Vector2, dir: Vector2, size: float, fill_col: Color, border_col: Color) -> Array[Vector2]:
+func _draw_triangle(center2d: Vector2, dir: Vector2, size: float, fill_col: Color, border_col = null) -> Array[Vector2]:
 	var dir_n := dir.normalized()
 	var perp := Vector2(-dir_n.y, dir_n.x)
 	var base_center = center2d - dir_n * (size * 0.333333)
@@ -212,8 +208,9 @@ func _draw_triangle(center2d: Vector2, dir: Vector2, size: float, fill_col: Colo
 	# 填充
 	draw_polygon(PackedVector2Array([apex, p1, p2]), PackedColorArray([fill_col, fill_col, fill_col]))
 	# 描边
-	draw_line(apex, p1, border_col, grid.facing_indicator_border_width)
-	draw_line(p1, p2, border_col, grid.facing_indicator_border_width)
-	draw_line(p2, apex, border_col, grid.facing_indicator_border_width)
+	if border_col:
+		draw_line(apex, p1, border_col, grid.facing_indicator_border_width)
+		draw_line(p1, p2, border_col, grid.facing_indicator_border_width)
+		draw_line(p2, apex, border_col, grid.facing_indicator_border_width)
 	# 返回三角形的基点
 	return [base_center, apex]
