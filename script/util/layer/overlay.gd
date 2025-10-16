@@ -48,6 +48,17 @@ func _draw():
 			if a != actor:
 				_draw_facing_indicator(a)
 
+	# 预览：面向鼠标方向的半透明箭头（仅当前单位）
+	if grid.flag_layer and grid.preview_facing_actor and grid.preview_facing_dir != Vector2.ZERO:
+		var a_prev: ActorController = grid.preview_facing_actor
+		var fill_col: Color = grid.facing_indicator_player_color if grid.flag_layer.is_player_team(a_prev.team_id) else grid.facing_indicator_enemy_color
+		var border_col: Color = grid.facing_indicator_team_colors[a_prev.team_id]
+		fill_col.a *= 0.5
+		border_col.a *= 0.5
+		var sz_prev: float = GridHelper.cell_size.x * grid.facing_indicator_size_ratio_selected
+		var center_prev: Vector2 = grid.map_to_local(a_prev.base3d.get_cur_cell())
+		_draw_triangle(center_prev, grid.preview_facing_dir, sz_prev, fill_col, border_col)
+
 	# 高亮格子
 	for k in grid.hightlight_cell_map:
 		var c = grid.hightlight_cell_map[k]

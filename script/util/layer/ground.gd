@@ -70,6 +70,10 @@ var facing_indicator_map: Dictionary[ActorController, Dictionary] = {}
 
 var flag_layer: FlagLayer = null
 
+# 预览：面向鼠标方向的半透明箭头（仅当前单位）
+var preview_facing_actor: ActorController = null
+var preview_facing_dir: Vector2 = Vector2.ZERO
+
 func _ready():
 	# 创建overlay节点用于绘制移动范围和路径
 	if overlay == null:
@@ -110,6 +114,17 @@ func update_facing_indicator_for(actor: ActorController, cell: Vector2i, dir: Ve
 func remove_facing_indicator_for(actor: ActorController) -> void:
 	if facing_indicator_map.has(actor):
 		facing_indicator_map.erase(actor)
+		overlay.queue_redraw()
+
+func set_preview_facing(actor: ActorController, dir: Vector2) -> void:
+	preview_facing_actor = actor
+	preview_facing_dir = dir
+	overlay.queue_redraw()
+
+func clear_preview_facing() -> void:
+	if preview_facing_actor != null or preview_facing_dir != Vector2.ZERO:
+		preview_facing_actor = null
+		preview_facing_dir = Vector2.ZERO
 		overlay.queue_redraw()
 
 func clear_on_cur_actor_move() -> void:

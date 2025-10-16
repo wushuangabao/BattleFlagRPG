@@ -22,6 +22,9 @@ var _current_path: Array[Vector2i] = []
 var _tween_hp : Tween
 var _tween_mp : Tween
 
+# 到鼠标的朝向
+var facing_dir_to_mouse: ActorController.FacingDirection
+
 # 朝向/位置指示器脏标记：当格子或朝向变化时置为 true
 var facing_dirty := true
 
@@ -45,14 +48,18 @@ func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
 func is_target_cell(cell: Vector2i) -> bool:
 	return cell == _target_cell
 	
-func set_target_cell(cell: Vector2i) -> bool:
-	if not _is_moving and cell != _cell and actor.get_state() != ActorController.ActorState.DoAction:
-		if _reachable.has(cell):
-			if not is_target_cell(cell) or _current_path.size() == 0:
-				_target_cell = cell
-				_update_path(true)
-			return true
-	return false
+func set_target_cell(cell: Vector2i) -> void:
+	if cell != _cell and is_target_can_go(cell):
+		if not is_target_cell(cell) or _current_path.size() == 0:
+			_target_cell = cell
+			_update_path(true)
+	else:
+		_clear_path()
+
+func is_target_can_go(cell = null) -> bool:
+	if cell == null:
+		cell = _target_cell
+	return not _is_moving and actor.get_state() != ActorController.ActorState.DoAction and _reachable.has(cell)
 
 func _ready() -> void:
 	anim.play(&"idle")
@@ -72,6 +79,14 @@ func on_selected() -> void:
 func _compute_reachable():
 	_reachable = GridHelper.movement_range(_cell, actor.get_AP(), _cell_walkable)
 	map.set_reachable(_reachable)
+
+# 计算并设置从角色位置指向鼠标位置的朝向（四方向）
+func set_facing_dir_to_mouse(hit: Vector3) -> void:
+	var delta: Vector2 = Vector2(hit.x, hit.z) - get_pos_2d()
+	if absf(delta.x) >= absf(delta.y):
+		facing_dir_to_mouse = ActorController.FacingDirection.Right if delta.x > 0.0 else ActorController.FacingDirection.Left
+	else:
+		facing_dir_to_mouse = ActorController.FacingDirection.Down if delta.y > 0.0 else ActorController.FacingDirection.Up
 
 func _process(_delta):
 	if _is_moving:
@@ -93,18 +108,20 @@ func _process(_delta):
 
 func _update_path(preview: bool):
 	if not _reachable.has(_target_cell):
-		_current_path.clear()
-		map.clear_path()
+		_clear_path()
 		return
 	var path = GridHelper.a_star(_cell, _target_cell, _dir, _cell_walkable)
 	# A* 可能返回空（理论上不会，因为 _target_cell 在可达范围内，但以防万一）
 	if path.size() == 0:
-		_current_path.clear()
-		map.clear_path()
+		_clear_path()
 		return
 	_current_path = path
 	if preview:
 		map.set_path(_current_path)
+
+func _clear_path() -> void:
+	_current_path.clear()
+	map.clear_path()
 
 func _cell_walkable(c: Vector2i) -> bool:
 	var source_id = map.get_cell_source_id(c)
@@ -139,8 +156,7 @@ func move_by_current_path():
 		_cell = _target_cell # 不要立刻设置_cell到目标位置，要等移动完
 		_is_moving = false
 		anim.play(&"idle")
-		_current_path.clear()
-		map.clear_path()
+		_clear_path()
 	)
 
 func is_arrived_target_cell() -> bool:

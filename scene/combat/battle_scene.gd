@@ -207,23 +207,23 @@ func _unhandled_input(event: InputEvent) -> void:
 				Game.g_event.send_event("event_chose_target", false) # 点击右键取消所选动作
 
 func _on_cell_clicked(cell: Vector2i) -> void:
-	if _cur_unit.is_target_cell(cell) and _cur_unit.get_cur_path().size() > 1:
-		my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
+	if _cur_unit.is_target_cell(cell):
+		if _cur_unit.get_cur_path().size() > 1:
+			my_system.on_chose_action(ActionMove.new(_cur_unit.get_cur_path()))
+			return
+	if _cur_unit.get_cur_cell() == _cell_mouse_on and _cur_unit.facing_dir_to_mouse != _cur_unit.actor.facing_direction:
+		my_system.on_chose_action(ActionChangeFacingDir.new(_cur_unit.facing_dir_to_mouse))
 		return
 	var battle_state = my_system.get_battle_state()
 	if battle_state != BattleSystem.BattleState.ActorIdle:
 		return
-	var can_go := _cur_unit.set_target_cell(cell)
-	if can_go:
-		ground_layer.highlight_cell(cell, &"reachable")
+	if ground_layer.path_cells.size() > 0:
+		ground_layer.clear_path()
+	var a = my_system.get_actor_on_cell(cell)
+	if a:
+		_on_actor_clicked(a, cell)
 	else:
-		if ground_layer.path_cells.size() > 0:
-			ground_layer.clear_path()
-		var a = my_system.get_actor_on_cell(cell)
-		if a:
-			_on_actor_clicked(a, cell)
-		else:
-			ground_layer.highlight_cell(cell, &"unreachable")
+		ground_layer.highlight_cell(cell, &"unreachable")
 
 func _on_actor_clicked(a: ActorController, cell: Vector2i) -> void:
 	if a != _cur_unit.actor:
@@ -258,6 +258,21 @@ func _process(_delta: float) -> void:
 	elif battle_state == BattleSystem.BattleState.ActorIdle:
 		if _cell_mouse_on and _cur_unit:
 			_cur_unit.set_target_cell(_cell_mouse_on)
+			# 预览转向：鼠标在当前格子，且朝向不同，则在 OverLay 绘制半透明箭头
+			if _cell_mouse_on == _cur_unit.get_cur_cell():
+				var fd = _cur_unit.facing_dir_to_mouse
+				if fd and fd != _cur_unit.actor.facing_direction:
+					var dir2 : Vector2
+					match int(fd):
+						0: dir2 = Vector2(1, 0)  # Right
+						1: dir2 = Vector2(0, 1)  # Down
+						2: dir2 = Vector2(-1, 0) # Left
+						3: dir2 = Vector2(0, -1) # Up
+					ground_layer.set_preview_facing(_cur_unit.actor, dir2)
+				else:
+					ground_layer.clear_preview_facing()
+			else:
+				ground_layer.clear_preview_facing()
 	# 更新地面上的朝向指示器（按需）
 	if _should_update_facing_indicators():
 		_update_facing_indicators()
@@ -278,6 +293,9 @@ func _get_cell_mouse_on() -> void:
 	# draw_debug_ray(from, hit)
 	# 将世界坐标映射到格子坐标
 	_cell_mouse_on = ground_layer.local_to_map(Vector2(hit.x * cell_pixel_size.x, hit.z * cell_pixel_size.y))
+	# 设置角色所在点到鼠标位置的朝向（四方向）
+	if _cur_unit:
+		_cur_unit.set_facing_dir_to_mouse(hit)
 
 func draw_debug_ray(from: Vector3, to: Vector3) -> void:
 	var dir := to - from
