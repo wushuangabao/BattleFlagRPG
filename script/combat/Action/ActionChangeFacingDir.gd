@@ -19,5 +19,6 @@ func validate(actor: ActorController) -> bool:
 func start(actor: ActorController) -> void:
 	actor.facing_direction = _dir
 	if actor.base3d:
+		actor.base3d._dir = actor.get_facing_vector()
 		actor.base3d.facing_dirty = true
 	_state = ActionState.Terminated

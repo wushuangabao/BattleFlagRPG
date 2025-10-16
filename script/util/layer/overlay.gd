@@ -42,23 +42,6 @@ func _draw():
 		if actor:
 			_draw_path_with_direction(actor, points)
 	
-	# 朝向指示器（三角形）
-	if grid.flag_layer and grid.facing_indicator_map.size() > 0:
-		for a in grid.facing_indicator_map:
-			if a != actor:
-				_draw_facing_indicator(a)
-
-	# 预览：面向鼠标方向的半透明箭头（仅当前单位）
-	if grid.flag_layer and grid.preview_facing_actor and grid.preview_facing_dir != Vector2.ZERO:
-		var a_prev: ActorController = grid.preview_facing_actor
-		var fill_col: Color = grid.facing_indicator_player_color if grid.flag_layer.is_player_team(a_prev.team_id) else grid.facing_indicator_enemy_color
-		var border_col: Color = grid.facing_indicator_team_colors[a_prev.team_id]
-		fill_col.a *= 0.5
-		border_col.a *= 0.5
-		var sz_prev: float = GridHelper.cell_size.x * grid.facing_indicator_size_ratio_selected
-		var center_prev: Vector2 = grid.map_to_local(a_prev.base3d.get_cur_cell())
-		_draw_triangle(center_prev, grid.preview_facing_dir, sz_prev, fill_col, border_col)
-
 	# 高亮格子
 	for k in grid.hightlight_cell_map:
 		var c = grid.hightlight_cell_map[k]
@@ -71,6 +54,35 @@ func _draw():
 				draw_circle(center, GridHelper.cell_size.x * 0.501, grid.color_hgihtlight_circle[k])
 			elif grid.color_hgihtlight_circle_border.has(k):
 				draw_circle(center, GridHelper.cell_size.x * 0.51, grid.color_hgihtlight_circle_border[k], false, 1.5)
+
+	# 检查是否有转向预览
+	var current_dir
+	if grid.preview_facing_actor:
+		current_dir = grid.preview_facing_actor.get_facing_vector()
+		if Vector2(current_dir).is_equal_approx(grid.preview_facing_dir):
+			grid.clear_preview_facing()
+
+	# 朝向指示器（三角形）
+	if grid.flag_layer and grid.facing_indicator_map.size() > 0:
+		for a in grid.facing_indicator_map:
+			if a != actor and a != grid.preview_facing_actor: # 绘制移动路径、转向预览时，不显示朝向
+				if a.get_state() == ActorController.ActorState.Idle:
+					_draw_facing_indicator(a)
+
+	# 转向预览
+	if grid.flag_layer and grid.preview_facing_actor and grid.preview_facing_dir != Vector2.ZERO:
+		var a_prev: ActorController = grid.preview_facing_actor
+		var sz_prev: float = GridHelper.cell_size.x * grid.facing_indicator_size_ratio
+		var center: Vector2 = grid.map_to_local(a_prev.base3d.get_cur_cell())
+		var fill_col: Color = grid.facing_indicator_player_color if grid.flag_layer.is_player_team(a_prev.team_id) else grid.facing_indicator_enemy_color
+		var ret_cur = _draw_triangle(center, current_dir, sz_prev, null, null, 0.5, sz_prev * 0.8)
+		var poly_old = PackedVector2Array([ret_cur[1], ret_cur[2], ret_cur[3]])
+		var ret_prev = _draw_triangle(center, grid.preview_facing_dir, sz_prev, fill_col, null, 0.5, sz_prev * 0.8)
+		var poly_new = PackedVector2Array([ret_prev[1], ret_prev[2], ret_prev[3]])
+		var o_minus_n: Array = Geometry2D.clip_polygons(poly_old, poly_new)
+		if o_minus_n.size() > 0:
+			fill_col.a *= 0.5
+			draw_colored_polygon(o_minus_n[0], fill_col)
 
 # 绘制闭合的多边形轮廓
 func _draw_boundary(cells: Array[Vector2i], color: Color, width: float) -> void:
@@ -182,7 +194,7 @@ func _draw_path_with_direction(actor: ActorController, points: PackedVector2Arra
 	if dir == Vector2.ZERO:
 		return
 	size = GridHelper.cell_size.x * grid.facing_indicator_size_ratio
-	points[last_i] = _draw_triangle(center2d, dir, size, col)[0]
+	points[last_i] = _draw_triangle(center2d, dir, size, col, null, grid.facing_indicator_size_ratio * 0.35, size * 0.75)[0]
 	# 绘制路径
 	for i in range(points.size() - 1):
 		draw_line(points[i], points[i + 1], col, grid.path_line_width)
@@ -208,20 +220,22 @@ func _draw_facing_indicator(actor: ActorController) -> void:
 		size = GridHelper.cell_size.x * grid.facing_indicator_size_ratio
 	_draw_triangle(center2d, dir, size, fill_col, border_col)
 
-func _draw_triangle(center2d: Vector2, dir: Vector2, size: float, fill_col: Color, border_col = null) -> Array[Vector2]:
+func _draw_triangle(center2d: Vector2, dir: Vector2, size: float, fill_col = null, border_col = null, offset: float = 0.0, half_w = null) -> Array[Vector2]:
 	var dir_n := dir.normalized()
 	var perp := Vector2(-dir_n.y, dir_n.x)
-	var base_center = center2d - dir_n * (size * 0.333333)
+	var base_center = center2d + dir_n * size * (offset - 0.25)
 	var apex = base_center + dir_n * size * 0.8
-	var half_w = size * 0.5
+	if half_w == null:
+		half_w = size * 0.5
 	var p1 = base_center + perp * half_w
 	var p2 = base_center - perp * half_w
 	# 填充
-	draw_polygon(PackedVector2Array([apex, p1, p2]), PackedColorArray([fill_col, fill_col, fill_col]))
+	if fill_col:
+		draw_colored_polygon(PackedVector2Array([apex, p1, p2]), fill_col)
 	# 描边
 	if border_col:
 		draw_line(apex, p1, border_col, grid.facing_indicator_border_width)
 		draw_line(p1, p2, border_col, grid.facing_indicator_border_width)
 		draw_line(p2, apex, border_col, grid.facing_indicator_border_width)
 	# 返回三角形的基点
-	return [base_center, apex]
+	return [base_center, apex, p1, p2]

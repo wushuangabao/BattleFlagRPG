@@ -49,18 +49,18 @@ var chose_area_cells: Array[Vector2i] = []
 var skill_area_cells: Array[Vector2i] = []
 
 @export_group("actor_facing_indicator")
-@export var facing_indicator_size_ratio: float = 0.64
+@export var facing_indicator_size_ratio: float = 0.5
 @export var facing_indicator_size_ratio_selected: float = 0.95
 @export var facing_indicator_border_width: float = 3.0
-@export var facing_indicator_player_color: Color = Color(0.1, 0.9, 0.1, 0.9)
-@export var facing_indicator_enemy_color: Color = Color(0.9, 0.1, 0.1, 0.9)
+@export var facing_indicator_player_color: Color = Color(0.1, 0.9, 0.1, 1.2)
+@export var facing_indicator_enemy_color: Color = Color(0.9, 0.1, 0.1, 1.2)
 @export var facing_indicator_team_colors: Dictionary[int, Color] = {
-	int(Game.TeamID.Red): Color(0.9, 0.1, 0.1, 1.0),
-	int(Game.TeamID.Yellow): Color(0.9, 0.8, 0.1, 1.0),
-	int(Game.TeamID.Blue): Color(0.1, 0.2, 0.9, 1.0),
-	int(Game.TeamID.Green): Color(0.1, 0.9, 0.1, 1.0),
-	int(Game.TeamID.White): Color(0.95, 0.95, 0.95,1.0),
-	int(Game.TeamID.Black): Color(0.1, 0.1, 0.1, 1.0)
+	int(Game.TeamID.Red): Color(0.9, 0.1, 0.1, 1.2),
+	int(Game.TeamID.Yellow): Color(0.9, 0.8, 0.1, 1.2),
+	int(Game.TeamID.Blue): Color(0.1, 0.2, 0.9, 1.2),
+	int(Game.TeamID.Green): Color(0.1, 0.9, 0.1, 1.2),
+	int(Game.TeamID.White): Color(0.95, 0.95, 0.95,1.2),
+	int(Game.TeamID.Black): Color(0.1, 0.1, 0.1, 1.2)
 }
 
 # 存储需要在地面上绘制的朝向指示器

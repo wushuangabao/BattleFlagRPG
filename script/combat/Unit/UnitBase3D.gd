@@ -101,10 +101,10 @@ func _process(_delta):
 					facing_dirty = true
 					if actor:
 						actor.update_facing_direction()
-				if next_cell.x < _cell.x and not anim.flip_h:
-					anim.flip_h = true
-				elif next_cell.x > _cell.x and anim.flip_h:
-					anim.flip_h = false
+	if _dir.x < 0 and not anim.flip_h:
+		anim.flip_h = true
+	elif _dir.x > 0 and anim.flip_h:
+		anim.flip_h = false
 
 func _update_path(preview: bool):
 	if not _reachable.has(_target_cell):

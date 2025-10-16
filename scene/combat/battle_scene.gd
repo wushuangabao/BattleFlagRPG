@@ -261,7 +261,7 @@ func _process(_delta: float) -> void:
 			# 预览转向：鼠标在当前格子，且朝向不同，则在 OverLay 绘制半透明箭头
 			if _cell_mouse_on == _cur_unit.get_cur_cell():
 				var fd = _cur_unit.facing_dir_to_mouse
-				if fd and fd != _cur_unit.actor.facing_direction:
+				if fd != null and fd != _cur_unit.actor.facing_direction:
 					var dir2 : Vector2
 					match int(fd):
 						0: dir2 = Vector2(1, 0)  # Right
