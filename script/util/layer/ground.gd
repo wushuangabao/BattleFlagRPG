@@ -95,8 +95,23 @@ func set_skill_area(area: Array[Vector2i]):
 	skill_area_cells = area
 	overlay.queue_redraw()
 
-func set_path(path: Array[Vector2i]):
-	path_cells = path
+func set_path(path):
+	# 统一转换为 Array[Vector2i]，兼容 PackedVector2Array 与 Array[Vector2i]
+	path_cells.clear()
+	if path is PackedVector2Array:
+		path_cells.resize(path.size())
+		for i in range(path.size()):
+			path_cells[i] = Vector2i(path[i])
+	elif path is Array[Vector2i]:
+		# 直接赋值（若上层可能复用同一数组，可用 duplicate(true)）
+		path_cells = path
+	else:
+		# 容错：尝试逐个转为 Vector2i
+		for p in path:
+			if p is Vector2i:
+				path_cells.append(p)
+			elif p is Vector2:
+				path_cells.append(Vector2i(p))
 	overlay.queue_redraw()
 
 func clear_path():

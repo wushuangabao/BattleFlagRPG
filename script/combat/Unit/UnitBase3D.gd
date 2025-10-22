@@ -17,7 +17,7 @@ var _dir: Vector2i # 当前朝向
 var _target_cell = Vector2i(-1, -1)# 移动目标格
 var _is_moving := false
 var _reachable: Dictionary = {} # cell->steps
-var _current_path: Array[Vector2i] = []
+var _current_path: PackedVector2Array = PackedVector2Array()
 
 var _tween_hp : Tween
 var _tween_mp : Tween
@@ -38,7 +38,11 @@ func _get_cur_cell() -> Vector2i:
 	return GridHelper.to_cell(map, get_pos_2d())
 
 func get_cur_path() -> Array[Vector2i]:
-	return _current_path
+	var arr: Array[Vector2i] = []
+	arr.resize(_current_path.size())
+	for i in range(_current_path.size()):
+		arr[i] = Vector2i(_current_path[i])
+	return arr
 
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
 	_cell = cell
@@ -92,9 +96,13 @@ func _process(_delta):
 	if _is_moving:
 		# 根据移动向左还是向右，翻转角色
 		if _current_path.size() > 1:
-			var idx = _current_path.find(_cell)
+			var idx := -1
+			for i in range(_current_path.size()):
+				if Vector2i(_current_path[i]) == _cell:
+					idx = i
+					break
 			if idx != -1 and idx < _current_path.size() - 1:
-				var next_cell = _current_path[idx + 1]
+				var next_cell: Vector2i = Vector2i(_current_path[idx + 1])
 				var new_dir: Vector2i = next_cell - _cell
 				if new_dir != _dir:
 					_dir = new_dir
@@ -110,7 +118,7 @@ func _update_path(preview: bool):
 	if not _reachable.has(_target_cell):
 		_clear_path()
 		return
-	var path = GridHelper.a_star(_cell, _target_cell, _dir, _cell_walkable)
+	var path = Utils.a_star(_cell, _target_cell, _dir, _cell_walkable)
 	# A* 可能返回空（理论上不会，因为 _target_cell 在可达范围内，但以防万一）
 	if path.size() == 0:
 		_clear_path()
@@ -146,7 +154,7 @@ func move_by_current_path():
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
 	# 跳过起点
 	for i in range(1, _current_path.size()):
-		var c = _current_path[i]
+		var c: Vector2i = Vector2i(_current_path[i])
 		tween.tween_property(self, ^"global_position", GridHelper.to_world_player_3d(map, c), move_time)
 		tween.tween_callback(func():
 			_cell = c
