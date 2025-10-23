@@ -101,7 +101,7 @@ func set_path(path):
 	if path is PackedVector2Array:
 		path_cells.resize(path.size())
 		for i in range(path.size()):
-			path_cells[i] = Vector2i(path[i])
+			path_cells[i] = Vector2i(path[i].round())
 	elif path is Array[Vector2i]:
 		# 直接赋值（若上层可能复用同一数组，可用 duplicate(true)）
 		path_cells = path
@@ -111,7 +111,7 @@ func set_path(path):
 			if p is Vector2i:
 				path_cells.append(p)
 			elif p is Vector2:
-				path_cells.append(Vector2i(p))
+				path_cells.append(Vector2i(p.round()))
 	overlay.queue_redraw()
 
 func clear_path():

@@ -41,7 +41,7 @@ func get_cur_path() -> Array[Vector2i]:
 	var arr: Array[Vector2i] = []
 	arr.resize(_current_path.size())
 	for i in range(_current_path.size()):
-		arr[i] = Vector2i(_current_path[i])
+		arr[i] = Vector2i(_current_path[i].round())
 	return arr
 
 func set_cur_cell(cell: Vector2i, dir: Vector2i = Vector2i(1, 0)) -> void:
@@ -98,11 +98,11 @@ func _process(_delta):
 		if _current_path.size() > 1:
 			var idx := -1
 			for i in range(_current_path.size()):
-				if Vector2i(_current_path[i]) == _cell:
+				if Vector2i(_current_path[i].round()) == _cell:
 					idx = i
 					break
 			if idx != -1 and idx < _current_path.size() - 1:
-				var next_cell: Vector2i = Vector2i(_current_path[idx + 1])
+				var next_cell: Vector2i = Vector2i(_current_path[idx + 1].round())
 				var new_dir: Vector2i = next_cell - _cell
 				if new_dir != _dir:
 					_dir = new_dir
@@ -154,7 +154,7 @@ func move_by_current_path():
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)	
 	# 跳过起点
 	for i in range(1, _current_path.size()):
-		var c: Vector2i = Vector2i(_current_path[i])
+		var c: Vector2i = Vector2i(_current_path[i].round())
 		tween.tween_property(self, ^"global_position", GridHelper.to_world_player_3d(map, c), move_time)
 		tween.tween_callback(func():
 			_cell = c

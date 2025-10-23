@@ -2,22 +2,30 @@
 
 #include "a_star_module.h"
 
+const float align_weight = 0.02f;
+const float turn_weight = 0.001f;
+const Vector2i Vector2i_ZERO = Vector2i(0, 0);
+
 PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
                                          const Vector2i& goal,
                                          const Vector2i& dir_start,
                                          const Callable& is_walkable) {
-    // 开放/关闭表
+    Vector2i dir_to_goal = goal - start;
+    if (dir_to_goal == Vector2i_ZERO) {
+        return PackedVector2Array();
+    }
+
     HashMap<Vector2i, Vector2i> came;
     HashMap<Vector2i, int> g;
     HashMap<Vector2i, int> f;
-    HashMap<Vector2i, int> angle_bias;
+    HashMap<Vector2i, float> angle_bias;
     HashMap<Vector2i, Vector2i> last_dir;
 
     std::priority_queue<OpenNode, std::vector<OpenNode>, OpenNode::Cmp> open;
 
     g[start] = 0;
     f[start] = heuristic(start, goal);
-    angle_bias[start] = 0;
+    angle_bias[start] = 0.0f;
     last_dir[start] = dir_start;
 
     OpenNode start_node;
@@ -41,8 +49,6 @@ PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
             return reconstruct(came, current, start);
         }
 
-        Vector2i cur_to_goal = goal - current;
-
         Vector2i neighbors[4];
         neighbors4(current, neighbors);
 
@@ -59,22 +65,29 @@ PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
             }
 
             int tentative_g = g[current] + 1;
-            Vector2i dir_cell = clamp_to_4dir(current, n); // 步进后的单元格
-            int align_score = dir_cell.x * cur_to_goal.x + dir_cell.y * cur_to_goal.y; // 与脚本一致的对齐评分
+            
+            dir_to_goal = goal - n;
+            float align_cos = 0.0f;
+            if (dir_to_goal != Vector2i_ZERO) {
+                Vector2 dir_to_goal_norm = Vector2(dir_to_goal).normalized();
+                Vector2 dir_from_start_norm = Vector2(n - start).normalized();
+                align_cos = dir_from_start_norm.dot(dir_to_goal_norm);
+            }
 
-            Vector2i prev_dir_cell = last_dir.has(current) ? last_dir[current] : Vector2i();
-            bool is_turn = (prev_dir_cell != Vector2i() && dir_cell != Vector2i() && prev_dir_cell != dir_cell);
-            int turn_penalty = is_turn ? 1 : 0;
+            Vector2i dir = clamp_to_4dir(current, n); // 单位方向向量（4邻域）
+            Vector2i prev_dir = last_dir.has(current) ? last_dir[current] : Vector2i(0, 0);
+            bool is_turn = (prev_dir != Vector2i_ZERO && dir != Vector2i_ZERO && prev_dir != dir);
+            float turn_penalty = (current == start) ? (is_turn ? turn_weight : 0.0f) : (is_turn ? 0.0f : turn_weight);
 
-            int current_angle_acc = angle_bias.has(current) ? angle_bias[current] : 0;
-            int tentative_angle = current_angle_acc - align_score * 2 + turn_penalty;
+            float current_angle_acc = angle_bias.has(current) ? angle_bias[current] : 0.0f;
+            float tentative_angle = current_angle_acc - align_cos * align_weight + turn_penalty;
 
             bool better = false;
             int old_g = g.has(n) ? g[n] : (1 << 30);
             if (tentative_g < old_g) {
                 better = true;
             } else if (tentative_g == old_g) {
-                int old_angle = angle_bias.has(n) ? angle_bias[n] : (1 << 30);
+                float old_angle = angle_bias.has(n) ? angle_bias[n] : 1e9f;
                 if (tentative_angle < old_angle) {
                     better = true;
                 }
@@ -85,14 +98,14 @@ PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
                 g[n] = tentative_g;
                 f[n] = tentative_g + heuristic(n, goal);
                 angle_bias[n] = tentative_angle;
-                last_dir[n] = dir_cell; // 存格子坐标，与脚本一致
+                last_dir[n] = dir;
 
                 OpenNode new_node;
                 new_node.node = n;
                 new_node.f = f[n];
                 new_node.angle_bias = angle_bias[n];
                 new_node.parent = current;
-                new_node.parent_dir = prev_dir_cell; // 队列比较器将按脚本式直行偏好比较
+                new_node.parent_dir = prev_dir;
                 open.push(new_node);
             }
         }

@@ -15,7 +15,7 @@ func get_action_name() -> StringName:
 
 func get_area_chose_target(me: ActorController) -> Array[Vector2i]:
 	var center := me.base3d._cell
-	return GridHelper.get_skill_area_cells(_skill.area_chose, center, center, func(c):
+	return GridHelper.get_skill_area_cells(_skill.area_chose, center, center, me.get_facing_vector(), func(c):
 		if Game.g_combat.scene.ground_layer.get_cell_source_id(c) == -1:
 			return false	
 		return true
@@ -23,7 +23,7 @@ func get_area_chose_target(me: ActorController) -> Array[Vector2i]:
 
 func get_area_skill_range(me: ActorController, tar: Vector2i) -> Array[Vector2i]:
 	var org := me.base3d._cell
-	return GridHelper.get_skill_area_cells(_skill.area_range, org, tar, func(c):
+	return GridHelper.get_skill_area_cells(_skill.area_range, org, tar, me.get_facing_vector(), func(c):
 		if c == org:
 			return false
 		if Game.g_combat.scene.ground_layer.get_cell_source_id(c) == -1:

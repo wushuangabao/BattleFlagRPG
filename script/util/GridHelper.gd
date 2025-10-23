@@ -5,6 +5,9 @@ class_name GridHelper
 # 方向向量数组（顺时针排列）
 const DIRECTIONS = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 
+const ALIGN_WEIGHT := 0.02
+const TURN_WEIGHT := 0.001
+
 static var cell_size = Game.cell_pixel_size
 
 static func pos2d_to_3d(v: Vector2) -> Vector3:
@@ -66,24 +69,37 @@ static func heuristic(a: Vector2i, b: Vector2i) -> int:
 	return abs(a.x - b.x) + abs(a.y - b.y)
 
 static func a_star(start: Vector2i, goal: Vector2i, dir_start: Vector2i, is_walkable: Callable) -> Array[Vector2i]:
+	var dir_to_goal: Vector2i = goal - start
+	if dir_to_goal == Vector2i.ZERO:
+		return []
+
 	var open: Array[Vector2i] = [start]
 	var came := {} # node -> parent
 	var g := { start: 0 } # 实际代价
 	var f := { start: heuristic(start, goal) } # 估计总代价
-	var angle_bias := { start: 0 } # 对齐偏好代价累计
+	var angle_bias := { start: 0.0 } # 对齐偏好代价累计（浮点）
 	var last_dir := { start: dir_start } # 进入节点时的方向
+	var closed := {} # 关闭集：已处理节点
 	
 	var sort_func = func(a, b): #候选点的优先级
 		var fa = f.get(a, 1<<30)
 		var fb = f.get(b, 1<<30)
 		if fa != fb:
 			return fa < fb
-		var aa = angle_bias.get(a, 1<<30)
-		var ab = angle_bias.get(b, 1<<30)
+		var aa = angle_bias.get(a, 1e9)
+		var ab = angle_bias.get(b, 1e9)
 		if aa != ab:
 			return aa < ab
-		if last_dir.get(came[a], Vector2i.ZERO) == a - came[a]:
-			return true
+		var came_a: Vector2i = came.get(a, a)
+		var came_b: Vector2i = came.get(b, b)
+		var step_a: Vector2i = a - came_a
+		var step_b: Vector2i = b - came_b
+		var dir_a: Vector2i = last_dir.get(came_a, Vector2i.ZERO)
+		var dir_b: Vector2i = last_dir.get(came_b, Vector2i.ZERO)
+		var straight_a := (dir_a == step_a)
+		var straight_b := (dir_b == step_b)
+		if straight_a != straight_b:
+			return straight_a
 		return false
 			
 	while open.size() > 0:
@@ -92,23 +108,32 @@ static func a_star(start: Vector2i, goal: Vector2i, dir_start: Vector2i, is_walk
 		if current == goal:
 			return _reconstruct(came, current)
 		open.remove_at(0)
-		var cur_to_goal: Vector2i = goal - current
+		closed[current] = true
 		for n in neighbors4(current):
 			if not is_walkable.call(n): continue
 			var tentative_g = g[current] + 1
-			var dir = clamp_to_4dir(current, n)
-			var align_score = dir.x * cur_to_goal.x + dir.y * cur_to_goal.y # 对齐程度（越大越对齐）
+			dir_to_goal = goal - n
+			var align_cos: float = 0.0
+			if dir_to_goal != Vector2i.ZERO:
+				var dir_to_goal_norm: Vector2 = Vector2(dir_to_goal).normalized()
+				var dir_from_start_norm: Vector2 = Vector2(n - start).normalized()
+				align_cos = dir_from_start_norm.dot(dir_to_goal_norm)
+			var dir: Vector2i = clamp_to_4dir(current, n)
 			var prev_dir: Vector2i = last_dir.get(current, Vector2i.ZERO)
-			var is_turn := (prev_dir != Vector2i.ZERO and dir != Vector2i.ZERO and prev_dir != dir) # 是否转向了
-			var turn_penalty = 1 if is_turn else 0
-			var tentative_angle = angle_bias.get(current, 0) - align_score * 2 + turn_penalty
+			var is_turn := (prev_dir != Vector2i.ZERO and dir != Vector2i.ZERO and prev_dir != dir)
+			var turn_penalty: float = 0.0
+			if current != start:
+				turn_penalty = 0.0 if is_turn else TURN_WEIGHT
+			else:
+				turn_penalty = TURN_WEIGHT if is_turn else 0.0
+			var tentative_angle: float = angle_bias.get(current, 0.0) - align_cos * ALIGN_WEIGHT + turn_penalty
 			var better := false
 			var old_g = g.get(n, 1<<30)
 			if tentative_g < old_g:
 				better = true
 			elif tentative_g == old_g:
 				# 同步长下，引入角度偏好+拐弯惩罚
-				var old_angle = angle_bias.get(n, 1<<30)
+				var old_angle = angle_bias.get(n, 1e9)
 				if tentative_angle < old_angle:
 					better = true
 			if better:
@@ -117,15 +142,10 @@ static func a_star(start: Vector2i, goal: Vector2i, dir_start: Vector2i, is_walk
 				f[n] = tentative_g + heuristic(n, goal)
 				angle_bias[n] = tentative_angle
 				last_dir[n] = dir
+				if closed.has(n):
+					closed.erase(n)
 				if not n in open:
 					open.append(n)
-			#var tentative = g[current] + 1
-			#if tentative < g.get(n, 1<<30):
-				#came[n] = current
-				#g[n] = tentative
-				#f[n] = tentative + heuristic(n, goal)
-				#if not n in open:
-					#open.append(n)
 	return []
 
 static func _reconstruct(came: Dictionary, cur: Vector2i) -> Array[Vector2i]:
@@ -192,43 +212,21 @@ static func manhattan_area(center: Vector2i, r: int, check_func: Callable) -> Ar
 	return result
 
 # 生成从 origin 到 target 的离散网格路径，并筛选出到 origin 的曼哈顿距离在 [d_inner, d_outer] 区间内的所有点
-static func bresenham_points_in_manhattan_band(origin: Vector2i, target: Vector2i, d_inner: int, d_outer: int, check_func: Callable) -> Array[Vector2i]:
+static func bresenham_points_in_manhattan_band(origin: Vector2i, target: Vector2i, dir_start: Vector2i, d_inner: int, d_outer: int, check_func: Callable) -> Array[Vector2i]:
 	if d_outer < d_inner or d_inner < 0:
 		push_error("bresenham_points_in_manhattan_band：错误的参数！")
 		return []
+	var path: PackedVector2Array = Utils.a_star(origin, target, dir_start, check_func)
 	var result: Array[Vector2i] = []
-	var x0 := origin.x
-	var y0 := origin.y
-	var x1 := target.x
-	var y1 := target.y
-	var dx := absi(x1 - x0)
-	var sx := 1 if x0 < x1 else -1
-	var dy := -absi(y1 - y0)  # 注意：经典写法将 dy 设为负数并在误差项中使用
-	var sy := 1 if y0 < y1 else -1
-	var err := dx + dy  # 其中 dy 为负，即等价于 err = dx - abs(dy)
-	var x := x0
-	var y := y0
-	while true:
-		var manhattan := absi(x - x0) + absi(y - y0)
+	for i in range(path.size()):
+		var c: Vector2i = Vector2i(path[i].round())
+		var manhattan := absi(c.x - origin.x) + absi(c.y - origin.y)
 		if manhattan >= d_inner and manhattan <= d_outer:
-		# 如果你想排除起点，可用下面的判断替换上述 append 条件：
-		# if not (x == x0 and y == y0) and manhattan >= d_inner and manhattan <= d_outer:
-			var c = Vector2i(x, y)
-			if check_func.call(c):
-				result.append(c)
-		if x == x1 and y == y1:
-			break
-		var e2 := 2 * err
-		if e2 >= dy: # 误差够大，沿 x 方向迈步
-			err += dy
-			x += sx
-		if e2 <= dx: # 误差够小，沿 y 方向迈步
-			err += dx
-			y += sy
+			result.append(c)
 	return result
 
 # 计算技能范围，check_func 是一个 func(c: Vector2i) -> bool
-static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i, check_func: Callable) -> Array[Vector2i]:
+static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i, dir_start: Vector2i, check_func: Callable) -> Array[Vector2i]:
 	match area_data.shape_type:
 		SkillAreaShape.ShapeType.Single:
 			if area_data.is_blockable:
@@ -242,7 +240,7 @@ static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, ta
 			if area_data.is_blockable:
 				return [origin]  #todo
 			else:
-				return bresenham_points_in_manhattan_band(origin, target, area_data.d_inner, area_data.d_outer, check_func)
+				return bresenham_points_in_manhattan_band(origin, target, dir_start, area_data.d_inner, area_data.d_outer, check_func)
 		SkillAreaShape.ShapeType.Ring:
 			var res = manhattan_ring(target, area_data.d_outer, check_func)
 			for i in range(area_data.d_inner, area_data.d_outer):

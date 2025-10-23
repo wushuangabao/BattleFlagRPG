@@ -4,6 +4,7 @@
 #include "core/templates/hash_set.h"
 
 #include "core/math/vector2i.h"
+#include "core/math/vector2.h"
 #include "core/variant/variant.h"
 
 class AStarWithBias
@@ -50,7 +51,7 @@ private:
     struct OpenNode {
         Vector2i node;
         int f = 0;
-        int angle_bias = 0;
+        float angle_bias = 0.0f;
         Vector2i parent; // 父节点位置
         Vector2i parent_dir; // last_dir[parent]，用于 tie-break（更直优先）
 
