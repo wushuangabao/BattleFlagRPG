@@ -15,6 +15,9 @@ public:
         const Vector2i& goal,
         const Vector2i& dir_start,
         const Callable& is_walkable);
+    static PackedVector2Array a_star_no_check(const Vector2i& start,
+        const Vector2i& goal,
+        const Vector2i& dir_start);
 
 private:
     // 参考实现：曼哈顿启发
@@ -46,6 +49,13 @@ private:
     static PackedVector2Array reconstruct(const HashMap<Vector2i, Vector2i>& came,
         Vector2i current,
         const Vector2i& start);
+
+    // 共享实现（内部）：通过 do_check 控制是否调用 is_walkable
+    static PackedVector2Array a_star_impl(const Vector2i& start,
+        const Vector2i& goal,
+        const Vector2i& dir_start,
+        const Callable* is_walkable,
+        bool do_check);
 
     // 用于优先队列的条目
     struct OpenNode {

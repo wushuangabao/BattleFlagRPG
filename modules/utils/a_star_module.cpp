@@ -6,10 +6,12 @@ const float align_weight = 0.02f;
 const float turn_weight = 0.001f;
 const Vector2i Vector2i_ZERO = Vector2i(0, 0);
 
-PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
-                                         const Vector2i& goal,
-                                         const Vector2i& dir_start,
-                                         const Callable& is_walkable) {
+// 共享实现：通过 do_check 控制是否调用 is_walkable
+PackedVector2Array AStarWithBias::a_star_impl(const Vector2i& start,
+                                              const Vector2i& goal,
+                                              const Vector2i& dir_start,
+                                              const Callable* is_walkable,
+                                              bool do_check) {
     Vector2i dir_to_goal = goal - start;
     if (dir_to_goal == Vector2i_ZERO) {
         return PackedVector2Array();
@@ -55,13 +57,15 @@ PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
         for (int i = 0; i < 4; i++) {
             Vector2i n = neighbors[i];
 
-            Variant args[1] = { Variant(n) };
-            const Variant* argptrs[1] = { &args[0] };
-            Callable::CallError call_error;
-            Variant result;
-            is_walkable.callp(argptrs, 1, result, call_error);
-            if (call_error.error != Callable::CallError::CALL_OK || !result.operator bool()) {
-                continue;
+            // 邻居通行检查（可选）
+            if (do_check && is_walkable) {
+                Variant args[1] = { Variant(n) };
+                const Variant* argptrs[1] = { &args[0] };
+                Callable::CallError call_error;
+                Variant result;
+                is_walkable->callp(argptrs, 1, result, call_error);
+                if (call_error.error != Callable::CallError::CALL_OK || !result.operator bool())
+                    continue;
             }
 
             int tentative_g = g[current] + 1;
@@ -112,6 +116,19 @@ PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
     }
 
     return PackedVector2Array();
+}
+
+PackedVector2Array AStarWithBias::a_star_no_check(const Vector2i& start,
+                                                  const Vector2i& goal,
+                                                  const Vector2i& dir_start) {
+    return a_star_impl(start, goal, dir_start, nullptr, false);
+}
+
+PackedVector2Array AStarWithBias::a_star(const Vector2i& start,
+                                         const Vector2i& goal,
+                                         const Vector2i& dir_start,
+                                         const Callable& is_walkable) {
+    return a_star_impl(start, goal, dir_start, &is_walkable, true);
 }
 
 PackedVector2Array AStarWithBias::reconstruct(const HashMap<Vector2i, Vector2i>& came, Vector2i current, const Vector2i& start)

@@ -212,17 +212,72 @@ static func manhattan_area(center: Vector2i, r: int, check_func: Callable) -> Ar
 	return result
 
 # 生成从 origin 到 target 的离散网格路径，并筛选出到 origin 的曼哈顿距离在 [d_inner, d_outer] 区间内的所有点
-static func bresenham_points_in_manhattan_band(origin: Vector2i, target: Vector2i, dir_start: Vector2i, d_inner: int, d_outer: int, check_func: Callable) -> Array[Vector2i]:
+static func path_points_in_manhattan_ring(origin: Vector2i, target: Vector2i, dir_start: Vector2i, d_inner: int, d_outer: int, check_func: Callable, is_blockable: bool) -> Array[Vector2i]:
 	if d_outer < d_inner or d_inner < 0:
-		push_error("bresenham_points_in_manhattan_band：错误的参数！")
+		push_error("path_points_in_manhattan_ring：错误的参数！")
 		return []
-	var path: PackedVector2Array = Utils.a_star(origin, target, dir_start, check_func)
+	var path: PackedVector2Array = Utils.a_star_no_check(origin, target, dir_start)
 	var result: Array[Vector2i] = []
 	for i in range(path.size()):
 		var c: Vector2i = Vector2i(path[i].round())
 		var manhattan := absi(c.x - origin.x) + absi(c.y - origin.y)
-		if manhattan >= d_inner and manhattan <= d_outer:
+		if manhattan >= d_inner and manhattan <= d_outer and check_func.call(c):
 			result.append(c)
+			if is_blockable and Game.g_combat and Game.g_combat.get_actor_on_cell(c) != null:
+				return result
+	return result
+
+# 生成从 origin 开始、经过 target，终点到 origin 的曼哈顿距离为 d_outer 的路径，并筛选 [d_inner, d_outer] 的点
+static func path_via_target_to_manhattan_ring(origin: Vector2i, target: Vector2i, dir_start: Vector2i, d_inner: int, d_outer: int, check_func: Callable, is_blockable: bool) -> Array[Vector2i]:
+	if d_outer < d_inner or d_inner < 0:
+		push_error("path_via_target_to_manhattan_ring：错误的参数！")
+		return []
+	# 段1：origin -> target
+	var path1: PackedVector2Array = Utils.a_star_no_check(origin, target, dir_start)
+	# 计算终点（终点到 origin 的曼哈顿距离为 d_outer），沿 origin→target 的射线按比例分配 X/Y
+	var md_target := absi(target.x - origin.x) + absi(target.y - origin.y)
+	var end: Vector2i = target
+	if md_target != d_outer:
+		var d: Vector2i = target - origin
+		var ax := absi(d.x)
+		var ay := absi(d.y)
+		var sum := ax + ay
+		if sum == 0:
+			# origin == target，使用 dir_start 方向延伸
+			var sx := 0 if dir_start.x == 0 else (1 if dir_start.x > 0 else -1)
+			var sy := 0 if dir_start.y == 0 else (1 if dir_start.y > 0 else -1)
+			var steps_x_total := int(round(d_outer * absi(dir_start.x)))
+			var steps_y_total := d_outer - steps_x_total
+			end = origin + Vector2i(sx * steps_x_total, sy * steps_y_total)
+		else:
+			var sx := 0 if d.x == 0 else (1 if d.x > 0 else -1)
+			var sy := 0 if d.y == 0 else (1 if d.y > 0 else -1)
+			var steps_x_total := int(round(float(d_outer) * float(ax) / float(sum)))
+			var steps_y_total := d_outer - steps_x_total
+			end = origin + Vector2i(sx * steps_x_total, sy * steps_y_total)
+	# 段2：target -> end
+	var dir_start_ext: Vector2i = clamp_to_4dir(target, end)
+	if dir_start_ext == Vector2i.ZERO:
+		dir_start_ext = dir_start if dir_start != Vector2i.ZERO else Vector2i(1, 0)
+	var path2: PackedVector2Array = Utils.a_star_no_check(target, end, dir_start_ext)
+	# 合并路径并筛选 [d_inner, d_outer]
+	var result: Array[Vector2i] = []
+	for i in range(path1.size()):
+		var c: Vector2i = Vector2i(path1[i].round())
+		var manhattan := absi(c.x - origin.x) + absi(c.y - origin.y)
+		if manhattan >= d_inner and manhattan <= d_outer and check_func.call(c):
+			result.append(c)
+			if is_blockable and Game.g_combat and Game.g_combat.get_actor_on_cell(c) != null:
+				return result
+	var start_index := 1 if path2.size() > 0 else 0
+	for i in range(start_index, path2.size()):
+		var c: Vector2i = Vector2i(path2[i].round())
+		var manhattan := absi(c.x - origin.x) + absi(c.y - origin.y)
+		if manhattan >= d_inner and manhattan <= d_outer and check_func.call(c):
+			if result.size() == 0 or result[result.size() - 1] != c:
+				result.append(c)
+			if is_blockable and Game.g_combat and Game.g_combat.get_actor_on_cell(c) != null:
+				return result
 	return result
 
 # 计算技能范围，check_func 是一个 func(c: Vector2i) -> bool
@@ -237,10 +292,7 @@ static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, ta
 				else:
 					return manhattan_area(target, area_data.target_range, check_func)
 		SkillAreaShape.ShapeType.Line:
-			if area_data.is_blockable:
-				return [origin]  #todo
-			else:
-				return bresenham_points_in_manhattan_band(origin, target, dir_start, area_data.d_inner, area_data.d_outer, check_func)
+				return path_via_target_to_manhattan_ring(origin, target, dir_start, area_data.d_inner, area_data.d_outer, check_func, area_data.is_blockable)
 		SkillAreaShape.ShapeType.Ring:
 			var res = manhattan_ring(target, area_data.d_outer, check_func)
 			for i in range(area_data.d_inner, area_data.d_outer):
