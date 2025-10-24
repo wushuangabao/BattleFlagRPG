@@ -238,9 +238,12 @@ func _process(_delta: float) -> void:
 	if battle_state == BattleSystem.BattleState.ChoseActionTarget and my_system.cur_action and my_system.cur_actor:
 		if _cell_mouse_on:
 			if ground_layer.chose_area_cells.has(_cell_mouse_on):
-				ground_layer.highlight_cell(_cell_mouse_on, &"reachable")
 				var skill_range = my_system.cur_action.get_area_skill_range(my_system.cur_actor, _cell_mouse_on)
 				ground_layer.set_skill_area(skill_range)
+				if skill_range.has(_cell_mouse_on):
+					ground_layer.highlight_cell(_cell_mouse_on, &"reachable")
+				else:
+					ground_layer.highlight_cell(_cell_mouse_on, &"unreachable")
 				var targets := my_system.cur_action.get_targets_on_cells(skill_range, my_system.cur_actor)
 				for tar in _target_units:
 					if not targets.has(tar):

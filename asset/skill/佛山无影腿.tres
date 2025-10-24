@@ -24,7 +24,7 @@ shape_type = 1
 d_inner = 1
 d_outer = 3
 target_range = 0
-is_blockable = false
+is_blockable = true
 metadata/_custom_type_script = "uid://bnwylwjjqdr4h"
 
 [sub_resource type="Resource" id="Resource_7bw3o"]
