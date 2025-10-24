@@ -284,13 +284,17 @@ static func path_via_target_to_manhattan_ring(origin: Vector2i, target: Vector2i
 static func get_skill_area_cells(area_data: SkillAreaShape, origin: Vector2i, target: Vector2i, dir_start: Vector2i, check_func: Callable) -> Array[Vector2i]:
 	match area_data.shape_type:
 		SkillAreaShape.ShapeType.Single:
-			if area_data.is_blockable:
-				return [origin] #todo
+			if target != origin and area_data.is_blockable:
+				# 检查 origin 到 target 之间是否有其他单位阻挡
+				var path: PackedVector2Array = Utils.a_star_no_check(origin, target, dir_start)
+				for i in range(1, path.size() - 1):
+					var c: Vector2i = Vector2i(path[i].round())
+					if Game.g_combat and Game.g_combat.get_actor_on_cell(c) != null:
+						return []
+			if area_data.target_range == 0:
+				return [target]
 			else:
-				if area_data.target_range == 0:
-					return [target]
-				else:
-					return manhattan_area(target, area_data.target_range, check_func)
+				return manhattan_area(target, area_data.target_range, check_func)
 		SkillAreaShape.ShapeType.Line:
 				return path_via_target_to_manhattan_ring(origin, target, dir_start, area_data.d_inner, area_data.d_outer, check_func, area_data.is_blockable)
 		SkillAreaShape.ShapeType.Ring:
