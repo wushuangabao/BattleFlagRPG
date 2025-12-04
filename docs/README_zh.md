@@ -18,7 +18,9 @@ BattleFlagRPG 是一款战术角色扮演游戏，包含战棋战斗、剧情叙
 
 1.  [架构设计 (Architecture)](architecture_zh.md) - 游戏架构模式概览，包括服务定位器和系统注册。
 2.  [战斗系统 (Combat System)](combat_system_zh.md) - 深入解析回合制战斗逻辑、状态机、动作和效果。
-3.  [目录结构 (Folder Structure)](folder_structure_zh.md) - 项目目录结构和关键文件的说明。
+3.  [剧情系统 (Story System)](story_system_zh.md) - 解析 `StoryRunner`、`StoryGraph` 和可视化剧情编辑器。
+4.  [编辑器工具与插件 (Tools and Plugins)](tools_and_plugins_zh.md) - 介绍 `attribute_viewer` 和 `story_editor` 等自定义工具。
+5.  [目录结构 (Folder Structure)](folder_structure_zh.md) - 项目目录结构和关键文件的说明。
 
 ---
 [English Version](README.md)

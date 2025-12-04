@@ -18,7 +18,9 @@ BattleFlagRPG is a tactical role-playing game that features grid-based combat, a
 
 1.  [Architecture](architecture.md) - Overview of the game's architectural patterns, including the Service Locator and System registration.
 2.  [Combat System](combat_system.md) - Deep dive into the turn-based combat logic, state machine, actions, and effects.
-3.  [Folder Structure](folder_structure.md) - Explanation of the project's directory layout and key files.
+3.  [Story System](story_system.md) - Explanation of the `StoryRunner`, `StoryGraph`, and the visual Story Editor.
+4.  [Tools and Plugins](tools_and_plugins.md) - Details on custom editors like the `attribute_viewer` and `story_editor`.
+5.  [Folder Structure](folder_structure.md) - Explanation of the project's directory layout and key files.
 
 ---
 [中文版 (Chinese Version)](README_zh.md)
